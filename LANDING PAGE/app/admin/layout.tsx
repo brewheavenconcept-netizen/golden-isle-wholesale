@@ -26,7 +26,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     }, [user, loading, isAuthPage, router]);
 
     if (loading) {
-        return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-emerald-500">Loading...</div>;
+        return <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] flex items-center justify-center text-emerald-500">Loading...</div>;
     }
 
     if (!user && !isAuthPage) {
@@ -36,7 +36,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     // Auth pages (login/register) don't get the sidebar layout
     if (isAuthPage) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] transition-colors duration-300">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] transition-colors duration-300">
                 <main className="w-full">
                     <ErrorBoundary>
                         {children}
@@ -49,7 +49,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
     return (
         <NotificationsProvider storeId={storeId}>
-            <div className="flex min-h-screen bg-[#0a0a0a] transition-colors duration-300">
+            <div className="flex min-h-screen bg-slate-50 dark:bg-[#0a0a0a] transition-colors duration-300">
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main className="w-full min-w-0 ml-0 p-6 md:ml-64 mt-14 md:mt-0">
                     <ErrorBoundary>

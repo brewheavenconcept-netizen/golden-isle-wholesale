@@ -1,10 +1,10 @@
 import { Product, Order, StoreSettings } from '@/types';
 
 export const DEFAULT_SETTINGS: StoreSettings = {
-    store_name: 'BrewCart Pro',
+    store_name: 'Golden Isle Wholesale',
     whatsapp_number: '60123456789',
     currency: 'MYR',
-    theme_color: '#2563eb',
+    theme_color: '#d4af37',
     logo_url: '',
     timezone: 'Asia/Kuala_Lumpur',
     delivery_fee: 10.00,

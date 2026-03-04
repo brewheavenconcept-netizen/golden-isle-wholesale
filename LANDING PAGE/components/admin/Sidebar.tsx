@@ -8,7 +8,7 @@ import { useStore } from "@/context/StoreContext";
 import { useStore as useStoreData } from "@/hooks/useStore";
 import NotificationBell from "./NotificationBell";
 import { useNotifications } from "@/hooks/useNotifications";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import StoreSwitcher from "./StoreSwitcher";
@@ -22,7 +22,10 @@ export default function Sidebar({
 }) {
     const { settings } = useStore();
     const { store } = useStoreData();
-    const { theme, toggleTheme } = useTheme();
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => setMounted(true), []);
     const router = useRouter();
     const pathname = usePathname();
     const storeName = settings.store_name || "Golden Isle Wholesale";
@@ -149,12 +152,14 @@ export default function Sidebar({
                     </div>
                     <div className="flex items-center justify-between px-4 pt-4 pb-2 border-t border-slate-800">
                         <div className="text-slate-400 text-sm font-medium">Dark Mode</div>
-                        <button
-                            onClick={toggleTheme}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${theme === 'dark' ? 'bg-blue-500' : 'bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
+                        {mounted && (
+                            <button
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${theme === 'dark' ? 'bg-blue-500' : 'bg-slate-700'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        )}
                     </div>
                 </div>
 
