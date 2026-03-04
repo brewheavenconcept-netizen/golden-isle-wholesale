@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { Product } from '@/types';
 import toast from 'react-hot-toast';
-import VariantBuilder from '@/components/ui/VariantBuilder';
 import { addProduct, updateProduct, uploadProductImage } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 
@@ -21,8 +20,9 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const [formData, setFormData] = useState<Partial<Product>>({
-        name: '', price: 0, compare_at_price: 0, sku: '', stock: 1,
-        category: 'General', description: '', status: 'active', images: [], variants: [],
+        name: '', price: 0, sku: '', stock: 1,
+        category: 'Whisky', description: '', status: 'active', images: [], variants: [],
+        stock_status: 'in_stock',
     });
 
     useEffect(() => {
@@ -134,14 +134,19 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                         )}
                     </div>
 
-                    {/* PRODUCT VARIANTS */}
+                    {/* CATEGORY */}
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
-                        <h3 className="font-semibold text-slate-700 dark:text-gray-300">Product Variants</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400">Add variants like Size, Color, Material, etc.</p>
-                        <VariantBuilder
-                            value={formData.variants || []}
-                            onChange={(variants) => setFormData({ ...formData, variants })}
-                        />
+                        <h3 className="font-semibold text-slate-700 dark:text-gray-300">Category</h3>
+                        <select
+                            required
+                            className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                            value={formData.category}
+                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                        >
+                            <option value="Whisky">🥃 Whisky</option>
+                            <option value="Wine">🍷 Wine</option>
+                            <option value="Craft Beer">🍺 Craft Beer</option>
+                        </select>
                     </div>
                 </div>
 
@@ -149,11 +154,16 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Status</h3>
-                        <select className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
-                            value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as 'active' | 'draft' })}>
-                            <option value="active">Active</option>
-                            <option value="draft">Draft</option>
-                        </select>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Availability</label>
+                            <select className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                                value={formData.stock_status || 'in_stock'}
+                                onChange={e => setFormData({ ...formData, stock_status: e.target.value as any })}>
+                                <option value="in_stock">✅ In Stock</option>
+                                <option value="low_stock">⚠️ Low Stock</option>
+                                <option value="out_of_stock">❌ Out of Stock</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
@@ -168,34 +178,13 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                                 value={formData.price === 0 ? '' : formData.price}
                                 onChange={e => {
                                     const value = e.target.value;
-                                    // Allow empty string or valid numbers
                                     if (value === '' || !isNaN(Number(value))) {
                                         setFormData({ ...formData, price: value === '' ? 0 : parseFloat(value) });
                                     }
                                 }}
                                 onBlur={e => {
-                                    // Parse and clean up on blur
                                     const value = parseFloat(e.target.value) || 0;
                                     setFormData({ ...formData, price: value });
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Compare Price</label>
-                            <input
-                                type="text"
-                                inputMode="decimal"
-                                className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
-                                value={formData.compare_at_price === 0 ? '' : formData.compare_at_price || ''}
-                                onChange={e => {
-                                    const value = e.target.value;
-                                    if (value === '' || !isNaN(Number(value))) {
-                                        setFormData({ ...formData, compare_at_price: value === '' ? 0 : parseFloat(value) });
-                                    }
-                                }}
-                                onBlur={e => {
-                                    const value = parseFloat(e.target.value) || 0;
-                                    setFormData({ ...formData, compare_at_price: value });
                                 }}
                             />
                         </div>

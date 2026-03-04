@@ -84,7 +84,7 @@ export default function LoginPage() {
         try {
             const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
             if (authError) throw authError;
-            toast.success('Welcome back!');
+            toast.success('Welcome back! 🥃', { duration: 3000 });
             router.push('/admin/dashboard');
         } catch (err: any) {
             setError('Invalid email or password. Please try again.');

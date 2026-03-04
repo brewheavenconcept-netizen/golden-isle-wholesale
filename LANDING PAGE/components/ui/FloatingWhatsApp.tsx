@@ -1,8 +1,12 @@
 'use client';
 
 import { getWhatsAppLink } from '@/lib/config';
+import { usePathname } from 'next/navigation';
 
 export function FloatingWhatsApp() {
+    const pathname = usePathname();
+    if (pathname?.startsWith('/admin')) return null;
+
     const message = "Hi, I'd like to know more about Golden Isle Wholesale.";
     const link = getWhatsAppLink(message);
 

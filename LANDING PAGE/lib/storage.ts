@@ -10,15 +10,10 @@ import { DEFAULT_SETTINGS } from '@/data/mockData';
 
 // ── Products ─────────────────────────────────────────────────────────────────
 
-export async function getProducts(storeId: string): Promise<Product[]> {
-    if (!storeId) {
-        console.warn('[getProducts] No storeId provided — returning empty array');
-        return [];
-    }
+export async function getProducts(storeId?: string): Promise<Product[]> {
     const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('store_id', storeId)
         .order('created_at', { ascending: false });
     if (error) {
         console.error('[getProducts] Error:', error.message, error.code);
@@ -27,13 +22,11 @@ export async function getProducts(storeId: string): Promise<Product[]> {
     return data || [];
 }
 
-export async function getProduct(id: string, storeId: string): Promise<Product | null> {
-    if (!storeId) return null;
+export async function getProduct(id: string, storeId?: string): Promise<Product | null> {
     const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('id', id)
-        .eq('store_id', storeId)
         .single();
     if (error) {
         console.error('[getProduct] Error:', error.message);
@@ -58,13 +51,9 @@ export async function getProductPublic(id: string): Promise<Product | null> {
 
 export async function addProduct(
     product: Omit<Product, 'id' | 'created_at'>,
-    storeId: string
+    storeId?: string
 ): Promise<Product | null> {
-    if (!storeId) {
-        console.error('[addProduct] No storeId — aborting');
-        return null;
-    }
-    const payload = { ...product, store_id: storeId, status: product.status || 'active' };
+    const payload = { ...product, status: product.status || 'active' };
     const { data, error } = await supabase
         .from('products')
         .insert([payload])
@@ -80,24 +69,20 @@ export async function addProduct(
 export async function updateProduct(
     id: string,
     updates: Partial<Product>,
-    storeId: string
+    storeId?: string
 ): Promise<void> {
-    if (!storeId) { console.error('[updateProduct] No storeId — aborting'); return; }
     const { error } = await supabase
         .from('products')
         .update(updates)
-        .eq('id', id)
-        .eq('store_id', storeId);
+        .eq('id', id);
     if (error) console.error('[updateProduct] Error:', error.message);
 }
 
-export async function deleteProduct(id: string, storeId: string): Promise<void> {
-    if (!storeId) { console.error('[deleteProduct] No storeId — aborting'); return; }
+export async function deleteProduct(id: string, storeId?: string): Promise<void> {
     const { error } = await supabase
         .from('products')
         .delete()
-        .eq('id', id)
-        .eq('store_id', storeId);
+        .eq('id', id);
     if (error) console.error('[deleteProduct] Error:', error.message);
 }
 
