@@ -1,7 +1,7 @@
 'use client';
 
-import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck } from "lucide-react";
-import { useCallback } from "react";
+import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox } from "lucide-react";
+import { useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
@@ -26,6 +26,30 @@ export default function Sidebar({
     const router = useRouter();
     const pathname = usePathname();
     const storeName = settings.store_name || "Golden Isle Wholesale";
+    const [newInquiries, setNewInquiries] = useState(0);
+
+    useEffect(() => {
+        const fetchInquiriesCount = async () => {
+            const { count } = await supabase
+                .from('inquiries')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'new');
+            if (count !== null) setNewInquiries(count);
+        };
+        fetchInquiriesCount();
+
+        // Subscribe to changes
+        const subscription = supabase
+            .channel('inquiries_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, () => {
+                fetchInquiriesCount();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
+        };
+    }, []);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -38,20 +62,27 @@ export default function Sidebar({
         }
     }, [setSidebarOpen]);
 
-    const navItem = (href: string, label: string, Icon: any) => {
+    const navItem = (href: string, label: string, Icon: any, badge?: number) => {
         const isActive = pathname === href || pathname.startsWith(href + '/');
         return (
             <Link
                 href={href}
                 onClick={closeSidebarOnMobile}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border-l-2
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group border-l-2
                     ${isActive
                         ? "bg-gradient-to-r from-blue-600/20 to-transparent border-blue-500 text-white"
                         : "text-slate-400 hover:bg-white/5 hover:text-white border-transparent"
                     }`}
             >
-                <Icon size={20} className={`transition-transform duration-200 group-hover:scale-105 ${isActive ? "text-blue-400" : ""}`} />
-                <span className="text-sm font-medium">{label}</span>
+                <div className="flex items-center gap-3">
+                    <Icon size={20} className={`transition-transform duration-200 group-hover:scale-105 ${isActive ? "text-blue-400" : ""}`} />
+                    <span className="text-sm font-medium">{label}</span>
+                </div>
+                {badge !== undefined && badge > 0 && (
+                    <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {badge}
+                    </span>
+                )}
             </Link>
         );
     };
@@ -97,6 +128,7 @@ export default function Sidebar({
                 <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
                     <NotificationBell />
                     {navItem("/admin/dashboard", "Overview", LayoutDashboard)}
+                    {navItem("/admin/inquiries", "Inquiries", Inbox, newInquiries)}
                     {navItem("/admin/analytics", "Analytics", TrendingUp)}
                     {navItem("/admin/products", "Products", Package)}
                     {navItem("/admin/orders", "Orders", ShoppingBag)}
