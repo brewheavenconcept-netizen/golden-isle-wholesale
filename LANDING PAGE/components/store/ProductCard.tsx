@@ -76,9 +76,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <h3 className="font-bold text-[#1a1a1a] text-sm truncate group-hover:text-[#b8960c] transition-colors">{product.name}</h3>
                 <div className="flex items-center gap-2 mt-2">
                     <span className="text-lg font-bold text-[#1a1a1a]">RM {product.price.toFixed(2)}</span>
-                    {product.compare_at_price && product.compare_at_price > product.price && (
-                        <span className="text-sm font-medium text-slate-400 line-through">RM {product.compare_at_price.toFixed(2)}</span>
-                    )}
                 </div>
                 {isOutOfStock ? (
                     <span className="inline-block mt-2 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded">Out of Stock</span>

@@ -39,7 +39,7 @@ export default function ProductsSection() {
                 // Fetch active products from supabase
                 const { data, error } = await supabase
                     .from('products')
-                    .select('id, name, price, compare_at_price, image_url, category, stock_status, description')
+                    .select('id, name, price, image_url, category, stock_status, description')
                     .order('created_at', { ascending: false });
 
                 if (error) {
