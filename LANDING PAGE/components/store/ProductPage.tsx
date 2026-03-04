@@ -183,8 +183,8 @@ export default function ProductPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
 
                     {/* LEFT — Image */}
-                    <div className="sticky top-24">
-                        <div className={`relative aspect-square rounded-2xl overflow-hidden border border-[#1f1f1f] bg-[#111111] shadow-2xl shadow-black/60 ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+                    <div className="relative w-full lg:sticky lg:top-24">
+                        <div className={`relative w-full h-auto max-h-[400px] lg:max-h-none aspect-square rounded-2xl lg:overflow-hidden border border-[#1f1f1f] bg-[#111111] shadow-2xl shadow-black/60 ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                             {product.image_url ? (
                                 <>
                                     <img
