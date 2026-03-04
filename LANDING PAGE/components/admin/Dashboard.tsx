@@ -6,6 +6,7 @@ import { Product, Order } from '@/types';
 import { Package, ShoppingBag, DollarSign, TrendingUp, BarChart3, Clock, Calendar } from 'lucide-react';
 import Skeleton from '@/components/system/Skeleton';
 import { useStore } from '@/context/StoreContext';
+import { useTheme } from 'next-themes';
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -15,9 +16,11 @@ const PIE_COLORS = ['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'];
 
 export default function Dashboard() {
     const { storeId } = useStore();
+    const { theme } = useTheme();
     const [orders, setOrders] = useState<Order[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         if (!storeId) return;
@@ -113,10 +116,20 @@ export default function Dashboard() {
                         </h3>
                         <ResponsiveContainer width="100%" height={200}>
                             <LineChart data={dailyRevenue}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="#94a3b8" />
-                                <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" />
-                                <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} formatter={(v: any) => [`RM ${Number(v).toFixed(2)}`, 'Revenue']} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#333" : "#f1f5f9"} />
+                                <XAxis dataKey="date" tick={{ fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }} stroke={isDark ? "#333" : "#e2e8f0"} />
+                                <YAxis tick={{ fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }} stroke={isDark ? "#333" : "#e2e8f0"} />
+                                <Tooltip
+                                    contentStyle={{
+                                        borderRadius: 12,
+                                        border: 'none',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                        backgroundColor: isDark ? '#1a1a1a' : '#fff',
+                                        color: isDark ? '#fff' : '#000'
+                                    }}
+                                    itemStyle={{ color: isDark ? '#fff' : '#000' }}
+                                    formatter={(v: any) => [`RM ${Number(v).toFixed(2)}`, 'Revenue']}
+                                />
                                 <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6' }} />
                             </LineChart>
                         </ResponsiveContainer>
@@ -130,10 +143,19 @@ export default function Dashboard() {
                         ) : (
                             <ResponsiveContainer width="100%" height={200}>
                                 <BarChart data={topProducts}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#94a3b8" />
-                                    <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" />
-                                    <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#333" : "#f1f5f9"} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: isDark ? "#94a3b8" : "#64748b" }} stroke={isDark ? "#333" : "#e2e8f0"} />
+                                    <YAxis tick={{ fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }} stroke={isDark ? "#333" : "#e2e8f0"} />
+                                    <Tooltip
+                                        contentStyle={{
+                                            borderRadius: 12,
+                                            border: 'none',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                            backgroundColor: isDark ? '#1a1a1a' : '#fff',
+                                            color: isDark ? '#fff' : '#000'
+                                        }}
+                                        itemStyle={{ color: isDark ? '#fff' : '#000' }}
+                                    />
                                     <Bar dataKey="sales" fill="#10b981" radius={[6, 6, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
