@@ -81,8 +81,8 @@ export default function InquiriesDashboard() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Inquiries</h1>
-                    <p className="text-slate-400 text-sm mt-1">Manage wholesale pricing requests and messages from the Landing Page CTA.</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Inquiries</h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage wholesale pricing requests and messages from the Landing Page CTA.</p>
                 </div>
 
                 <div className="relative w-full md:w-64">
@@ -92,27 +92,27 @@ export default function InquiriesDashboard() {
                         placeholder="Search by business or email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
                     />
                 </div>
             </div>
 
-            <div className="bg-slate-900 rounded-xl border border-slate-800 shadow-xl overflow-hidden">
+            <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors">
                 {loading ? (
                     <div className="p-12 flex justify-center items-center">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
                     </div>
                 ) : inquiries.length === 0 ? (
                     <div className="p-12 text-center">
-                        <Inbox className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-white mb-2">No inquiries yet</h3>
-                        <p className="text-slate-400">When potential wholesale clients submit the "Get Catalog" form, they will appear here.</p>
+                        <Inbox className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No inquiries yet</h3>
+                        <p className="text-slate-500 dark:text-slate-400">When potential wholesale clients submit the "Get Catalog" form, they will appear here.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-800/50 border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                                     <th className="p-4">Date</th>
                                     <th className="p-4">Business</th>
                                     <th className="p-4">Contact</th>
@@ -120,17 +120,17 @@ export default function InquiriesDashboard() {
                                     <th className="p-4">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800 text-sm text-slate-300">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm text-slate-700 dark:text-slate-300">
                                 {filteredInquiries.map((inquiry) => (
                                     <React.Fragment key={inquiry.id}>
-                                        <tr className={`hover:bg-slate-800/20 transition-colors ${inquiry.status === 'new' ? 'bg-blue-500/5' : ''}`}>
+                                        <tr className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors ${inquiry.status === 'new' ? 'bg-blue-50 dark:bg-blue-500/5' : ''}`}>
                                             <td className="p-4 whitespace-nowrap">
                                                 {new Date(inquiry.created_at).toLocaleDateString()}
                                                 <div className="text-xs text-slate-500">{new Date(inquiry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                             </td>
                                             <td className="p-4">
-                                                <div className="font-medium text-white">{inquiry.business_name}</div>
-                                                <div className="text-xs text-slate-400">{inquiry.email}</div>
+                                                <div className="font-medium text-slate-900 dark:text-white">{inquiry.business_name}</div>
+                                                <div className="text-xs text-slate-500 dark:text-slate-400">{inquiry.email}</div>
                                             </td>
                                             <td className="p-4">
                                                 <div>{inquiry.contact_person || '—'}</div>
@@ -140,7 +140,7 @@ export default function InquiriesDashboard() {
                                                 <select
                                                     value={inquiry.status}
                                                     onChange={e => updateStatus(inquiry.id, e.target.value)}
-                                                    className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
                                                 >
                                                     <option value="new">New</option>
                                                     <option value="contacted">Contacted</option>
@@ -166,12 +166,12 @@ export default function InquiriesDashboard() {
                                         </tr>
                                         {/* Expanded Row for Message */}
                                         {expandedRow === inquiry.id && (
-                                            <tr className="bg-slate-800/30">
+                                            <tr className="bg-slate-50 dark:bg-slate-800/30">
                                                 <td colSpan={5} className="p-4 border-l-4 border-blue-500">
                                                     <div className="pl-2">
                                                         <h4 className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Message Content</h4>
-                                                        <p className="text-white text-sm whitespace-pre-wrap leading-relaxed">
-                                                            {inquiry.message || <span className="text-slate-500 italic">No message provided.</span>}
+                                                        <p className="text-slate-700 dark:text-white text-sm whitespace-pre-wrap leading-relaxed">
+                                                            {inquiry.message || <span className="text-slate-400 dark:text-slate-500 italic">No message provided.</span>}
                                                         </p>
                                                     </div>
                                                 </td>
