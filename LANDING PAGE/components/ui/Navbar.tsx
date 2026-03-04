@@ -3,17 +3,29 @@
 import Link from "next/link";
 import { Menu, MessageCircle, GlassWater, X, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getWhatsAppLink } from '@/lib/config';
 
 export function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navLinks = [
-        { name: "Whisky", href: "#products" },
-        { name: "Wine", href: "#products" },
-        { name: "Craft Beer", href: "#products" }
+        { name: "Home", href: "#" },
+        { name: "Products", href: "#products" },
+        { name: "About", href: "#about" },
+        { name: "Contact", href: "#contact" }
     ];
+
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isMobileMenuOpen]);
 
     return (
         <motion.nav
@@ -87,7 +99,7 @@ export function Navbar() {
                         </Link>
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-[#1a1a1a] hover:text-[#b8960c] p-1 transition-colors"
+                            className="text-[#1a1a1a] hover:text-[#b8960c] p-2 transition-colors flex items-center justify-center min-w-[44px] min-h-[44px]"
                             aria-label="Toggle Menu"
                         >
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

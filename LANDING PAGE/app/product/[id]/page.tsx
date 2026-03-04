@@ -1,9 +1,46 @@
-'use client';
-
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+import { Metadata } from 'next';
+import ProductPage from '@/components/store/ProductPage';
 
-const ProductPage = lazy(() => import('@/components/store/ProductPage'));
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+
+    const { data } = await supabase
+        .from('products')
+        .select('name, description, image_url')
+        .eq('id', params.id)
+        .single();
+
+    if (!data) {
+        return {
+            title: 'Product Not Found | Golden Isle Wholesale'
+        };
+    }
+
+    const defaultDesc = "Premium wholesale supplier of whisky, wine, and craft beer. Duty-free prices for businesses in Malaysia.";
+    const description = data.description ? data.description.substring(0, 160) : defaultDesc;
+
+    return {
+        title: `${data.name} | Golden Isle Wholesale`,
+        description: description,
+        openGraph: {
+            title: `${data.name} | Golden Isle Wholesale`,
+            description: description,
+            type: 'website',
+            images: data.image_url ? [{ url: data.image_url }] : [],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${data.name} | Golden Isle Wholesale`,
+            description: description,
+        }
+    };
+}
 
 export default function ProductRoute() {
     return (

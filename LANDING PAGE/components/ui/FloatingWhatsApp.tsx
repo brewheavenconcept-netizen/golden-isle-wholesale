@@ -11,7 +11,7 @@ export function FloatingWhatsApp() {
             href={link}
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-[9999] w-14 h-14 bg-[#25D366] hover:bg-[#20BD5A] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30 transition-all duration-300 hover:scale-110 animate-fade-in group"
+            className="fixed bottom-5 right-5 md:bottom-6 md:right-6 z-[9999] w-14 h-14 bg-[#25D366] hover:bg-[#20BD5A] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30 transition-all duration-300 hover:scale-110 animate-fade-in group"
             aria-label="Chat on WhatsApp"
         >
             {/* Subtle pulse effect on load */}
