@@ -61,37 +61,37 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isOutOfStock = product.stock_status === 'out_of_stock' || product.stock <= 0;
 
     return (
-        <Link href={`/product/${product.id}`} className={`group bg-[#1a1a2e] rounded-2xl overflow-hidden border border-white/5 shadow-sm transition-all duration-300 ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_8px_30px_rgba(212,168,83,0.3)] hover:border-[#d4a853]'}`}>
-            <div className="aspect-square bg-[#0a0a14] flex items-center justify-center overflow-hidden relative">
+        <Link href={`/product/${product.id}`} className={`group bg-white rounded-2xl overflow-hidden border border-[#e8e4dd] shadow-sm transition-all duration-300 ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_8px_30px_rgba(212,168,83,0.3)] hover:border-[#d4a853]'}`}>
+            <div className="aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative">
                 {imageUrl ? (
                     <>
                         <img
                             src={imageUrl}
                             alt={product.name}
                             loading="lazy"
-                            className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500"
+                            className="w-[85%] h-[85%] object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                             onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                                 const sibling = e.currentTarget.nextElementSibling as HTMLElement | null;
                                 if (sibling) sibling.classList.remove('hidden');
                             }}
                         />
-                        <div className="hidden absolute inset-0 w-full h-full flex items-center justify-center bg-[#1a1a2e]">
+                        <div className="hidden absolute inset-0 w-full h-full flex items-center justify-center bg-[#fafaf7]">
                             {getCategoryPlaceholder()}
                         </div>
                     </>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#1a1a2e]">
+                    <div className="w-full h-full flex items-center justify-center bg-[#fafaf7]">
                         {getCategoryPlaceholder()}
                     </div>
                 )}
             </div>
-            <div className="p-4 border-t border-white/5">
-                <h3 className="font-bold text-white text-sm truncate group-hover:text-[#d4a853] transition-colors">{product.name}</h3>
+            <div className="p-4 border-t border-[#fafaf7]">
+                <h3 className="font-bold text-[#1a1a1a] text-sm truncate group-hover:text-[#b8960c] transition-colors">{product.name}</h3>
                 <div className="flex items-center gap-2 mt-2">
-                    <span className="text-lg font-bold text-[#d4a853]">RM {product.price.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-[#1a1a1a]">RM {product.price.toFixed(2)}</span>
                     {product.compare_at_price && product.compare_at_price > product.price && (
-                        <span className="text-sm font-medium text-[#6b6b6b] line-through">RM {product.compare_at_price.toFixed(2)}</span>
+                        <span className="text-sm font-medium text-slate-400 line-through">RM {product.compare_at_price.toFixed(2)}</span>
                     )}
                 </div>
                 {isOutOfStock ? (
