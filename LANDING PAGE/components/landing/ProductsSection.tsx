@@ -7,13 +7,13 @@ import ProductCard from '@/components/store/ProductCard';
 import { ShoppingBag, Loader2, Search, X } from 'lucide-react';
 import { usePublicStore } from '@/hooks/usePublicStore';
 
-const filterCategories = ['All', 'Whisky', 'Wine', 'Craft Beer'];
+const filterCategories = ['Whisky', 'Wine', 'Craft Beer'];
 
 export default function ProductsSection() {
     const { storeId, loading: storeLoading } = usePublicStore();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState('Whisky');
 
     useEffect(() => {
         // Initialize Supabase Client
@@ -71,13 +71,10 @@ export default function ProductsSection() {
         return () => window.removeEventListener('filterCategory', handleFilter as EventListener);
     }, []);
 
-    const categories = ['All', 'Whisky', 'Wine', 'Craft Beer'];
+    const categories = ['Whisky', 'Wine', 'Craft Beer'];
 
     const filteredProducts = useMemo(() => {
-        return products.filter(p => {
-            const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-            return matchesCategory;
-        });
+        return products.filter(p => p.category === selectedCategory);
     }, [products, selectedCategory]);
 
     if (loading || storeLoading) {
@@ -139,7 +136,7 @@ export default function ProductsSection() {
                         `}} />
                         <div className="flex gap-6 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#1f1f1f] items-end">
                             {categories.map((cat, index) => {
-                                const count = cat === 'All' ? products.length : products.filter(p => p.category === cat).length;
+                                const count = products.filter(p => p.category === cat).length;
                                 const isActive = selectedCategory === cat;
 
                                 let btnStyle = '';
@@ -160,11 +157,6 @@ export default function ProductsSection() {
                                         ? 'bg-[#B8860B] text-white shadow-md shadow-[#B8860B]/30 border border-transparent font-bold'
                                         : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#B8860B]/50 hover:bg-yellow-50';
                                     badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
-                                } else {
-                                    btnStyle = isActive
-                                        ? 'bg-[#d4a853] text-[#0a0a0a] shadow-md shadow-[#d4a853]/30 border border-transparent font-bold hover:bg-[#c9a84c]'
-                                        : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#d4a853]/50 hover:bg-amber-50';
-                                    badgeStyle = isActive ? 'bg-[#0a0a0a]/20 text-[#0a0a0a]' : 'bg-gray-100 text-gray-600';
                                 }
 
                                 // Beverage SVG icons per category
@@ -249,17 +241,9 @@ export default function ProductsSection() {
                 {filteredProducts.length === 0 ? (
                     <div key="empty" className="text-center py-24 text-slate-500 bg-[#fafaf7] rounded-3xl border border-[#e8e4dd]" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
                         <p className="text-xl font-medium text-[#1a1a1a] mb-2">
-                            {selectedCategory !== 'All' ? 'No products in this category yet' : 'No products found'}
+                            No products in this category yet
                         </p>
                         <p className="text-sm">Try exploring our other categories.</p>
-                        {selectedCategory !== 'All' && (
-                            <button suppressHydrationWarning
-                                onClick={() => setSelectedCategory('All')}
-                                className="mt-6 px-8 py-3 bg-[#d4a853] text-[#0a0a0a] rounded-full text-sm font-bold hover:bg-[#c9a84c] transition-colors shadow-lg shadow-[#d4a853]/20"
-                            >
-                                Show All Products
-                            </button>
-                        )}
                     </div>
                 ) : (
                     <div key={selectedCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
