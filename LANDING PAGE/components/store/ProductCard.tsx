@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Product } from '@/types';
-import { Package, Wine, Beer, GlassWater } from 'lucide-react';
+import { Package } from 'lucide-react';
+import { WhiskyIcon, WineIcon, BeerIcon, AllCategoryIcon } from '@/components/icons';
 
 interface ProductCardProps {
     product: Product;
@@ -15,43 +16,28 @@ export default function ProductCard({ product }: ProductCardProps) {
         if (cat.includes('wine')) return (
             <div className="flex flex-col items-center z-10 relative">
                 <div className="absolute inset-0 bg-[#722F37]/20 blur-2xl rounded-full" />
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#722F37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 drop-shadow-[0_0_8px_rgba(114,47,55,0.5)] relative z-10">
-                    <path d="M8 22h8" />
-                    <path d="M7 10h10" />
-                    <path d="M12 15v7" />
-                    <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z" />
-                </svg>
+                <WineIcon size={56} className="opacity-90 drop-shadow-[0_0_8px_rgba(114,47,55,0.5)] relative z-10" />
                 <span className="text-[10px] font-bold mt-4 uppercase tracking-widest text-[#722F37] relative z-10">NO IMAGE</span>
             </div>
         );
         if (cat.includes('beer')) return (
             <div className="flex flex-col items-center z-10 relative">
                 <div className="absolute inset-0 bg-[#B8860B]/20 blur-2xl rounded-full" />
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#B8860B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 drop-shadow-[0_0_8px_rgba(184,134,11,0.5)] relative z-10">
-                    <path d="M17 11h1.2a3.24 3.24 0 0 1 3.18 3.18O21.38 18 21.38 18a3.24 3.24 0 0 1-3.18 3.18H17" />
-                    <path d="m5 8 2 14h10l2-14" />
-                    <path d="M7 8S6 2 12 2s5 6 5 6" />
-                </svg>
+                <BeerIcon size={56} className="opacity-90 drop-shadow-[0_0_8px_rgba(184,134,11,0.5)] relative z-10" />
                 <span className="text-[10px] font-bold mt-4 uppercase tracking-widest text-[#B8860B] relative z-10">NO IMAGE</span>
             </div>
         );
         if (cat.includes('whisky')) return (
             <div className="flex flex-col items-center z-10 relative">
                 <div className="absolute inset-0 bg-[#92400e]/20 blur-2xl rounded-full" />
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 drop-shadow-[0_0_8px_rgba(146,64,14,0.5)] relative z-10">
-                    <path d="M10 2v7.51" />
-                    <path d="M14 2v7.51" />
-                    <rect x="5" y="9" width="14" height="13" rx="2" />
-                    <path d="M8 2h8" />
-                    <path d="M5 14h14" />
-                </svg>
+                <WhiskyIcon size={56} className="opacity-90 drop-shadow-[0_0_8px_rgba(146,64,14,0.5)] relative z-10" />
                 <span className="text-[10px] font-bold mt-4 uppercase tracking-widest text-[#92400e] relative z-10">NO IMAGE</span>
             </div>
         );
         return (
             <div className="flex flex-col items-center z-10 relative">
                 <div className="absolute inset-0 bg-[#d4a853]/20 blur-2xl rounded-full" />
-                <Package size={56} className="text-[#d4a853] opacity-90 drop-shadow-[0_0_8px_rgba(212,168,83,0.5)] relative z-10" />
+                <AllCategoryIcon size={56} className="text-[#d4a853] opacity-90 drop-shadow-[0_0_8px_rgba(212,168,83,0.5)] relative z-10" />
                 <span className="text-[10px] font-bold mt-4 uppercase tracking-widest text-[#d4a853] relative z-10">NO IMAGE</span>
             </div>
         );
