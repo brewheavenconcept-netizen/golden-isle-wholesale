@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft, Package, Loader2, Wine, Beer, GlassWater, MessageCircle, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { WHATSAPP_NUMBER } from '@/lib/config';
 
 type Product = {
     id: string;
@@ -18,7 +19,7 @@ type Product = {
     created_at: string;
 };
 
-const WHATSAPP_NUMBER = '60123456789'; // Replace with real number when provided
+
 
 export default function ProductPage() {
     const params = useParams();

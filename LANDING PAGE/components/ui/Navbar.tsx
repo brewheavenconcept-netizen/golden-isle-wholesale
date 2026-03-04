@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, MessageCircle, GlassWater, X, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { getWhatsAppLink } from '@/lib/config';
 
 export function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,7 +63,7 @@ export function Navbar() {
                                 Login
                             </motion.button>
                         </Link>
-                        <Link href="https://wa.me/" target="_blank" rel="noopener noreferrer">
+                        <Link href={getWhatsAppLink('Hi, I\'m interested in Golden Isle Wholesale products. Can you share your catalog?')} target="_blank" rel="noopener noreferrer">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -116,7 +117,7 @@ export function Navbar() {
                                 </Link>
                             ))}
                             <div className="pt-4 flex flex-col gap-3">
-                                <Link href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="w-full">
+                                <Link href={getWhatsAppLink('Hi, I\'m interested in Golden Isle Wholesale products. Can you share your catalog?')} target="_blank" rel="noopener noreferrer" className="w-full">
                                     <button className="w-full bg-[#b8960c] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg">
                                         <MessageCircle className="w-5 h-5" /> WhatsApp Us
                                     </button>

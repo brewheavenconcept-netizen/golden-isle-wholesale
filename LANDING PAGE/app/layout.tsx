@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
+import { FloatingWhatsApp } from '@/components/ui/FloatingWhatsApp';
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster position="top-right" />
+          <FloatingWhatsApp />
         </ThemeProvider>
       </body>
     </html>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MessageCircle, Clock, MapPin, Instagram, Facebook, GlassWater } from "lucide-react";
+import { getWhatsAppLink, WHATSAPP_NUMBER } from '@/lib/config';
 
 export function Footer() {
     return (
@@ -29,7 +30,7 @@ export function Footer() {
                         <div className="flex gap-4">
                             <Link
                                 className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#b8960c] hover:text-white transition-colors"
-                                href="https://wa.me/"
+                                href={getWhatsAppLink('Hi, I\'m interested in Golden Isle Wholesale products. Can you share your catalog?')}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -83,7 +84,7 @@ export function Footer() {
                                 <MessageCircle className="w-5 h-5 text-[#b8960c] shrink-0" />
                                 <div>
                                     <div className="font-medium text-slate-300">WhatsApp Sales</div>
-                                    <Link href="https://wa.me/6087123456" className="hover:text-[#b8960c] transition-colors">+60 87 123 456</Link>
+                                    <Link href={getWhatsAppLink('Hi, I\'m interested in Golden Isle Wholesale products. Can you share your catalog?')} target="_blank" rel="noopener noreferrer" className="hover:text-[#b8960c] transition-colors">+{WHATSAPP_NUMBER}</Link>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3 text-slate-400">

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowDown, MessageCircle, Beer, Droplets, Wine, CheckCircle2, GlassWater } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getWhatsAppLink } from '@/lib/config';
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -82,7 +83,7 @@ export function HeroSection() {
                                     Browse Products <ArrowDown className="w-5 h-5" />
                                 </motion.button>
                             </Link>
-                            <Link href="https://wa.me/" target="_blank">
+                            <Link href={getWhatsAppLink('Hi, I\'m interested in Golden Isle Wholesale products. Can you share your catalog?')} target="_blank">
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
