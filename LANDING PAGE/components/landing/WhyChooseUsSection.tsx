@@ -1,92 +1,174 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Tag, Truck, MousePointerClick } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
+// ── Feature buttons data ─────────────────────────────────────────────────────
 const features = [
     {
-        icon: Tag,
-        title: "Wholesale Pricing",
-        description: "Best prices for bulk orders. Maximize your margins with our competitive wholesale rates on premium beverages.",
+        emoji: "🥃",
+        title: "Premium Brands",
+        subtitle: "Curated selection of duty-free whisky, wine & craft beer",
+        targetId: "products",
     },
     {
-        icon: Truck,
-        title: "Fast Delivery",
-        description: "Next-day delivery across Sabah. Reliable supply chain so you never run out of stock during peak hours.",
+        emoji: "🚚",
+        title: "Next-Day Delivery",
+        subtitle: "Fast & reliable delivery across Sabah",
+        targetId: "inquiry",
     },
     {
-        icon: MousePointerClick,
-        title: "Easy Ordering",
-        description: "Order online, pay on delivery or bank transfer. A seamless digital ordering experience built for businesses.",
+        emoji: "📦",
+        title: "Bulk Orders Welcome",
+        subtitle: "Competitive wholesale pricing for your business",
+        targetId: "inquiry",
     },
 ];
 
-const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-        },
-    },
-};
+// ── Stats data ────────────────────────────────────────────────────────────────
+const stats = [
+    { end: 1000, suffix: "+", label: "Products Available" },
+    { end: 500, suffix: "+", label: "Happy Clients" },
+    { end: 24, suffix: "hr", label: "Delivery Time" },
+    { end: 100, suffix: "%", label: "Authentic Guaranteed" },
+];
 
-const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+// ── Smooth scroll helper ─────────────────────────────────────────────────────
+function scrollToSection(id: string) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+}
 
-export function WhyChooseUsSection() {
+// ── useCountUp hook ───────────────────────────────────────────────────────────
+function useCountUp(end: number, duration = 2000, triggered: boolean) {
+    const [count, setCount] = useState(0);
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (!triggered || hasRun.current) return;
+        hasRun.current = true;
+
+        const startTime = performance.now();
+        const step = (now: number) => {
+            const elapsed = Math.min(now - startTime, duration);
+            const progress = elapsed / duration;
+            // ease-out quad
+            const eased = 1 - (1 - progress) * (1 - progress);
+            setCount(Math.floor(eased * end));
+            if (elapsed < duration) requestAnimationFrame(step);
+            else setCount(end);
+        };
+        requestAnimationFrame(step);
+    }, [triggered, end, duration]);
+
+    return count;
+}
+
+// ── Single stat item ─────────────────────────────────────────────────────────
+function StatItem({ end, suffix, label, triggered }: { end: number; suffix: string; label: string; triggered: boolean }) {
+    const count = useCountUp(end, 2000, triggered);
     return (
-        <section className="py-24 bg-white relative overflow-hidden" id="about">
-            <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-amber-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+        <div className="flex flex-col items-center text-center px-4">
+            <span className="text-4xl md:text-5xl font-bold text-[#d4a853] leading-none">
+                {count}{suffix}
+            </span>
+            <span className="mt-2 text-xs md:text-sm font-semibold tracking-widest uppercase text-[#6b6b6b]">
+                {label}
+            </span>
+        </div>
+    );
+}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16"
-                >
-                    <span className="text-emerald-500 text-sm font-semibold tracking-wider uppercase bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full">
-                        Why Choose Us
+// ── Main section ─────────────────────────────────────────────────────────────
+export function WhyChooseUsSection() {
+    const statsRef = useRef<HTMLDivElement>(null);
+    const [statsTriggered, setStatsTriggered] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setStatsTriggered(true);
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.3 }
+        );
+        if (statsRef.current) observer.observe(statsRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <section id="about" className="bg-[#0a0a0a] py-20 md:py-28 relative overflow-hidden">
+
+            {/* Ambient gold glows */}
+            <div className="pointer-events-none absolute top-0 left-1/4 w-96 h-96 bg-[#d4a853]/5 blur-[120px] rounded-full" />
+            <div className="pointer-events-none absolute bottom-0 right-1/4 w-96 h-96 bg-[#d4a853]/5 blur-[120px] rounded-full" />
+
+            <div className="max-w-6xl mx-auto px-4 relative z-10">
+
+                {/* ── Heading ── */}
+                <div className="text-center mb-14">
+                    <span className="inline-block mb-4 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border border-[#d4a853]/30 text-[#d4a853] bg-[#d4a853]/5">
+                        Why Choose Golden Isle
                     </span>
-                    <h2 className="mt-6 text-3xl md:text-5xl font-bold text-white">
-                        Built for Business Reliability
+                    <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+                        Built for Business{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4a853] to-[#c9a84c]">
+                            Reliability
+                        </span>
                     </h2>
-                    <p className="mt-4 text-slate-400 max-w-2xl mx-auto text-lg">
-                        We understand the demands of running a bar, restaurant, or event space. That&apos;s why we focus on what matters most.
+                    <p className="mt-4 text-[#6b6b6b] max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+                        We understand the demands of running a bar, restaurant, or event space.
+                        That&apos;s why we focus on what matters most.
                     </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
-                >
-                    {features.map((feature, index) => (
-                        <motion.div
-                            key={index}
-                            variants={fadeInUp}
-                            className="bg-[#111111] p-8 rounded-3xl border border-white/5 hover:border-emerald-500/30 transition-colors group relative overflow-hidden"
+                {/* ── Feature Buttons ── */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-16">
+                    {features.map((f) => (
+                        <button
+                            key={f.title}
+                            onClick={() => scrollToSection(f.targetId)}
+                            className="group text-left bg-[#111827] border border-[#d4a853]/20 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:scale-[1.02] hover:border-[#d4a853]/60 hover:shadow-[0_8px_32px_rgba(212,168,83,0.18)] active:scale-[0.98] cursor-pointer"
                         >
-                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <feature.icon className="w-32 h-32 text-emerald-500 -mt-10 -mr-10 rotate-12" />
+                            <div className="flex items-start gap-4">
+                                <span className="text-4xl leading-none select-none">{f.emoji}</span>
+                                <div>
+                                    <h3 className="text-base md:text-lg font-bold text-white group-hover:text-[#d4a853] transition-colors duration-200">
+                                        {f.title}
+                                    </h3>
+                                    <p className="mt-1 text-sm text-[#6b6b6b] leading-relaxed">
+                                        {f.subtitle}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-                                <feature.icon className="w-7 h-7" />
+                            <div className="mt-4 flex items-center gap-1 text-[#d4a853]/50 group-hover:text-[#d4a853] transition-colors duration-200 text-xs font-semibold uppercase tracking-widest">
+                                Learn more
+                                <svg className="w-3 h-3 translate-x-0 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-3">
-                                {feature.title}
-                            </h3>
-                            <p className="text-slate-400 leading-relaxed">
-                                {feature.description}
-                            </p>
-                        </motion.div>
+                        </button>
                     ))}
-                </motion.div>
+                </div>
+
+                {/* ── Stats Bar ── */}
+                <div
+                    ref={statsRef}
+                    className="rounded-2xl border border-[#d4a853]/15 bg-[#0f0f14] overflow-hidden"
+                >
+                    <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 divide-x-0 md:divide-x divide-[#d4a853]/10">
+                        {stats.map((s, i) => (
+                            <div
+                                key={s.label}
+                                className={`py-8 ${i === 0 ? "" : "border-t md:border-t-0 border-[#d4a853]/10"}`}
+                            >
+                                <StatItem {...s} triggered={statsTriggered} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
             </div>
         </section>
     );

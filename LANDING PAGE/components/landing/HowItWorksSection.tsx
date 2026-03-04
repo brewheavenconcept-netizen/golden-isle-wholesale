@@ -26,7 +26,7 @@ const steps = [
 
 export function HowItWorksSection() {
     return (
-        <section className="py-24 bg-[#f5f3ee] border-y border-[#e8e4dd] relative overflow-hidden">
+        <section className="py-24 bg-[#0a0a0a] border-y border-[#d4a853]/15 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="flex flex-col md:flex-row gap-16 items-center">
                     <motion.div
@@ -35,7 +35,7 @@ export function HowItWorksSection() {
                         viewport={{ once: true }}
                         className="md:w-1/3"
                     >
-                        <h2 className="text-3xl md:text-5xl font-bold text-[#1a1a1a] mb-6 leading-tight">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
                             Simple & Fast Ordering.
                         </h2>
                         <p className="text-[#6b6b6b] text-lg">
@@ -57,10 +57,10 @@ export function HowItWorksSection() {
                                     {step.num}
                                 </div>
                                 <div className="relative z-10">
-                                    <div className="w-12 h-12 bg-white border border-[#e8e4dd] text-emerald-600 rounded-xl flex items-center justify-center mb-6">
+                                    <div className="w-12 h-12 bg-[#d4a853]/10 border border-[#d4a853]/30 text-[#d4a853] rounded-xl flex items-center justify-center mb-6">
                                         <step.icon className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-[#1a1a1a] mb-2">
+                                    <h3 className="text-lg font-bold text-white mb-2">
                                         {step.title}
                                     </h3>
                                     <p className="text-sm text-[#6b6b6b]">

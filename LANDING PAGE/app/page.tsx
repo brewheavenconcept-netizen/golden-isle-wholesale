@@ -36,7 +36,7 @@ class SectionErrorBoundary extends Component<
 
 export default function Home() {
   return (
-    <div className="bg-white min-h-screen selection:bg-[#d4af37]/30">
+    <div className="bg-[#0a0a0a] min-h-screen selection:bg-[#d4af37]/30">
       <Navbar />
       <HeroSection />
       <StatsSection />
