@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install @supabase/supabase-js react-hot-toast recharts clsx tailwind-merge)"
+    ]
+  }
+}
