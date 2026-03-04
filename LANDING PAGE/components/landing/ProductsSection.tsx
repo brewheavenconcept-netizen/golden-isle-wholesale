@@ -13,7 +13,6 @@ export default function ProductsSection() {
     const { storeId, loading: storeLoading } = usePublicStore();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
 
     useEffect(() => {
@@ -76,26 +75,25 @@ export default function ProductsSection() {
 
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
-            const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-            return matchesSearch && matchesCategory;
+            return matchesCategory;
         });
-    }, [products, searchQuery, selectedCategory]);
+    }, [products, selectedCategory]);
 
     if (loading || storeLoading) {
         return (
-            <section id="products" className="py-24 bg-white border-t border-[#e8e4dd] relative z-10">
+            <section id="products" className="py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10">
                 <div className="max-w-6xl mx-auto px-4 relative">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-[#fafaf7] border border-[#e8e4dd] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-                            <Loader2 className="w-4 h-4 animate-spin text-[#b8960c]" /> Loading Catalogue...
+                        <div className="inline-flex items-center gap-2 bg-[#1a1a2e] border border-[#2a2a2e] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+                            <Loader2 className="w-4 h-4 animate-spin text-[#d4a853]" /> Loading Catalogue...
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4">Our Products</h2>
+                        <h2 className="text-3xl md:text-5xl font-bold font-display text-white mb-4">Our Products</h2>
                     </div>
                     {/* Skeleton Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                            <div key={i} className="animate-pulse bg-[#fafaf7] rounded-3xl border border-[#e8e4dd] overflow-hidden aspect-[3/4]"></div>
+                            <div key={i} className="animate-pulse bg-[#111118] rounded-3xl border border-[#1f1f2e] overflow-hidden aspect-[3/4]"></div>
                         ))}
                     </div>
                 </div>
@@ -105,9 +103,9 @@ export default function ProductsSection() {
 
     if (products.length === 0 && !loading) {
         return (
-            <section id="products" className="py-24 bg-white border-t border-[#e8e4dd] relative z-10">
+            <section id="products" className="py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10">
                 <div className="max-w-6xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4">Our Products</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold font-display text-white mb-4">Our Products</h2>
                     <p className="text-[#6b6b6b] mt-8 text-lg">Our curated collection is currently being updated. Check back soon!</p>
                 </div>
             </section>
@@ -115,34 +113,17 @@ export default function ProductsSection() {
     }
 
     return (
-        <section id="products" className="py-24 bg-white border-t border-[#e8e4dd] relative z-10">
+        <section id="products" className="py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10">
             <div className="max-w-6xl mx-auto px-4 relative">
                 <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-2 bg-[#fafaf7] border border-[#e8e4dd] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
-                        <ShoppingBag size={14} className="text-[#b8960c]" /> Available Wholesale
+                    <div className="inline-flex items-center gap-2 bg-[#1a1a2e] border border-[#2a2a2e] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
+                        <ShoppingBag size={14} className="text-[#d4a853]" /> Available Wholesale
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4">Our Products</h2>
-                    <p className="text-[#6b6b6b] max-w-xl mx-auto text-lg hover:text-[#1a1a1a] transition-colors">Browse our curated selection and place your premium bulk order online.</p>
+                    <h2 className="text-3xl md:text-5xl font-bold font-display text-white mb-4">Our Products</h2>
+                    <p className="text-[#6b6b6b] max-w-xl mx-auto text-lg hover:text-white transition-colors">Browse our curated selection and place your premium bulk order online.</p>
                 </div>
 
-                {/* Search Bar */}
-                <div className="max-w-lg mx-auto mb-8">
-                    <div className="relative group">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#b8960c] transition-colors" />
-                        <input suppressHydrationWarning
-                            type="text"
-                            placeholder="Search products..."
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full pl-11 pr-10 py-4 border border-[#e8e4dd] rounded-full bg-white backdrop-blur-md text-sm focus:ring-2 focus:ring-[#b8960c]/50 focus:border-[#b8960c] outline-none shadow-sm transition-all text-[#1a1a1a] placeholder-slate-400"
-                        />
-                        {searchQuery && (
-                            <button suppressHydrationWarning onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#1a1a1a] transition-colors">
-                                <X size={16} />
-                            </button>
-                        )}
-                    </div>
-                </div>
+                {/* Removed Search Bar */}
 
                 {/* Category Pills */}
                 {categories.length > 1 && (
@@ -156,20 +137,44 @@ export default function ProductsSection() {
                                 to { opacity: 1; transform: translateY(0); }
                             }
                         `}} />
-                        <div className="flex gap-3 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#e8e4dd]">
+                        <div className="flex gap-3 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#1f1f1f]">
                             {categories.map((cat, index) => {
                                 const count = cat === 'All' ? products.length : products.filter(p => p.category === cat).length;
+                                const isActive = selectedCategory === cat;
+
+                                let btnStyle = '';
+                                let badgeStyle = '';
+
+                                if (cat === 'Whisky') {
+                                    btnStyle = isActive
+                                        ? 'bg-[#92400e] text-white shadow-md shadow-[#92400e]/30 border border-transparent font-bold'
+                                        : 'bg-[#1a1a2e] text-[#b45309] border border-[#92400e]/30 hover:border-[#92400e]/60 hover:bg-[#92400e]/10';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#92400e]/20 text-[#b45309]';
+                                } else if (cat === 'Wine') {
+                                    btnStyle = isActive
+                                        ? 'bg-[#722F37] text-white shadow-md shadow-[#722F37]/30 border border-transparent font-bold'
+                                        : 'bg-[#1a1a2e] text-[#9f1239] border border-[#722F37]/30 hover:border-[#722F37]/60 hover:bg-[#722F37]/10';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#722F37]/20 text-[#9f1239]';
+                                } else if (cat === 'Craft Beer') {
+                                    btnStyle = isActive
+                                        ? 'bg-[#B8860B] text-white shadow-md shadow-[#B8860B]/30 border border-transparent font-bold'
+                                        : 'bg-[#1a1a2e] text-[#ca8a04] border border-[#B8860B]/30 hover:border-[#B8860B]/60 hover:bg-[#B8860B]/10';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#B8860B]/20 text-[#ca8a04]';
+                                } else {
+                                    btnStyle = isActive
+                                        ? 'bg-[#d4a853] text-[#0a0a0a] shadow-md shadow-[#d4a853]/30 border border-transparent font-bold hover:bg-[#c9a84c]'
+                                        : 'bg-[#1a1a2e] text-[#d4a853] border border-[#d4a853]/30 hover:border-[#d4a853]/60 hover:bg-[#d4a853]/10';
+                                    badgeStyle = isActive ? 'bg-[#0a0a0a]/20 text-[#0a0a0a]' : 'bg-[#d4a853]/20 text-[#d4a853]';
+                                }
+
                                 return (
                                     <button suppressHydrationWarning
                                         key={`${cat}-${index}`}
                                         onClick={() => setSelectedCategory(cat)}
-                                        className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-sm whitespace-nowrap transition-all duration-300 ${selectedCategory === cat
-                                            ? 'bg-[#d4a853] text-[#0a0a0a] font-bold shadow-md shadow-[#d4a853]/20 border border-transparent'
-                                            : 'bg-[#111111] text-[#9a9a9a] border border-[#2a2a2a] hover:border-[#d4a853]/50 hover:bg-[#1a1a1a] hover:text-white'
-                                            }`}
+                                        className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-sm whitespace-nowrap transition-all duration-300 ${btnStyle}`}
                                     >
                                         <span>{cat}</span>
-                                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${selectedCategory === cat ? 'bg-[#0a0a0a]/20 text-[#0a0a0a]' : 'bg-[#1f1f1f] text-[#6b6b6b]'}`}>
+                                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${badgeStyle}`}>
                                             {count}
                                         </span>
                                     </button>
@@ -181,18 +186,17 @@ export default function ProductsSection() {
 
                 {/* Product Grid */}
                 {filteredProducts.length === 0 ? (
-                    <div key="empty" className="text-center py-24 text-slate-500 bg-[#fafaf7] rounded-3xl border border-[#e8e4dd]" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
-                        <Search className="w-16 h-16 mx-auto mb-4 text-[#e8e4dd]" />
-                        <p className="text-xl font-medium text-[#1a1a1a] mb-2">
+                    <div key="empty" className="text-center py-24 text-[#6b6b6b] bg-[#111111] rounded-3xl border border-[#1f1f1f]" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
+                        <p className="text-xl font-medium text-white mb-2">
                             {selectedCategory !== 'All' ? 'No products in this category yet' : 'No products found'}
                         </p>
-                        <p className="text-sm">Try a different search or category constraint.</p>
-                        {(searchQuery || selectedCategory !== 'All') && (
+                        <p className="text-sm">Try exploring our other categories.</p>
+                        {selectedCategory !== 'All' && (
                             <button suppressHydrationWarning
-                                onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-                                className="mt-6 px-8 py-3 bg-[#d4a853] text-[#0a0a0a] rounded-full text-sm font-bold hover:bg-[#eacc7e] transition-colors shadow-lg shadow-[#d4a853]/20"
+                                onClick={() => setSelectedCategory('All')}
+                                className="mt-6 px-8 py-3 bg-[#d4a853] text-[#0a0a0a] rounded-full text-sm font-bold hover:bg-[#c9a84c] transition-colors shadow-lg shadow-[#d4a853]/20"
                             >
-                                Clear All Filters
+                                Show All Products
                             </button>
                         )}
                     </div>

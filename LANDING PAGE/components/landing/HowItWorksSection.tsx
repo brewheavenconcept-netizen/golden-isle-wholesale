@@ -53,12 +53,18 @@ export function HowItWorksSection() {
                                 transition={{ delay: index * 0.15 }}
                                 className="relative"
                             >
-                                <div className="text-6xl font-black text-[#b8960c]/20 absolute -top-6 -left-2 tracking-tighter select-none">
-                                    {step.num}
-                                </div>
-                                <div className="relative z-10">
-                                    <div className="w-12 h-12 bg-[#d4a853]/10 border border-[#d4a853]/30 text-[#d4a853] rounded-xl flex items-center justify-center mb-6">
-                                        <step.icon className="w-6 h-6" />
+                                <div className="relative z-10 group cursor-default">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="text-xs font-bold uppercase tracking-widest text-[#d4a853]">
+                                            Step {parseInt(step.num)}
+                                        </div>
+                                        {/* Optional connector line on desktop, hide on last step */}
+                                        {index < steps.length - 1 && (
+                                            <div className="hidden sm:block h-[1px] flex-grow bg-gradient-to-r from-[#d4a853]/50 to-transparent ml-2" />
+                                        )}
+                                    </div>
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#d4a853] to-[#c9a84c] text-[#0a0a0a] flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(212,168,83,0.2)] group-hover:shadow-[0_0_30px_rgba(212,168,83,0.4)] transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
+                                        <step.icon className="w-7 h-7" />
                                     </div>
                                     <h3 className="text-lg font-bold text-white mb-2">
                                         {step.title}
