@@ -146,39 +146,58 @@ export default function ProductsSection() {
 
                 {/* Category Pills */}
                 {categories.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-6 mb-4 justify-center flex-wrap">
-                        {categories.map((cat, index) => (
-                            <button suppressHydrationWarning
-                                key={`${cat}-${index}`}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat
-                                    ? 'bg-[#b8960c] text-white shadow-md border border-[#b8960c]'
-                                    : 'bg-white text-[#6b6b6b] border border-[#e8e4dd] hover:border-[#b8960c]/50 hover:text-[#1a1a1a]'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
+                    <>
+                        <style dangerouslySetInnerHTML={{
+                            __html: `
+                            .no-scrollbar::-webkit-scrollbar { display: none; }
+                            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                            @keyframes productsFadeIn {
+                                from { opacity: 0; transform: translateY(10px); }
+                                to { opacity: 1; transform: translateY(0); }
+                            }
+                        `}} />
+                        <div className="flex gap-3 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#e8e4dd]">
+                            {categories.map((cat, index) => {
+                                const count = cat === 'All' ? products.length : products.filter(p => p.category === cat).length;
+                                return (
+                                    <button suppressHydrationWarning
+                                        key={`${cat}-${index}`}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-sm whitespace-nowrap transition-all duration-300 ${selectedCategory === cat
+                                            ? 'bg-[#d4a853] text-[#0a0a0a] font-bold shadow-md shadow-[#d4a853]/20 border border-transparent'
+                                            : 'bg-[#111111] text-[#9a9a9a] border border-[#2a2a2a] hover:border-[#d4a853]/50 hover:bg-[#1a1a1a] hover:text-white'
+                                            }`}
+                                    >
+                                        <span>{cat}</span>
+                                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${selectedCategory === cat ? 'bg-[#0a0a0a]/20 text-[#0a0a0a]' : 'bg-[#1f1f1f] text-[#6b6b6b]'}`}>
+                                            {count}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </>
                 )}
 
                 {/* Product Grid */}
                 {filteredProducts.length === 0 ? (
-                    <div className="text-center py-24 text-slate-500 bg-[#fafaf7] rounded-3xl border border-[#e8e4dd]">
+                    <div key="empty" className="text-center py-24 text-slate-500 bg-[#fafaf7] rounded-3xl border border-[#e8e4dd]" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
                         <Search className="w-16 h-16 mx-auto mb-4 text-[#e8e4dd]" />
-                        <p className="text-xl font-medium text-[#1a1a1a] mb-2">No products found</p>
+                        <p className="text-xl font-medium text-[#1a1a1a] mb-2">
+                            {selectedCategory !== 'All' ? 'No products in this category yet' : 'No products found'}
+                        </p>
                         <p className="text-sm">Try a different search or category constraint.</p>
                         {(searchQuery || selectedCategory !== 'All') && (
                             <button suppressHydrationWarning
                                 onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-                                className="mt-6 px-8 py-3 bg-[#b8960c] text-white rounded-full text-sm font-bold hover:bg-[#d4af37] transition-colors shadow-lg shadow-[#b8960c]/20"
+                                className="mt-6 px-8 py-3 bg-[#d4a853] text-[#0a0a0a] rounded-full text-sm font-bold hover:bg-[#eacc7e] transition-colors shadow-lg shadow-[#d4a853]/20"
                             >
                                 Clear All Filters
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                    <div key={selectedCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
                         {filteredProducts.map((product, index) => (
                             <ProductCard key={`${product.id}-${index}`} product={product} />
                         ))}

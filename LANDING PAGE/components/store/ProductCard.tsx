@@ -19,9 +19,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     };
 
     const imageUrl = product.images?.[0] || (product as any).image_url;
+    const isOutOfStock = product.stock_status === 'out_of_stock' || product.stock <= 0;
 
     return (
-        <Link href={`/product/${product.id}`} className={`group bg-white rounded-2xl overflow-hidden border border-[#e8e4dd] shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[#b8960c]/30 ${product.stock_status === 'out_of_stock' || product.stock <= 0 ? 'opacity-70 grayscale-[0.4]' : ''}`}>
+        <Link href={`/product/${product.id}`} className={`group bg-white rounded-2xl overflow-hidden border border-[#e8e4dd] shadow-sm transition-all duration-300 ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_8px_30px_rgba(212,168,83,0.3)] hover:border-[#d4a853]'}`}>
             <div className="aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative">
                 {imageUrl ? (
                     <>
@@ -56,10 +57,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                         <span className="text-sm font-medium text-slate-400 line-through">RM {product.compare_at_price.toFixed(2)}</span>
                     )}
                 </div>
-                {product.stock_status === 'out_of_stock' || product.stock <= 0 ? (
+                {isOutOfStock ? (
                     <span className="inline-block mt-2 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded">Out of Stock</span>
                 ) : product.stock_status === 'low_stock' ? (
-                    <span className="inline-block mt-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Low Stock</span>
+                    <span className="inline-block mt-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded animate-pulse">Low Stock</span>
                 ) : (
                     <span className="inline-block mt-2 text-xs font-bold text-green-600 bg-green-50 border border-green-100 px-2.5 py-1 rounded">In Stock</span>
                 )}
