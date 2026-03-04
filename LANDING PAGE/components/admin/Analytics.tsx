@@ -84,7 +84,7 @@ export default function Analytics() {
     }, [storeId]);
 
     const StatCard = ({ title, value, icon: Icon, color }: any) => (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+        <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm transition-colors duration-300">
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">{title}</p>
@@ -116,7 +116,7 @@ export default function Analytics() {
                 <StatCard title="Total Revenue" value={revenueData.total} icon={ShoppingBag} color="bg-purple-600" />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Daily Revenue (Last 30 Days)</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={dailyRevenue}>
@@ -129,7 +129,7 @@ export default function Analytics() {
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Top 5 Products</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={topProducts}>
@@ -142,7 +142,7 @@ export default function Analytics() {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Order Status Distribution</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -153,18 +153,18 @@ export default function Analytics() {
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Quick Stats</h3>
                     <div className="space-y-4">
-                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-gray-700">
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-white/10">
                             <span className="text-slate-600 dark:text-gray-400">Total Orders</span>
                             <span className="font-bold text-slate-900 dark:text-white">{orders.length}</span>
                         </div>
-                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-gray-700">
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-white/10">
                             <span className="text-slate-600 dark:text-gray-400">Average Order Value</span>
                             <span className="font-bold text-emerald-600">RM {orders.length > 0 ? (revenueData.total / orders.length).toFixed(2) : '0.00'}</span>
                         </div>
-                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-gray-700">
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-white/10">
                             <span className="text-slate-600 dark:text-gray-400">Orders This Week</span>
                             <span className="font-bold text-blue-600">{orders.filter(o => new Date(o.created_at) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}</span>
                         </div>

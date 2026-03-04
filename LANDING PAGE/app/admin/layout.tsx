@@ -51,7 +51,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         <NotificationsProvider storeId={storeId}>
             <div className="flex min-h-screen bg-slate-50 dark:bg-[#0a0a0a] transition-colors duration-300">
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-                <main className="w-full min-w-0 ml-0 p-6 md:ml-64 mt-14 md:mt-0">
+                <main className="w-full min-w-0 ml-0 p-6 md:ml-64 mt-14 md:mt-0 bg-slate-50 dark:bg-[#0a0a0a] min-h-screen transition-colors duration-300">
                     <ErrorBoundary>
                         {children}
                     </ErrorBoundary>

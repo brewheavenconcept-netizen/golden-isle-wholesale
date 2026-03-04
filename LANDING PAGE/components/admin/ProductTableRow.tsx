@@ -32,14 +32,14 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
     return (
         <tr className={`
             md:table-row md:border-b md:border-slate-100 dark:md:border-gray-700 md:hover:bg-slate-50 dark:md:hover:bg-gray-800/50 md:transition-colors md:bg-transparent
-            grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 p-4 border border-slate-200 dark:border-gray-700 rounded-xl mb-3 bg-white dark:bg-gray-800 relative shadow-sm hover:shadow-md transition-shadow
+            grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 p-4 border border-slate-200 dark:border-white/10 rounded-xl mb-3 bg-white dark:bg-[#111111] relative shadow-sm hover:shadow-md transition-shadow
             ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : ''}
         `}>
             {/* Checkbox */}
             <td className="md:table-cell md:w-12 md:px-6 md:py-4 absolute top-4 left-4 z-10 md:static">
                 <input
                     type="checkbox"
-                    className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-800"
+                    className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-[#111111]"
                     checked={isSelected}
                     onChange={(e) => onSelect(product.id, e.target.checked)}
                 />
@@ -106,7 +106,7 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                     </button>
 
                     {showMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-slate-100 dark:border-gray-700 z-50 py-1 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#111111] rounded-lg shadow-xl border border-slate-100 dark:border-white/10 z-50 py-1 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                             <button
                                 onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit(product); }}
                                 className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 flex items-center gap-2"

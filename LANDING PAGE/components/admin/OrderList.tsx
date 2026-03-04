@@ -327,7 +327,7 @@ export default function OrderList() {
                                 placeholder="Search by name or phone..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 text-sm bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                                className="w-full h-11 pl-10 pr-4 text-sm bg-white dark:bg-[#111111] border border-slate-200 dark:border-white/10 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
                             />
                         </div>
                         {selectedOrderIds.size > 0 && (
@@ -358,7 +358,7 @@ export default function OrderList() {
                             onClick={() => setStatusFilter(tab.value)}
                             className={`h-11 px-4 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${statusFilter === tab.value
                                 ? 'bg-blue-600 text-white shadow-sm'
-                                : 'bg-white dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-gray-700'
+                                : 'bg-white dark:bg-[#111111] text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-white/10'
                                 }`}
                         >
                             {tab.label}
@@ -367,21 +367,21 @@ export default function OrderList() {
                 </div>
 
                 {/* DATE RANGE FILTER & SELECT ALL */}
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors duration-300">
+                <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors duration-300">
 
                     {/* Select All */}
                     <button
                         onClick={() => handleSelectAll(filteredIds)}
                         className="flex items-center gap-3 group"
                     >
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${isAllSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-800 group-hover:border-blue-400'}`}>
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${isAllSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-gray-600 bg-white dark:bg-[#111111] group-hover:border-blue-400'}`}>
                             {isAllSelected && <CheckSquare size={14} className="text-white" />}
                         </div>
                         <span className={`text-sm font-bold transition-colors ${isAllSelected ? 'text-blue-600' : 'text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-white'}`}>Select All</span>
                     </button>
 
                     {/* Date Inputs - Grouped Pill */}
-                    <div className="flex items-center bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl p-1.5 gap-2 w-full md:w-auto overflow-x-auto">
+                    <div className="flex items-center bg-slate-50 dark:bg-[#111111] border border-slate-200 dark:border-white/10 rounded-xl p-1.5 gap-2 w-full md:w-auto overflow-x-auto">
                         <div className="flex items-center gap-2 pl-2">
                             <Calendar size={16} className="text-slate-400 dark:text-gray-500 shrink-0" />
                             <span className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider hidden sm:inline">From</span>
@@ -433,8 +433,8 @@ export default function OrderList() {
                                 className={`rounded-2xl shadow-sm overflow-hidden transition-all duration-500 ${highlightId === order.id
                                     ? 'bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700'
                                     : selectedOrderIds.has(order.id)
-                                        ? 'bg-white dark:bg-gray-800 ring-2 ring-blue-500'
-                                        : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700'
+                                        ? 'bg-white dark:bg-[#111111] ring-2 ring-blue-500'
+                                        : 'bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/10'
                                     }`}
                             >
 
@@ -487,7 +487,7 @@ export default function OrderList() {
 
                                 {/* DETAIL */}
                                 {expandedOrderIds.has(order.id) && (
-                                    <div className="border-t border-slate-100 dark:border-gray-700 p-3 bg-white dark:bg-gray-800/50">
+                                    <div className="border-t border-slate-100 dark:border-white/10 p-3 bg-white dark:bg-[#111111]/50">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                             {/* LEFT COLUMN */}
                                             <div className="space-y-6">
@@ -607,7 +607,7 @@ export default function OrderList() {
                                                     <h4 className="font-bold text-sm text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                                                         <ShoppingBag size={16} /> Items Purchased
                                                     </h4>
-                                                    <div className="border border-slate-100 dark:border-gray-700 rounded-lg divide-y divide-slate-100 dark:divide-gray-700">
+                                                    <div className="border border-slate-100 dark:border-white/10 rounded-lg divide-y divide-slate-100 dark:divide-gray-700">
                                                         {order.items && Array.isArray(order.items) ? (
                                                             order.items.map((item: any, idx: number) => (
                                                                 <div key={idx} className="p-3 flex justify-between items-center">
@@ -639,7 +639,7 @@ export default function OrderList() {
                                                             value={editingNotes[order.id] ?? order.admin_notes ?? ''}
                                                             onChange={(e) => setEditingNotes({ ...editingNotes, [order.id]: e.target.value })}
                                                             placeholder="Add internal notes (e.g., 'Called customer, out for delivery')"
-                                                            className="w-full p-3 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                                            className="w-full p-3 bg-white dark:bg-[#111111] border border-slate-200 dark:border-white/10 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                                             rows={3}
                                                         />
                                                         <button

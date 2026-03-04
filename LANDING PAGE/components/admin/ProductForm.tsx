@@ -72,7 +72,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-slate-50 dark:bg-gray-900/50 p-6 rounded-xl transition-colors duration-300">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-slate-50 dark:bg-[#111111]/50 p-6 rounded-xl transition-colors duration-300">
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{initialData ? 'Edit Product' : 'Add New Product'}</h2>
@@ -89,24 +89,24 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* LEFT COL */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">General Information</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Product Name</label>
-                            <input required type="text" className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white focus:ring-blue-500 outline-none"
+                            <input required type="text" className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:ring-blue-500 outline-none"
                                 value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Description</label>
-                            <textarea className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white h-32 outline-none"
+                            <textarea className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white h-32 outline-none"
                                 value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                         </div>
                     </div>
 
                     {/* MEDIA */}
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Media</h3>
-                        <div className={`border-2 border-dashed ${imageUploading ? 'border-blue-400 bg-blue-50' : 'border-slate-300 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700/50'} rounded-lg p-8 text-center transition cursor-pointer relative`}>
+                        <div className={`border-2 border-dashed ${imageUploading ? 'border-blue-400 bg-blue-50' : 'border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-gray-700/50'} rounded-lg p-8 text-center transition cursor-pointer relative`}>
                             <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={loading || imageUploading} />
                             <div className="flex flex-col items-center pointer-events-none">
                                 {imageUploading ? (
@@ -135,11 +135,11 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                     </div>
 
                     {/* CATEGORY */}
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Category</h3>
                         <select
                             required
-                            className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                            className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                             value={formData.category}
                             onChange={e => setFormData({ ...formData, category: e.target.value })}
                         >
@@ -152,11 +152,11 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
 
                 {/* RIGHT COL */}
                 <div className="space-y-6">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Status</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Availability</label>
-                            <select className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                            <select className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                                 value={formData.stock_status || 'in_stock'}
                                 onChange={e => setFormData({ ...formData, stock_status: e.target.value as any })}>
                                 <option value="in_stock">✅ In Stock</option>
@@ -166,7 +166,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Pricing</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Price (RM)</label>
@@ -174,7 +174,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                                 required
                                 type="text"
                                 inputMode="decimal"
-                                className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                                className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                                 value={formData.price === 0 ? '' : formData.price}
                                 onChange={e => {
                                     const value = e.target.value;
@@ -190,11 +190,11 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Inventory</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Quantity</label>
-                            <input type="number" className="w-full p-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg text-slate-900 dark:text-white"
+                            <input type="number" className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                                 value={formData.stock} onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })} />
                         </div>
                     </div>

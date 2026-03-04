@@ -177,7 +177,7 @@ export default function Settings() {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
 
             {/* 1. STORE INFORMATION */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Building2 size={20} className="text-blue-600" />
                     Store Information
@@ -190,7 +190,7 @@ export default function Settings() {
                             value={settings.store_name}
                             onChange={(e) => updateSettings({ store_name: e.target.value })}
                             placeholder="My Coffee Shop"
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                     </div>
                     <div>
@@ -200,7 +200,7 @@ export default function Settings() {
                             value={settings.whatsapp_number}
                             onChange={(e) => updateSettings({ whatsapp_number: e.target.value })}
                             placeholder="60123456789"
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                         <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">Format: Numbers only (e.g., 60123456789)</p>
                     </div>
@@ -208,7 +208,7 @@ export default function Settings() {
             </div>
 
             {/* 2. BRANDING */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <ImageIcon size={20} className="text-blue-600" />
                     Branding
@@ -223,7 +223,7 @@ export default function Settings() {
                                 <img
                                     src={settings.logo_url}
                                     alt="Store logo"
-                                    className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 dark:border-gray-700"
+                                    className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 dark:border-white/10"
                                 />
                                 <button
                                     onClick={handleRemoveLogo}
@@ -264,7 +264,7 @@ export default function Settings() {
             </div>
 
             {/* 3. CURRENCY & REGIONAL */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Globe size={20} className="text-blue-600" />
                     Currency & Regional
@@ -275,7 +275,7 @@ export default function Settings() {
                         <select
                             value={settings.currency}
                             onChange={(e) => updateSettings({ currency: e.target.value })}
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="MYR">MYR - Malaysian Ringgit</option>
                             <option value="USD">USD - US Dollar</option>
@@ -288,7 +288,7 @@ export default function Settings() {
                         <select
                             value={settings.timezone}
                             onChange={(e) => updateSettings({ timezone: e.target.value })}
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="Asia/Kuala_Lumpur">Asia/Kuala Lumpur (GMT+8)</option>
                             <option value="Asia/Singapore">Asia/Singapore (GMT+8)</option>
@@ -299,7 +299,7 @@ export default function Settings() {
             </div>
 
             {/* 3. DELIVERY SETTINGS */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Truck size={20} className="text-blue-600" />
                     Delivery Settings
@@ -313,7 +313,7 @@ export default function Settings() {
                             value={settings.delivery_fee}
                             onChange={(e) => updateSettings({ delivery_fee: parseFloat(e.target.value) || 0 })}
                             placeholder="10.00"
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                     </div>
                     <div>
@@ -324,7 +324,7 @@ export default function Settings() {
                             value={settings.free_delivery_threshold}
                             onChange={(e) => updateSettings({ free_delivery_threshold: parseFloat(e.target.value) || 0 })}
                             placeholder="50.00"
-                            className="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                         <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">Minimum order for free delivery</p>
                     </div>
@@ -335,7 +335,7 @@ export default function Settings() {
                         id="self-pickup"
                         checked={settings.enable_self_pickup}
                         onChange={(e) => updateSettings({ enable_self_pickup: e.target.checked })}
-                        className="w-5 h-5 rounded border-slate-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-gray-800"
+                        className="w-5 h-5 rounded border-slate-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-[#111111]"
                     />
                     <label htmlFor="self-pickup" className="text-sm font-medium text-slate-700 dark:text-gray-300 cursor-pointer">
                         Enable Self-Pickup
@@ -344,7 +344,7 @@ export default function Settings() {
             </div>
 
             {/* 5. OPERATING HOURS */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors duration-300">
                 <div
                     className="p-6 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors"
                     onClick={() => setIsOperatingHoursExpanded(!isOperatingHoursExpanded)}
@@ -362,9 +362,9 @@ export default function Settings() {
                 </div>
 
                 <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOperatingHoursExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="p-6 pt-0 space-y-3 border-t border-slate-100 dark:border-gray-700">
+                    <div className="p-6 pt-0 space-y-3 border-t border-slate-100 dark:border-white/10">
                         {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const).map((day) => (
-                            <div key={day} className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-gray-700 last:border-0 last:pb-0 overflow-hidden">
+                            <div key={day} className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-white/10 last:border-0 last:pb-0 overflow-hidden">
                                 <div className="w-16 md:w-24 flex-shrink-0 font-medium text-sm text-slate-700 dark:text-gray-300 capitalize truncate">{day.slice(0, 3)}</div>
                                 <div className="flex items-center gap-1.5 flex-1 min-w-0">
                                     <input
@@ -372,7 +372,7 @@ export default function Settings() {
                                         value={settings.operating_hours[day].open}
                                         onChange={(e) => updateOperatingHours(day, 'open', e.target.value)}
                                         disabled={settings.operating_hours[day].closed}
-                                        className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-gray-900 text-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                                        className="flex-1 min-w-0 bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-gray-900 text-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                                     />
                                     <span className="text-slate-400 text-xs flex-shrink-0">to</span>
                                     <input
@@ -380,7 +380,7 @@ export default function Settings() {
                                         value={settings.operating_hours[day].close}
                                         onChange={(e) => updateOperatingHours(day, 'close', e.target.value)}
                                         disabled={settings.operating_hours[day].closed}
-                                        className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-gray-900 text-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                                        className="flex-1 min-w-0 bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-gray-900 text-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                                     />
                                 </div>
                                 <div className="flex items-center gap-1 flex-shrink-0">
@@ -389,7 +389,7 @@ export default function Settings() {
                                         id={`closed-${day}`}
                                         checked={settings.operating_hours[day].closed}
                                         onChange={(e) => updateOperatingHours(day, 'closed', e.target.checked)}
-                                        className="w-4 h-4 rounded border-slate-300 dark:border-gray-600 text-red-600 focus:ring-red-500 bg-white dark:bg-gray-800"
+                                        className="w-4 h-4 rounded border-slate-300 dark:border-gray-600 text-red-600 focus:ring-red-500 bg-white dark:bg-[#111111]"
                                     />
                                     <label htmlFor={`closed-${day}`} className="text-xs text-slate-500 dark:text-gray-400 cursor-pointer">
                                         Off
@@ -402,7 +402,7 @@ export default function Settings() {
             </div>
 
             {/* 6. NOTIFICATIONS */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Bell size={20} className="text-blue-600" />
                     Notifications
@@ -413,7 +413,7 @@ export default function Settings() {
                         id="whatsapp-notifications"
                         checked={settings.whatsapp_order_notifications}
                         onChange={(e) => updateSettings({ whatsapp_order_notifications: e.target.checked })}
-                        className="w-5 h-5 rounded border-slate-300 dark:border-gray-600 text-green-600 focus:ring-green-500 bg-white dark:bg-gray-800"
+                        className="w-5 h-5 rounded border-slate-300 dark:border-gray-600 text-green-600 focus:ring-green-500 bg-white dark:bg-[#111111]"
                     />
                     <div>
                         <label htmlFor="whatsapp-notifications" className="text-sm font-medium text-slate-700 dark:text-gray-300 cursor-pointer block">
@@ -425,7 +425,7 @@ export default function Settings() {
             </div>
 
             {/* SAVE BUTTON */}
-            <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-slate-100 dark:border-gray-700 p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] -mx-6 -mb-8 mt-6 z-10 transition-colors duration-300">
+            <div className="sticky bottom-0 bg-white dark:bg-[#111111] border-t border-slate-100 dark:border-white/10 p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] -mx-6 -mb-8 mt-6 z-10 transition-colors duration-300">
                 <button
                     onClick={handleSave}
                     disabled={saveLoading}

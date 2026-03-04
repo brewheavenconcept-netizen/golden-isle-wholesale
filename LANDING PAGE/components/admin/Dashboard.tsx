@@ -85,7 +85,7 @@ export default function Dashboard() {
     const statusDist = getStatusDist();
 
     const StatCard = ({ title, value, icon: Icon, color }: any) => (
-        <div className="bg-white dark:bg-gray-800 p-5 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm flex items-start justify-between transition-colors duration-300">
+        <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
             <div>
                 <p className="text-xs font-medium text-slate-500 dark:text-gray-400 mb-1">{title}</p>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">{loading ? <Skeleton width="80px" height="28px" /> : value}</h3>
@@ -107,7 +107,7 @@ export default function Dashboard() {
             </div>
             {!loading && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm p-5 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm p-5 transition-colors duration-300">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-white mb-4 flex items-center gap-2">
                             <TrendingUp size={16} className="text-blue-600" /> 7-Day Revenue
                         </h3>
@@ -121,7 +121,7 @@ export default function Dashboard() {
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm p-5 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm p-5 transition-colors duration-300">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-white mb-4 flex items-center gap-2">
                             <BarChart3 size={16} className="text-emerald-600" /> Top Products
                         </h3>
@@ -143,7 +143,7 @@ export default function Dashboard() {
             )}
             {!loading && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm p-5 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm p-5 transition-colors duration-300">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-white mb-4">Order Status</h3>
                         {statusDist.length === 0 ? (
                             <div className="text-center py-12 text-slate-400 text-sm">No orders yet</div>
@@ -168,7 +168,7 @@ export default function Dashboard() {
                             </>
                         )}
                     </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm p-5 lg:col-span-2 transition-colors duration-300">
+                    <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm p-5 lg:col-span-2 transition-colors duration-300">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-sm font-bold text-slate-700 dark:text-white flex items-center gap-2">
                                 <ShoppingBag size={16} className="text-blue-600" /> Recent Orders

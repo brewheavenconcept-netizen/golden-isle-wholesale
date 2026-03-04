@@ -78,7 +78,7 @@ export default function AdminProductPage() {
 
     if (loading && !isFormOpen) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 dark:bg-gray-900 transition-colors duration-300 text-slate-400 animate-pulse">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 dark:bg-[#111111] transition-colors duration-300 text-slate-400 animate-pulse">
                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
                 <p>Loading products...</p>
             </div>
@@ -104,11 +104,11 @@ export default function AdminProductPage() {
 
             {/* FORM vs TABLE */}
             {isFormOpen ? (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-gray-700 transition-colors duration-300">
+                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl shadow-sm border border-slate-100 dark:border-white/10 transition-colors duration-300">
                     <ProductForm initialData={editingProduct} onSuccess={handleFormSuccess} onCancel={handleCloseForm} />
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 border-dashed transition-colors duration-300">
+                <div className="text-center py-20 bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 border-dashed transition-colors duration-300">
                     <div className="w-16 h-16 bg-slate-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Package className="h-8 w-8 text-slate-400 dark:text-gray-500" />
                     </div>
@@ -117,13 +117,13 @@ export default function AdminProductPage() {
                     <button onClick={handleCreateNew} className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Create new product</button>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
+                <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors duration-300">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 dark:bg-gray-900/50 border-b border-slate-100 dark:border-gray-700">
+                            <thead className="bg-slate-50 dark:bg-[#111111]/50 border-b border-slate-100 dark:border-white/10">
                                 <tr>
                                     <th className="px-6 py-4 w-12 text-center md:table-cell hidden">
-                                        <input type="checkbox" className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-800"
+                                        <input type="checkbox" className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-[#111111]"
                                             checked={products.length > 0 && selectedIds.length === products.length} onChange={handleSelectAll} />
                                     </th>
                                     <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider w-20 md:table-cell hidden">Image</th>
