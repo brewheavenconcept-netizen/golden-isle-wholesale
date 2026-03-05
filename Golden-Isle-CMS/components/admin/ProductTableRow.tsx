@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Edit, Trash2, Package } from 'lucide-react';
-import Image from 'next/image';
 import { Product } from '@/types';
 
 interface ProductTableRowProps {
@@ -51,11 +50,10 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                 <div className="h-14 w-14 rounded-md overflow-hidden bg-slate-100 dark:bg-gray-700 border border-slate-200 dark:border-gray-600 flex-shrink-0 relative">
                     {safeImages[0] ? (
                         <>
-                            <Image
+                            <img
                                 src={safeImages[0]}
                                 alt={product.name}
-                                width={56}
-                                height={56}
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';

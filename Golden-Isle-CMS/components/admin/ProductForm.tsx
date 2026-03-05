@@ -18,6 +18,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     const [loading, setLoading] = useState(false);
     const [imageUploading, setImageUploading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [manualCategoryOverride, setManualCategoryOverride] = useState(false);
 
     const [formData, setFormData] = useState<Partial<Product>>({
         name: '', price: 0, sku: '', stock: 1,
@@ -29,8 +30,33 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
         if (initialData) {
             setFormData(initialData);
             if (initialData.images?.length) setImagePreview(initialData.images[0]);
+            setManualCategoryOverride(true);
         }
     }, [initialData]);
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setFormData(prev => {
+            let nextCategory = prev.category;
+
+            if (!manualCategoryOverride && value.trim() !== '') {
+                const nameLower = value.toLowerCase();
+                if (['whisky', 'macallan', 'johnnie', 'chivas'].some(k => nameLower.includes(k))) {
+                    nextCategory = 'Whisky';
+                } else if (['beer', 'asahi', 'stout', 'lager', 'craft'].some(k => nameLower.includes(k))) {
+                    nextCategory = 'Craft Beer';
+                } else if (['wine', 'red', 'white', 'penfolds'].some(k => nameLower.includes(k))) {
+                    nextCategory = 'Wine';
+                } else if (['hennessy', 'spirit', 'brandy', 'cognac'].some(k => nameLower.includes(k))) {
+                    nextCategory = 'Spirit';
+                } else {
+                    nextCategory = 'Other';
+                }
+            }
+
+            return { ...prev, name: value, category: nextCategory };
+        });
+    };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
@@ -94,7 +120,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Product Name</label>
                             <input required type="text" className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:ring-blue-500 outline-none"
-                                value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                value={formData.name} onChange={handleNameChange} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Description</label>
@@ -141,7 +167,10 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                             required
                             className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                             value={formData.category}
-                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                            onChange={e => {
+                                setFormData({ ...formData, category: e.target.value });
+                                setManualCategoryOverride(true);
+                            }}
                         >
                             <option value="Whisky">🥃 Whisky</option>
                             <option value="Wine">🍷 Wine</option>
