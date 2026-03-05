@@ -419,13 +419,16 @@ export async function savePaymentSettings(settings: Partial<StoreSettings>, stor
     // Strict sanitization: Only include exactly what is needed to avoid schema cache errors
     const sanitizedPayload = {
         store_id: storeId,
-        accept_cod: settings.accept_cod,
-        accept_bank_transfer: settings.accept_bank_transfer,
+        store_name: settings.store_name,
+        accept_bank_transfer: settings.accept_bank_transfer ?? false,
+        accept_cod: settings.accept_cod ?? false,
         bank_name: settings.bank_name,
         bank_holder_name: settings.bank_holder_name,
-        bank_account: settings.bank_account_number,
+        bank_account_number: settings.bank_account_number,
+        account_holder: (settings as any).account_holder,
+        account_number: (settings as any).account_number,
         qr_code_url: settings.qr_code_url,
-        updated_at: new Date().toISOString(),
+        qr_image_url: (settings as any).qr_image_url,
     };
 
     const { error } = await supabase
