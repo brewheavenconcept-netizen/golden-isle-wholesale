@@ -285,7 +285,7 @@ export default function CheckoutPage() {
                                     type="text"
                                     value={fullName}
                                     onChange={e => setFullName(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
                                     placeholder="Enter your name"
                                 />
                             </div>
@@ -296,7 +296,7 @@ export default function CheckoutPage() {
                                     type="tel"
                                     value={phone}
                                     onChange={e => setPhone(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
                                     placeholder="e.g. 012-3456789"
                                 />
                             </div>
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                                     rows={3}
                                     value={address}
                                     onChange={e => setAddress(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-900"
                                     placeholder="Enter full address"
                                 />
                             </div>
@@ -317,7 +317,7 @@ export default function CheckoutPage() {
                                     rows={2}
                                     value={notes}
                                     onChange={e => setNotes(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-900"
                                     placeholder="Any specific instructions?"
                                 />
                             </div>
