@@ -413,6 +413,31 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
     }
 }
 
+export async function savePaymentSettings(settings: Partial<StoreSettings>, storeId: string): Promise<void> {
+    if (!storeId) throw new Error('Store ID is required to save payment settings');
+
+    // Strict sanitization: Only include exactly what is needed to avoid schema cache errors
+    const sanitizedPayload = {
+        store_id: storeId,
+        accept_cod: settings.accept_cod,
+        accept_bank_transfer: settings.accept_bank_transfer,
+        bank_name: settings.bank_name,
+        bank_holder_name: settings.bank_holder_name,
+        bank_account: settings.bank_account_number,
+        qr_code_url: settings.qr_code_url,
+        updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase
+        .from('store_settings')
+        .upsert(sanitizedPayload, { onConflict: 'store_id' });
+
+    if (error) {
+        console.error('[savePaymentSettings] Error:', error.message, error.details);
+        throw error;
+    }
+}
+
 export async function updateStoreName(storeId: string, name: string): Promise<void> {
     if (!storeId || !name.trim()) return;
     const { error } = await supabase

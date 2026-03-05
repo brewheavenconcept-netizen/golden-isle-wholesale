@@ -4,7 +4,7 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import Image from 'next/image';
 import { Save, CreditCard, Banknote, ShieldCheck, ChevronRight, ChevronDown, CheckCircle2, Wallet, Building2, ImageIcon, AlertCircle, X, Truck, Landmark, ChevronLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getSettings, saveSettings } from '@/lib/storage';
+import { getSettings, savePaymentSettings } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 import { StoreSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
@@ -96,8 +96,8 @@ export default function PaymentSettings() {
                 ...currentData,
             };
 
-            // 3. Save to Supabase (Upsert via saveSettings)
-            await saveSettings(fullSettings, storeId);
+            // 3. Save to Supabase (Upsert via savePaymentSettings)
+            await savePaymentSettings(fullSettings, storeId);
 
             setFormData(currentData);
             setPendingFile(null);
