@@ -149,9 +149,10 @@ export default function CheckoutPage() {
             const whatsappNumber = settings?.whatsapp_number || '60123456789';
             const adminPhone = whatsappNumber.replace(/[^0-9]/g, '');
 
-            if (adminPhone) {
-                window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
+            // Commenting out the auto WhatsApp redirection so users see the payment QR / Bank info first.
+            // if (adminPhone) {
+            //     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
+            // }
 
             if (method === 'toyyibpay') {
                 toast.loading('Initializing FPX Payment...', { id: 'payment' });
