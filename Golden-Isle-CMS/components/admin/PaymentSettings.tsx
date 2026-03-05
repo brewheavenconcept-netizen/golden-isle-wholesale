@@ -8,6 +8,7 @@ import { getSettings, saveSettings } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 import { StoreSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
+import { supabase } from '@/lib/supabase';
 
 const StatusBadge = ({ active }: { active: boolean }) => (
     <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
@@ -20,6 +21,7 @@ export default function PaymentSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
     const [formData, setFormData] = useState({
         stripe_publishable_key: '',
         stripe_secret_key: '',
@@ -65,19 +67,46 @@ export default function PaymentSettings() {
         }
         setSaving(true);
         try {
-            // Merge payment-specific fields into full settings object and save
+            let currentQrUrl = formData.qr_code_url;
+
+            // 1. Upload new image if pending
+            if (pendingFile) {
+                const fileExt = pendingFile.name.split('.').pop();
+                const fileName = `${storeId}-qr-${Date.now()}.${fileExt}`;
+                const filePath = `${storeId}/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('payments')
+                    .upload(filePath, pendingFile, { cacheControl: '3600', upsert: true });
+
+                if (uploadError) {
+                    console.error('[PaymentSettings] QR Upload failed:', uploadError);
+                    throw new Error('Failed to upload QR image');
+                }
+
+                const { data: urlData } = supabase.storage.from('payments').getPublicUrl(filePath);
+                currentQrUrl = urlData.publicUrl;
+            }
+
+            // 2. Prepare full settings object
+            const currentData = { ...formData, qr_code_url: currentQrUrl };
             const fullSettings: StoreSettings = {
                 ...DEFAULT_SETTINGS,
                 ...ctxSettings,
-                ...formData,
+                ...currentData,
             };
+
+            // 3. Save to Supabase (Upsert via saveSettings)
             await saveSettings(fullSettings, storeId);
+
+            setFormData(currentData);
+            setPendingFile(null);
             reload();
             toast.success('Payment Settings Saved!');
             setExpandedSection(null);
-        } catch (error) {
+        } catch (error: any) {
             console.error('[PaymentSettings] Save failed:', error);
-            toast.error('Failed to save settings. Please try again.');
+            toast.error(error.message || 'Failed to save settings. Please try again.');
         }
         setSaving(false);
     };
@@ -193,6 +222,7 @@ export default function PaymentSettings() {
                                 <input id="qr-upload" type="file" accept="image/*" className="hidden" onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
+                                    setPendingFile(file);
                                     const reader = new FileReader();
                                     reader.onloadend = () => setFormData({ ...formData, qr_code_url: reader.result as string });
                                     reader.readAsDataURL(file);
