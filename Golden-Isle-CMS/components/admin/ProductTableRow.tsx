@@ -80,6 +80,28 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                 </div>
             </td>
 
+            {/* Category */}
+            <td className="md:table-cell md:px-6 md:py-4 col-start-2 -mt-1 md:mt-0 md:col-auto">
+                <div className="flex items-center">
+                    {(() => {
+                        const c = product.category || 'Other';
+                        const cfg: Record<string, { cls: string }> = {
+                            'Whisky': { cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800' },
+                            'Craft Beer': { cls: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-100 dark:border-orange-800' },
+                            'Wine': { cls: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-100 dark:border-purple-800' },
+                            'Spirit': { cls: 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800' },
+                            'Other': { cls: 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-gray-700' },
+                        };
+                        const { cls } = cfg[c] || cfg['Other'];
+                        return (
+                            <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls}`}>
+                                {c}
+                            </span>
+                        );
+                    })()}
+                </div>
+            </td>
+
             {/* Status / Stock */}
             <td className="md:table-cell md:w-32 md:px-6 md:py-4 col-start-2 -mt-2 md:mt-0 md:col-auto">
                 <div className="flex flex-row md:flex-col gap-2 md:gap-1 items-center md:items-start">
