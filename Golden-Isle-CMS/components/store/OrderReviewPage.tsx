@@ -253,56 +253,57 @@ export default function OrderReviewPage() {
                     </div>
                 </div>
 
-                {/* SECTION A — Bank Transfer Details */}
+                {/* SECTION A/B — Bank Transfer & DuitNow QR Details */}
                 {pm === 'bank_transfer' && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
-                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                            <CreditCard size={18} /> Bank Transfer Details
-                        </h3>
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <div>
-                                    <p className="text-xs text-slate-500">Bank Name</p>
-                                    <p className="font-bold text-sm text-slate-900">{settings.bank_name || 'Not configured'}</p>
+                    <div className="space-y-4">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+                            <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                <CreditCard size={18} /> Bank Transfer Details
+                            </h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div>
+                                        <p className="text-xs text-slate-500">Bank Name</p>
+                                        <p className="font-bold text-sm text-slate-900">{settings.bank_name || 'Not configured'}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <div>
-                                    <p className="text-xs text-slate-500">Account Number</p>
-                                    <p className="font-bold text-sm text-slate-900 font-mono">{settings.bank_account_number || 'Not configured'}</p>
+                                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div>
+                                        <p className="text-xs text-slate-500">Account Number</p>
+                                        <p className="font-bold text-sm text-slate-900 font-mono">{settings.bank_account_number || 'Not configured'}</p>
+                                    </div>
+                                    {settings.bank_account_number && (
+                                        <button onClick={() => copyToClipboard(settings.bank_account_number)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 transition-colors">
+                                            <Copy size={16} />
+                                        </button>
+                                    )}
                                 </div>
-                                {settings.bank_account_number && (
-                                    <button onClick={() => copyToClipboard(settings.bank_account_number)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 transition-colors">
-                                        <Copy size={16} />
-                                    </button>
-                                )}
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <div>
-                                    <p className="text-xs text-slate-500">Account Holder</p>
-                                    <p className="font-bold text-sm text-slate-900">{settings.bank_holder_name || 'Not configured'}</p>
+                                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div>
+                                        <p className="text-xs text-slate-500">Account Holder</p>
+                                        <p className="font-bold text-sm text-slate-900">{settings.bank_holder_name || 'Not configured'}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {/* SECTION B — DuitNow QR Payment */}
-                {pm === 'duitnow' && settings.qr_code_url && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-purple-200 p-6 space-y-4">
-                        <h3 className="font-bold text-purple-600 flex items-center gap-2">
-                            <QrCode size={18} /> DuitNow QR Payment
-                        </h3>
-                        <div className="text-center space-y-3">
-                            <div className="inline-block p-3 bg-white rounded-xl border-2 border-purple-200 shadow-sm">
-                                <img
-                                    src={settings.qr_code_url}
-                                    alt="DuitNow QR Code"
-                                    className="w-56 h-56 object-contain mx-auto"
-                                />
+                        {settings.qr_code_url && (
+                            <div className="bg-white rounded-2xl shadow-sm border border-purple-200 p-6 space-y-4">
+                                <h3 className="font-bold text-purple-600 flex items-center gap-2">
+                                    <QrCode size={18} /> DuitNow QR Payment
+                                </h3>
+                                <div className="text-center space-y-3">
+                                    <div className="inline-block p-3 bg-white rounded-xl border-2 border-purple-200 shadow-sm">
+                                        <img
+                                            src={settings.qr_code_url}
+                                            alt="DuitNow QR Code"
+                                            className="w-56 h-56 object-contain mx-auto"
+                                        />
+                                    </div>
+                                    <p className="text-sm text-slate-500">Scan using any Malaysian banking app</p>
+                                </div>
                             </div>
-                            <p className="text-sm text-slate-500">Scan using any Malaysian banking app</p>
-                        </div>
+                        )}
                     </div>
                 )}
 
