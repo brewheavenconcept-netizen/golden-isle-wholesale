@@ -42,7 +42,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         {children}
                     </ErrorBoundary>
                 </main>
-                <Toaster position="top-right" />
+                <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
             </div>
         );
     }
@@ -56,7 +56,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         {children}
                     </ErrorBoundary>
                 </main>
-                <Toaster position="top-right" />
+                <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
             </div>
         </NotificationsProvider>
     );

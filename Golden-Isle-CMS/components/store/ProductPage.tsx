@@ -190,7 +190,7 @@ export default function ProductPage() {
                                     <img
                                         src={product.image_url}
                                         alt={product.name}
-                                        className="w-[85%] h-[85%] object-contain absolute inset-0 m-auto mix-blend-luminosity"
+                                        className="w-[85%] h-[85%] object-contain absolute inset-0 m-auto"
                                         onError={(e) => {
                                             e.currentTarget.style.display = 'none';
                                             const sibling = e.currentTarget.nextElementSibling as HTMLElement | null;

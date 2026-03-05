@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
 -- 6. Storage Buckets for Images
 INSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('receipts', 'receipts', true) ON CONFLICT DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('payment-qr', 'payment-qr', true) ON CONFLICT DO NOTHING;
 
 -- -----------------------------------------------------
 -- SIMPLIFIED RLS POLICIES (Super Admin / Admin Only)
@@ -94,6 +95,12 @@ CREATE POLICY "Admin manage orders" ON public.orders FOR ALL USING (auth.role() 
 CREATE POLICY "Public read product images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');
 CREATE POLICY "Admin insert product images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images' AND auth.role() = 'authenticated');
 CREATE POLICY "Admin delete product images" ON storage.objects FOR DELETE USING (bucket_id = 'product-images' AND auth.role() = 'authenticated');
+
+-- Storage Payment QR:
+CREATE POLICY "Public read payment qr" ON storage.objects FOR SELECT USING (bucket_id = 'payment-qr');
+CREATE POLICY "Admin insert payment qr" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'payment-qr' AND auth.role() = 'authenticated');
+CREATE POLICY "Admin update payment qr" ON storage.objects FOR UPDATE USING (bucket_id = 'payment-qr' AND auth.role() = 'authenticated');
+CREATE POLICY "Admin delete payment qr" ON storage.objects FOR DELETE USING (bucket_id = 'payment-qr' AND auth.role() = 'authenticated');
 
 -- Insert the Dummy DB Store so the CMS naturally works with single-tenant
 INSERT INTO public.stores (id, name, slug) VALUES ('00000000-0000-0000-0000-000000000000', 'Golden Isle Wholesale', 'default') ON CONFLICT DO NOTHING;

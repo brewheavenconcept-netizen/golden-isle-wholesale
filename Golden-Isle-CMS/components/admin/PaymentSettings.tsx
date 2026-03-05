@@ -76,7 +76,7 @@ export default function PaymentSettings() {
                 const filePath = `${storeId}/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
-                    .from('payments')
+                    .from('payment-qr')
                     .upload(filePath, pendingFile, { cacheControl: '3600', upsert: true });
 
                 if (uploadError) {
@@ -84,7 +84,7 @@ export default function PaymentSettings() {
                     throw new Error('Failed to upload QR image');
                 }
 
-                const { data: urlData } = supabase.storage.from('payments').getPublicUrl(filePath);
+                const { data: urlData } = supabase.storage.from('payment-qr').getPublicUrl(filePath);
                 currentQrUrl = urlData.publicUrl;
             }
 
