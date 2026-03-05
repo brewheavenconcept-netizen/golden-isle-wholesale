@@ -58,7 +58,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (authLoading) return;
-        setSettingsLoading(false);
+        const timer = setTimeout(() => {
+            setSettingsLoading(false);
+        }, 0);
+        return () => clearTimeout(timer);
     }, [authLoading]);
 
     const reload = useCallback(() => {

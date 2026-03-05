@@ -1,0 +1,57 @@
+﻿
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx
+  26:36  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx:26:36
+  24 |     };
+  25 |
+> 26 |     useEffect(() => { if (storeId) loadProducts(); }, [storeId]);
+     |                                    ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  27 |
+  28 |     const handleCreateNew = () => { setEditingProduct(null); setIsFormOpen(true); };
+  29 |     const handleEditProduct = (product: Product) => { setEditingProduct(product); setIsFormOpen(true); };  react-hooks/set-state-in-effect
+  26:55  warning  React Hook useEffect has a missing dependency: 'loadProducts'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx
+    6:10  warning  'Package' is defined but never used            @typescript-eslint/no-unused-vars
+   17:65  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   33:12  warning  'products' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  133:52  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx
+    4:78   warning  'CheckCircle2' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    4:92   warning  'Wallet' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    4:100  warning  'Building2' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  113:247  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  183:41   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Sidebar.tsx
+    3:68   warning  'ExternalLink' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    3:102  warning  'Sun' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+    3:107  warning  'Moon' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+    3:113  warning  'Megaphone' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    3:136  warning  'ShieldCheck' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   10:10   warning  'useNotifications' is defined but never used                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   12:10   warning  'useAuth' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   23:13   warning  'store' is assigned a value but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   70:57   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  103:21   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  119:29   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\CartPage.tsx
+  84:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\context\StoreContext.tsx
+   3:78  warning  'useRef' is defined but never used         @typescript-eslint/no-unused-vars
+   7:22  warning  'useStoreHook' is defined but never used   @typescript-eslint/no-unused-vars
+   7:36  warning  'generateSlug' is defined but never used   @typescript-eslint/no-unused-vars
+  35:13  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 27 problems (5 errors, 22 warnings)
+

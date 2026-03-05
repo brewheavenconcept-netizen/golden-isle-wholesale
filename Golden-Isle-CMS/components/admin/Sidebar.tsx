@@ -11,7 +11,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
-import StoreSwitcher from "./StoreSwitcher";
 
 export default function Sidebar({
     sidebarOpen,
@@ -25,7 +24,10 @@ export default function Sidebar({
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
-    useEffect(() => setMounted(true), []);
+    useEffect(() => {
+        const timer = setTimeout(() => setMounted(true), 0);
+        return () => clearTimeout(timer);
+    }, []);
     const router = useRouter();
     const pathname = usePathname();
     const storeName = settings.store_name || "Golden Isle Wholesale";
@@ -65,7 +67,7 @@ export default function Sidebar({
         }
     }, [setSidebarOpen]);
 
-    const navItem = (href: string, label: string, Icon: any, badge?: number) => {
+    const navItem = (href: string, label: string, Icon: React.ElementType, badge?: number) => {
         const isActive = pathname === href || pathname.startsWith(href + '/');
         return (
             <Link
@@ -135,6 +137,7 @@ export default function Sidebar({
                     {navItem("/admin/analytics", "Analytics", TrendingUp)}
                     {navItem("/admin/products", "Products", Package)}
                     {navItem("/admin/orders", "Orders", ShoppingBag)}
+                    {navItem("/admin/payment", "Payment Settings", CreditCard)}
                     {navItem("/admin/settings", "Settings", Settings)}
                 </nav>
 

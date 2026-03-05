@@ -14,6 +14,18 @@ import {
 
 const PIE_COLORS = ['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'];
 
+const StatCard = ({ title, value, icon: Icon, color, loading }: { title: string, value: string | number, icon: React.ElementType, color: string, loading?: boolean }) => (
+    <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
+        <div>
+            <p className="text-xs font-medium text-slate-500 dark:text-gray-400 mb-1">{title}</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{loading ? <Skeleton width="80px" height="28px" /> : value}</h3>
+        </div>
+        <div className={`p-2.5 rounded-lg ${color} text-white`}>
+            <Icon size={20} />
+        </div>
+    </div>
+);
+
 export default function Dashboard() {
     const { storeId } = useStore();
     const { theme } = useTheme();
@@ -87,26 +99,16 @@ export default function Dashboard() {
     const topProducts = getTopProducts();
     const statusDist = getStatusDist();
 
-    const StatCard = ({ title, value, icon: Icon, color }: any) => (
-        <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
-            <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-gray-400 mb-1">{title}</p>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{loading ? <Skeleton width="80px" height="28px" /> : value}</h3>
-            </div>
-            <div className={`p-2.5 rounded-lg ${color} text-white`}>
-                <Icon size={20} />
-            </div>
-        </div>
-    );
+    // StatCard moved outside the component
 
     return (
         <div className="space-y-6">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">Business Overview</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard title="Total Revenue" value={`RM ${totalRevenue.toFixed(2)}`} icon={DollarSign} color="bg-emerald-500" />
-                <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" />
-                <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" />
-                <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" />
+                <StatCard title="Total Revenue" value={`RM ${totalRevenue.toFixed(2)}`} icon={DollarSign} color="bg-emerald-500" loading={loading} />
+                <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" loading={loading} />
+                <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" loading={loading} />
+                <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" loading={loading} />
             </div>
             {!loading && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -128,7 +130,7 @@ export default function Dashboard() {
                                         color: isDark ? '#fff' : '#000'
                                     }}
                                     itemStyle={{ color: isDark ? '#fff' : '#000' }}
-                                    formatter={(v: any) => [`RM ${Number(v).toFixed(2)}`, 'Revenue']}
+                                    formatter={(v: number | string | undefined) => [`RM ${Number(v || 0).toFixed(2)}`, 'Revenue']}
                                 />
                                 <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6' }} />
                             </LineChart>

@@ -13,7 +13,10 @@ export default function CartPage() {
     const loadCart = () => setCart(getCart());
 
     useEffect(() => {
-        loadCart();
+        const timer = setTimeout(() => {
+            loadCart();
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const notifyCartUpdate = () => window.dispatchEvent(new Event('cart-updated'));

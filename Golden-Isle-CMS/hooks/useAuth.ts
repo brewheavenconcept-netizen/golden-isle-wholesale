@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
-let superAdminCache: Record<string, boolean> = {};
-let superAdminPending: Record<string, Promise<boolean> | undefined> = {};
+const superAdminCache: Record<string, boolean> = {};
+const superAdminPending: Record<string, Promise<boolean> | undefined> = {};
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);

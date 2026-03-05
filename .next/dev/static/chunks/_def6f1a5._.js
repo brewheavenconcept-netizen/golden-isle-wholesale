@@ -1509,6 +1509,705 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
 }),
+"[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>WhiskyIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+;
+function WhiskyIcon({ size = 56, className = '' }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size * (56 / 48),
+        viewBox: "0 0 48 72",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "19",
+                y: "0",
+                width: "10",
+                height: "6",
+                rx: "2",
+                fill: "#c9a84c"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 11,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "20",
+                y: "6",
+                width: "8",
+                height: "14",
+                rx: "3",
+                fill: "#8B4513"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 12,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "21",
+                y: "6",
+                width: "3",
+                height: "14",
+                fill: "#a0522d",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 13,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M16 20 Q10 28 10 36 L38 36 Q38 28 32 20 Z",
+                fill: "#8B4513"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 14,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M16 20 Q13 28 13 36 L20 36 L20 20 Z",
+                fill: "#a0522d",
+                opacity: "0.4"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 15,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "36",
+                width: "28",
+                height: "30",
+                rx: "3",
+                fill: "#8B4513"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 16,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "36",
+                width: "9",
+                height: "30",
+                rx: "2",
+                fill: "#a0522d",
+                opacity: "0.3"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 17,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "13",
+                y: "40",
+                width: "22",
+                height: "18",
+                rx: "2",
+                fill: "#f5deb3",
+                opacity: "0.9"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "15",
+                y: "44",
+                width: "18",
+                height: "2",
+                rx: "1",
+                fill: "#8B4513",
+                opacity: "0.7"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 19,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "16",
+                y: "48",
+                width: "14",
+                height: "1.5",
+                rx: "1",
+                fill: "#8B4513",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 20,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "17",
+                y: "51",
+                width: "12",
+                height: "1.5",
+                rx: "1",
+                fill: "#8B4513",
+                opacity: "0.4"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 21,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "66",
+                width: "28",
+                height: "4",
+                rx: "2",
+                fill: "#6b3510"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "13",
+                y: "22",
+                width: "3",
+                height: "30",
+                rx: "1.5",
+                fill: "white",
+                opacity: "0.12"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WhiskyIcon.tsx",
+                lineNumber: 23,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/icons/WhiskyIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 9
+    }, this);
+}
+_c = WhiskyIcon;
+var _c;
+__turbopack_context__.k.register(_c, "WhiskyIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/components/icons/WineIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>WineIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+;
+function WineIcon({ size = 56, className = '' }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size * (56 / 44),
+        viewBox: "0 0 44 72",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "18",
+                y: "0",
+                width: "8",
+                height: "5",
+                rx: "1.5",
+                fill: "#d2a679"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 11,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "17",
+                y: "4",
+                width: "10",
+                height: "5",
+                rx: "1",
+                fill: "#722F37"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 12,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "18",
+                y: "9",
+                width: "8",
+                height: "16",
+                rx: "3",
+                fill: "#2d1b1b"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 13,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "19",
+                y: "9",
+                width: "3",
+                height: "16",
+                fill: "#3d2b2b",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 14,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M14 25 Q7 34 7 42 L37 42 Q37 34 30 25 Z",
+                fill: "#2d1b1b"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 15,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M14 25 Q10 34 10 42 L18 42 L18 25 Z",
+                fill: "#3d2b2b",
+                opacity: "0.4"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 16,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "7",
+                y: "42",
+                width: "30",
+                height: "26",
+                rx: "3",
+                fill: "#2d1b1b"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 17,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "7",
+                y: "42",
+                width: "10",
+                height: "26",
+                rx: "2",
+                fill: "#3d2b2b",
+                opacity: "0.3"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "46",
+                width: "24",
+                height: "16",
+                rx: "2",
+                fill: "#722F37",
+                opacity: "0.9"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 19,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "12",
+                y: "48",
+                width: "20",
+                height: "2",
+                rx: "1",
+                fill: "#f5c2c7",
+                opacity: "0.8"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 20,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "13",
+                y: "52",
+                width: "16",
+                height: "1.5",
+                rx: "1",
+                fill: "#f5c2c7",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 21,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "14",
+                y: "55",
+                width: "14",
+                height: "1.5",
+                rx: "1",
+                fill: "#f5c2c7",
+                opacity: "0.4"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "7",
+                y: "68",
+                width: "30",
+                height: "3",
+                rx: "1.5",
+                fill: "#1a0e0e"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 23,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "27",
+                width: "3",
+                height: "32",
+                rx: "1.5",
+                fill: "white",
+                opacity: "0.1"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/WineIcon.tsx",
+                lineNumber: 24,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/icons/WineIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 9
+    }, this);
+}
+_c = WineIcon;
+var _c;
+__turbopack_context__.k.register(_c, "WineIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>BeerIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+;
+function BeerIcon({ size = 56, className = '' }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size * (56 / 54),
+        viewBox: "0 0 60 72",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M44 26 Q58 26 58 38 Q58 50 44 50",
+                stroke: "#B8860B",
+                strokeWidth: "6",
+                fill: "none",
+                strokeLinecap: "round"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 11,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M44 26 Q54 26 54 38 Q54 50 44 50",
+                stroke: "#d4a853",
+                strokeWidth: "2",
+                fill: "none",
+                strokeLinecap: "round",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 12,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "6",
+                y: "20",
+                width: "40",
+                height: "46",
+                rx: "4",
+                fill: "#B8860B"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 13,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "6",
+                y: "20",
+                width: "13",
+                height: "46",
+                rx: "3",
+                fill: "#c9a84c",
+                opacity: "0.3"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 14,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "8",
+                y: "32",
+                width: "36",
+                height: "32",
+                rx: "2",
+                fill: "#d4a853"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 15,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "8",
+                y: "32",
+                width: "12",
+                height: "32",
+                rx: "2",
+                fill: "#e0b84d",
+                opacity: "0.3"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 16,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
+                cx: "14",
+                cy: "32",
+                rx: "6",
+                ry: "5",
+                fill: "white",
+                opacity: "0.95"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 17,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
+                cx: "24",
+                cy: "30",
+                rx: "7",
+                ry: "6",
+                fill: "white",
+                opacity: "0.95"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
+                cx: "34",
+                cy: "32",
+                rx: "6",
+                ry: "5",
+                fill: "white",
+                opacity: "0.95"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 19,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
+                cx: "42",
+                cy: "33",
+                rx: "4",
+                ry: "4",
+                fill: "white",
+                opacity: "0.90"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 20,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "8",
+                y: "30",
+                width: "36",
+                height: "8",
+                fill: "white",
+                opacity: "0.85"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 21,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "4",
+                y: "64",
+                width: "44",
+                height: "6",
+                rx: "3",
+                fill: "#8B640A"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "10",
+                y: "22",
+                width: "4",
+                height: "38",
+                rx: "2",
+                fill: "white",
+                opacity: "0.12"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 23,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
+                cx: "18",
+                cy: "50",
+                r: "2",
+                fill: "#e8c66a",
+                opacity: "0.6"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 24,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
+                cx: "28",
+                cy: "44",
+                r: "1.5",
+                fill: "#e8c66a",
+                opacity: "0.5"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 25,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
+                cx: "36",
+                cy: "54",
+                r: "2",
+                fill: "#e8c66a",
+                opacity: "0.6"
+            }, void 0, false, {
+                fileName: "[project]/components/icons/BeerIcon.tsx",
+                lineNumber: 26,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/icons/BeerIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 9
+    }, this);
+}
+_c = BeerIcon;
+var _c;
+__turbopack_context__.k.register(_c, "BeerIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>AllCategoryIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+;
+function AllCategoryIcon({ size = 56, className = '' }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+            d: "M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9L12 2Z",
+            fill: "#d4a853"
+        }, void 0, false, {
+            fileName: "[project]/components/icons/AllCategoryIcon.tsx",
+            lineNumber: 11,
+            columnNumber: 13
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/components/icons/AllCategoryIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 9
+    }, this);
+}
+_c = AllCategoryIcon;
+var _c;
+__turbopack_context__.k.register(_c, "AllCategoryIcon");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/components/icons/index.ts [app-client] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/WineIcon.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript)");
+;
+;
+;
+;
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript) <export default as WhiskyIcon>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "WhiskyIcon",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript)");
+}),
+"[project]/components/icons/WineIcon.tsx [app-client] (ecmascript) <export default as WineIcon>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "WineIcon",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/WineIcon.tsx [app-client] (ecmascript)");
+}),
+"[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript) <export default as BeerIcon>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "BeerIcon",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript)");
+}),
+"[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript) <export default as AllCategoryIcon>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "AllCategoryIcon",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript)");
+}),
 "[project]/components/store/ProductCard.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -1518,7 +2217,11 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Package$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/package.js [app-client] (ecmascript) <export default as Package>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$index$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/components/icons/index.ts [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WhiskyIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript) <export default as WhiskyIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WineIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/WineIcon.tsx [app-client] (ecmascript) <export default as WineIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BeerIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript) <export default as BeerIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AllCategoryIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript) <export default as AllCategoryIcon>");
 'use client';
 ;
 ;
@@ -1534,52 +2237,15 @@ function ProductCard({ product }) {
                     className: "absolute inset-0 bg-[#722F37]/20 blur-2xl rounded-full"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 17,
+                    lineNumber: 18,
                     columnNumber: 17
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                    width: "56",
-                    height: "56",
-                    viewBox: "0 0 24 24",
-                    fill: "none",
-                    stroke: "#722F37",
-                    strokeWidth: "1.5",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(114,47,55,0.5)] relative z-10",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M8 22h8"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 19,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M7 10h10"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 20,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M12 15v7"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 21,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 22,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WineIcon$3e$__["WineIcon"], {
+                    size: 56,
+                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(114,47,55,0.5)] relative z-10"
+                }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 18,
+                    lineNumber: 19,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1587,13 +2253,13 @@ function ProductCard({ product }) {
                     children: "NO IMAGE"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 24,
+                    lineNumber: 20,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/store/ProductCard.tsx",
-            lineNumber: 16,
+            lineNumber: 17,
             columnNumber: 13
         }, this);
         if (cat.includes('beer')) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1603,45 +2269,15 @@ function ProductCard({ product }) {
                     className: "absolute inset-0 bg-[#B8860B]/20 blur-2xl rounded-full"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 29,
+                    lineNumber: 25,
                     columnNumber: 17
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                    width: "56",
-                    height: "56",
-                    viewBox: "0 0 24 24",
-                    fill: "none",
-                    stroke: "#B8860B",
-                    strokeWidth: "1.5",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(184,134,11,0.5)] relative z-10",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M17 11h1.2a3.24 3.24 0 0 1 3.18 3.18O21.38 18 21.38 18a3.24 3.24 0 0 1-3.18 3.18H17"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 31,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "m5 8 2 14h10l2-14"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 32,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M7 8S6 2 12 2s5 6 5 6"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 33,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BeerIcon$3e$__["BeerIcon"], {
+                    size: 56,
+                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(184,134,11,0.5)] relative z-10"
+                }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 30,
+                    lineNumber: 26,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1649,13 +2285,13 @@ function ProductCard({ product }) {
                     children: "NO IMAGE"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 35,
+                    lineNumber: 27,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/store/ProductCard.tsx",
-            lineNumber: 28,
+            lineNumber: 24,
             columnNumber: 13
         }, this);
         if (cat.includes('whisky')) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1665,63 +2301,15 @@ function ProductCard({ product }) {
                     className: "absolute inset-0 bg-[#92400e]/20 blur-2xl rounded-full"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 40,
+                    lineNumber: 32,
                     columnNumber: 17
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                    width: "56",
-                    height: "56",
-                    viewBox: "0 0 24 24",
-                    fill: "none",
-                    stroke: "#92400e",
-                    strokeWidth: "1.5",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(146,64,14,0.5)] relative z-10",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M10 2v7.51"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 42,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M14 2v7.51"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 43,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                            x: "5",
-                            y: "9",
-                            width: "14",
-                            height: "13",
-                            rx: "2"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 44,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M8 2h8"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 45,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                            d: "M5 14h14"
-                        }, void 0, false, {
-                            fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 46,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WhiskyIcon$3e$__["WhiskyIcon"], {
+                    size: 56,
+                    className: "opacity-90 drop-shadow-[0_0_8px_rgba(146,64,14,0.5)] relative z-10"
+                }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 41,
+                    lineNumber: 33,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1729,13 +2317,13 @@ function ProductCard({ product }) {
                     children: "NO IMAGE"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 48,
+                    lineNumber: 34,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/store/ProductCard.tsx",
-            lineNumber: 39,
+            lineNumber: 31,
             columnNumber: 13
         }, this);
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1745,15 +2333,15 @@ function ProductCard({ product }) {
                     className: "absolute inset-0 bg-[#d4a853]/20 blur-2xl rounded-full"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 53,
+                    lineNumber: 39,
                     columnNumber: 17
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Package$3e$__["Package"], {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AllCategoryIcon$3e$__["AllCategoryIcon"], {
                     size: 56,
                     className: "text-[#d4a853] opacity-90 drop-shadow-[0_0_8px_rgba(212,168,83,0.5)] relative z-10"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 54,
+                    lineNumber: 40,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1761,13 +2349,13 @@ function ProductCard({ product }) {
                     children: "NO IMAGE"
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 55,
+                    lineNumber: 41,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/store/ProductCard.tsx",
-            lineNumber: 52,
+            lineNumber: 38,
             columnNumber: 13
         }, this);
     };
@@ -1775,17 +2363,17 @@ function ProductCard({ product }) {
     const isOutOfStock = product.stock_status === 'out_of_stock' || product.stock <= 0;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
         href: `/product/${product.id}`,
-        className: `group bg-[#1a1a2e] rounded-2xl overflow-hidden border border-white/5 shadow-sm transition-all duration-300 ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_8px_30px_rgba(212,168,83,0.3)] hover:border-[#d4a853]'}`,
+        className: `group bg-white rounded-2xl overflow-hidden border border-[#e8e4dd] shadow-sm transition-all duration-300 ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_8px_30px_rgba(212,168,83,0.3)] hover:border-[#d4a853]'}`,
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "aspect-square bg-[#0a0a14] flex items-center justify-center overflow-hidden relative",
+                className: "aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative",
                 children: imageUrl ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                             src: imageUrl,
                             alt: product.name,
                             loading: "lazy",
-                            className: "w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500",
+                            className: "w-[85%] h-[85%] object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500",
                             onError: (e)=>{
                                 e.currentTarget.style.display = 'none';
                                 const sibling = e.currentTarget.nextElementSibling;
@@ -1793,71 +2381,58 @@ function ProductCard({ product }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 68,
+                            lineNumber: 54,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "hidden absolute inset-0 w-full h-full flex items-center justify-center bg-[#1a1a2e]",
+                            className: "hidden absolute inset-0 w-full h-full flex items-center justify-center bg-[#fafaf7]",
                             children: getCategoryPlaceholder()
                         }, void 0, false, {
                             fileName: "[project]/components/store/ProductCard.tsx",
-                            lineNumber: 79,
+                            lineNumber: 65,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-full h-full flex items-center justify-center bg-[#1a1a2e]",
+                    className: "w-full h-full flex items-center justify-center bg-[#fafaf7]",
                     children: getCategoryPlaceholder()
                 }, void 0, false, {
                     fileName: "[project]/components/store/ProductCard.tsx",
-                    lineNumber: 84,
+                    lineNumber: 70,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/store/ProductCard.tsx",
-                lineNumber: 65,
+                lineNumber: 51,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "p-4 border-t border-white/5",
+                className: "p-4 border-t border-[#fafaf7]",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                        className: "font-bold text-white text-sm truncate group-hover:text-[#d4a853] transition-colors",
+                        className: "font-bold text-[#1a1a1a] text-sm truncate group-hover:text-[#b8960c] transition-colors",
                         children: product.name
                     }, void 0, false, {
                         fileName: "[project]/components/store/ProductCard.tsx",
-                        lineNumber: 90,
+                        lineNumber: 76,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center gap-2 mt-2",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-lg font-bold text-[#d4a853]",
-                                children: [
-                                    "RM ",
-                                    product.price.toFixed(2)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/store/ProductCard.tsx",
-                                lineNumber: 92,
-                                columnNumber: 21
-                            }, this),
-                            product.compare_at_price && product.compare_at_price > product.price && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-sm font-medium text-[#6b6b6b] line-through",
-                                children: [
-                                    "RM ",
-                                    product.compare_at_price.toFixed(2)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/store/ProductCard.tsx",
-                                lineNumber: 94,
-                                columnNumber: 25
-                            }, this)
-                        ]
-                    }, void 0, true, {
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "text-lg font-bold text-[#1a1a1a]",
+                            children: [
+                                "RM ",
+                                product.price.toFixed(2)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/store/ProductCard.tsx",
+                            lineNumber: 78,
+                            columnNumber: 21
+                        }, this)
+                    }, void 0, false, {
                         fileName: "[project]/components/store/ProductCard.tsx",
-                        lineNumber: 91,
+                        lineNumber: 77,
                         columnNumber: 17
                     }, this),
                     isOutOfStock ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1865,33 +2440,33 @@ function ProductCard({ product }) {
                         children: "Out of Stock"
                     }, void 0, false, {
                         fileName: "[project]/components/store/ProductCard.tsx",
-                        lineNumber: 98,
+                        lineNumber: 81,
                         columnNumber: 21
                     }, this) : product.stock_status === 'low_stock' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         className: "inline-block mt-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded animate-pulse",
                         children: "Low Stock"
                     }, void 0, false, {
                         fileName: "[project]/components/store/ProductCard.tsx",
-                        lineNumber: 100,
+                        lineNumber: 83,
                         columnNumber: 21
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         className: "inline-block mt-2 text-xs font-bold text-green-600 bg-green-50 border border-green-100 px-2.5 py-1 rounded",
                         children: "In Stock"
                     }, void 0, false, {
                         fileName: "[project]/components/store/ProductCard.tsx",
-                        lineNumber: 102,
+                        lineNumber: 85,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/store/ProductCard.tsx",
-                lineNumber: 89,
+                lineNumber: 75,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/store/ProductCard.tsx",
-        lineNumber: 64,
+        lineNumber: 50,
         columnNumber: 9
     }, this);
 }
@@ -1943,10 +2518,10 @@ __turbopack_context__.s([
     ()=>MOCK_PRODUCTS
 ]);
 const DEFAULT_SETTINGS = {
-    store_name: 'BrewCart Pro',
+    store_name: 'Golden Isle Wholesale',
     whatsapp_number: '60123456789',
     currency: 'MYR',
-    theme_color: '#2563eb',
+    theme_color: '#d4af37',
     logo_url: '',
     timezone: 'Asia/Kuala_Lumpur',
     delivery_fee: 10.00,
@@ -2149,11 +2724,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$data$2f$mockData$2e$ts__$5b$
 ;
 ;
 async function getProducts(storeId) {
-    if (!storeId) {
-        console.warn('[getProducts] No storeId provided — returning empty array');
-        return [];
-    }
-    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').select('*').eq('store_id', storeId).order('created_at', {
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').select('*').order('created_at', {
         ascending: false
     });
     if (error) {
@@ -2163,8 +2734,7 @@ async function getProducts(storeId) {
     return data || [];
 }
 async function getProduct(id, storeId) {
-    if (!storeId) return null;
-    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').select('*').eq('id', id).eq('store_id', storeId).single();
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').select('*').eq('id', id).single();
     if (error) {
         console.error('[getProduct] Error:', error.message);
         return null;
@@ -2180,13 +2750,8 @@ async function getProductPublic(id) {
     return data;
 }
 async function addProduct(product, storeId) {
-    if (!storeId) {
-        console.error('[addProduct] No storeId — aborting');
-        return null;
-    }
     const payload = {
         ...product,
-        store_id: storeId,
         status: product.status || 'active'
     };
     const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').insert([
@@ -2199,19 +2764,11 @@ async function addProduct(product, storeId) {
     return data;
 }
 async function updateProduct(id, updates, storeId) {
-    if (!storeId) {
-        console.error('[updateProduct] No storeId — aborting');
-        return;
-    }
-    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').update(updates).eq('id', id).eq('store_id', storeId);
+    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').update(updates).eq('id', id);
     if (error) console.error('[updateProduct] Error:', error.message);
 }
 async function deleteProduct(id, storeId) {
-    if (!storeId) {
-        console.error('[deleteProduct] No storeId — aborting');
-        return;
-    }
-    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').delete().eq('id', id).eq('store_id', storeId);
+    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from('products').delete().eq('id', id);
     if (error) console.error('[deleteProduct] Error:', error.message);
 }
 async function createOrderWithStockCheck(order, storeId) {
@@ -2661,6 +3218,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$store$2f$Produ
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shopping$2d$bag$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShoppingBag$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/shopping-bag.js [app-client] (ecmascript) <export default as ShoppingBag>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.js [app-client] (ecmascript) <export default as Loader2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$usePublicStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/hooks/usePublicStore.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$index$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/components/icons/index.ts [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WhiskyIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/WhiskyIcon.tsx [app-client] (ecmascript) <export default as WhiskyIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WineIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/WineIcon.tsx [app-client] (ecmascript) <export default as WineIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BeerIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/BeerIcon.tsx [app-client] (ecmascript) <export default as BeerIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AllCategoryIcon$3e$__ = __turbopack_context__.i("[project]/components/icons/AllCategoryIcon.tsx [app-client] (ecmascript) <export default as AllCategoryIcon>");
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
@@ -2669,8 +3231,48 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
+const getCategoryIcon = (category, size)=>{
+    switch(category){
+        case 'Whisky':
+            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WhiskyIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WhiskyIcon$3e$__["WhiskyIcon"], {
+                size: size,
+                className: "drop-shadow-[0_4px_12px_rgba(139,69,19,0.45)] flex-shrink-0"
+            }, void 0, false, {
+                fileName: "[project]/components/landing/ProductsSection.tsx",
+                lineNumber: 13,
+                columnNumber: 31
+            }, ("TURBOPACK compile-time value", void 0));
+        case 'Wine':
+            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$WineIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__WineIcon$3e$__["WineIcon"], {
+                size: size,
+                className: "drop-shadow-[0_4px_12px_rgba(114,47,55,0.45)] flex-shrink-0"
+            }, void 0, false, {
+                fileName: "[project]/components/landing/ProductsSection.tsx",
+                lineNumber: 14,
+                columnNumber: 29
+            }, ("TURBOPACK compile-time value", void 0));
+        case 'Craft Beer':
+            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$BeerIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BeerIcon$3e$__["BeerIcon"], {
+                size: size,
+                className: "drop-shadow-[0_4px_12px_rgba(184,134,11,0.45)] flex-shrink-0"
+            }, void 0, false, {
+                fileName: "[project]/components/landing/ProductsSection.tsx",
+                lineNumber: 15,
+                columnNumber: 35
+            }, ("TURBOPACK compile-time value", void 0));
+        default:
+            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$AllCategoryIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AllCategoryIcon$3e$__["AllCategoryIcon"], {
+                size: size,
+                className: "drop-shadow-[0_4px_12px_rgba(212,168,83,0.45)] flex-shrink-0"
+            }, void 0, false, {
+                fileName: "[project]/components/landing/ProductsSection.tsx",
+                lineNumber: 16,
+                columnNumber: 25
+            }, ("TURBOPACK compile-time value", void 0));
+    }
+};
 const filterCategories = [
-    'All',
     'Whisky',
     'Wine',
     'Craft Beer'
@@ -2680,7 +3282,7 @@ function ProductsSection() {
     const { storeId, loading: storeLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$usePublicStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePublicStore"])();
     const [products, setProducts] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    const [selectedCategory, setSelectedCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('All');
+    const [selectedCategory, setSelectedCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('Whisky');
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "ProductsSection.useEffect": ()=>{
             // Initialize Supabase Client
@@ -2690,7 +3292,7 @@ function ProductsSection() {
                 try {
                     console.log('Fetching products for store:', storeId);
                     // Fetch active products from supabase
-                    const { data, error } = await supabase.from('products').select('*').order('created_at', {
+                    const { data, error } = await supabase.from('products').select('id, name, price, image_url, category, stock_status, description').order('created_at', {
                         ascending: false
                     });
                     if (error) {
@@ -2740,7 +3342,6 @@ function ProductsSection() {
         }
     }["ProductsSection.useEffect"], []);
     const categories = [
-        'All',
         'Whisky',
         'Wine',
         'Craft Beer'
@@ -2748,10 +3349,7 @@ function ProductsSection() {
     const filteredProducts = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "ProductsSection.useMemo[filteredProducts]": ()=>{
             return products.filter({
-                "ProductsSection.useMemo[filteredProducts]": (p)=>{
-                    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-                    return matchesCategory;
-                }
+                "ProductsSection.useMemo[filteredProducts]": (p)=>p.category === selectedCategory
             }["ProductsSection.useMemo[filteredProducts]"]);
         }
     }["ProductsSection.useMemo[filteredProducts]"], [
@@ -2761,7 +3359,7 @@ function ProductsSection() {
     if (loading || storeLoading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
             id: "products",
-            className: "py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10",
+            className: "py-24 bg-white border-t border-[#e8e4dd] relative z-10",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "max-w-6xl mx-auto px-4 relative",
                 children: [
@@ -2769,34 +3367,34 @@ function ProductsSection() {
                         className: "text-center mb-12",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "inline-flex items-center gap-2 bg-[#1a1a2e] border border-[#2a2a2e] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6",
+                                className: "inline-flex items-center gap-2 bg-[#fafaf7] border border-[#e8e4dd] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
-                                        className: "w-4 h-4 animate-spin text-[#d4a853]"
+                                        className: "w-4 h-4 animate-spin text-[#b8960c]"
                                     }, void 0, false, {
                                         fileName: "[project]/components/landing/ProductsSection.tsx",
-                                        lineNumber: 89,
+                                        lineNumber: 96,
                                         columnNumber: 29
                                     }, this),
                                     " Loading Catalogue..."
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/landing/ProductsSection.tsx",
-                                lineNumber: 88,
+                                lineNumber: 95,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                className: "text-3xl md:text-5xl font-bold font-display text-white mb-4",
+                                className: "text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4",
                                 children: "Our Products"
                             }, void 0, false, {
                                 fileName: "[project]/components/landing/ProductsSection.tsx",
-                                lineNumber: 91,
+                                lineNumber: 98,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/landing/ProductsSection.tsx",
-                        lineNumber: 87,
+                        lineNumber: 94,
                         columnNumber: 21
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2811,42 +3409,42 @@ function ProductsSection() {
                             7,
                             8
                         ].map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "animate-pulse bg-[#111118] rounded-3xl border border-[#1f1f2e] overflow-hidden aspect-[3/4]"
+                                className: "animate-pulse bg-[#fafaf7] rounded-3xl border border-[#e8e4dd] overflow-hidden aspect-[3/4]"
                             }, i, false, {
                                 fileName: "[project]/components/landing/ProductsSection.tsx",
-                                lineNumber: 96,
+                                lineNumber: 103,
                                 columnNumber: 29
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/landing/ProductsSection.tsx",
-                        lineNumber: 94,
+                        lineNumber: 101,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/landing/ProductsSection.tsx",
-                lineNumber: 86,
+                lineNumber: 93,
                 columnNumber: 17
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/landing/ProductsSection.tsx",
-            lineNumber: 85,
+            lineNumber: 92,
             columnNumber: 13
         }, this);
     }
     if (products.length === 0 && !loading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
             id: "products",
-            className: "py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10",
+            className: "py-24 bg-white border-t border-[#e8e4dd] relative z-10",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "max-w-6xl mx-auto px-4 text-center",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                        className: "text-3xl md:text-5xl font-bold font-display text-white mb-4",
+                        className: "text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4",
                         children: "Our Products"
                     }, void 0, false, {
                         fileName: "[project]/components/landing/ProductsSection.tsx",
-                        lineNumber: 108,
+                        lineNumber: 115,
                         columnNumber: 21
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2854,24 +3452,24 @@ function ProductsSection() {
                         children: "Our curated collection is currently being updated. Check back soon!"
                     }, void 0, false, {
                         fileName: "[project]/components/landing/ProductsSection.tsx",
-                        lineNumber: 109,
+                        lineNumber: 116,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/landing/ProductsSection.tsx",
-                lineNumber: 107,
+                lineNumber: 114,
                 columnNumber: 17
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/landing/ProductsSection.tsx",
-            lineNumber: 106,
+            lineNumber: 113,
             columnNumber: 13
         }, this);
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         id: "products",
-        className: "py-24 bg-[#0a0a0a] border-t border-[#1f1f1f] relative z-10",
+        className: "py-24 bg-white border-t border-[#e8e4dd] relative z-10",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "max-w-6xl mx-auto px-4 relative",
             children: [
@@ -2879,43 +3477,43 @@ function ProductsSection() {
                     className: "text-center mb-12",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "inline-flex items-center gap-2 bg-[#1a1a2e] border border-[#2a2a2e] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6 backdrop-blur-sm",
+                            className: "inline-flex items-center gap-2 bg-[#fafaf7] border border-[#e8e4dd] text-[#6b6b6b] px-4 py-1.5 rounded-full text-sm font-medium mb-6 backdrop-blur-sm",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shopping$2d$bag$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShoppingBag$3e$__["ShoppingBag"], {
                                     size: 14,
-                                    className: "text-[#d4a853]"
+                                    className: "text-[#b8960c]"
                                 }, void 0, false, {
                                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                                    lineNumber: 120,
+                                    lineNumber: 127,
                                     columnNumber: 25
                                 }, this),
                                 " Available Wholesale"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 119,
+                            lineNumber: 126,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-3xl md:text-5xl font-bold font-display text-white mb-4",
+                            className: "text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4",
                             children: "Our Products"
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 122,
+                            lineNumber: 129,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-[#6b6b6b] max-w-xl mx-auto text-lg hover:text-white transition-colors",
+                            className: "text-[#6b6b6b] max-w-xl mx-auto text-lg hover:text-[#1a1a1a] transition-colors",
                             children: "Browse our curated selection and place your premium bulk order online."
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 123,
+                            lineNumber: 130,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                    lineNumber: 118,
+                    lineNumber: 125,
                     columnNumber: 17
                 }, this),
                 categories.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2933,583 +3531,28 @@ function ProductsSection() {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 131,
+                            lineNumber: 138,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex gap-6 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#1f1f1f] items-end",
                             children: categories.map((cat, index)=>{
-                                const count = cat === 'All' ? products.length : products.filter((p)=>p.category === cat).length;
+                                const count = products.filter((p)=>p.category === cat).length;
                                 const isActive = selectedCategory === cat;
                                 let btnStyle = '';
                                 let badgeStyle = '';
                                 if (cat === 'Whisky') {
-                                    btnStyle = isActive ? 'bg-[#92400e] text-white shadow-md shadow-[#92400e]/30 border border-transparent font-bold' : 'bg-[#1a1a2e] text-[#b45309] border border-[#92400e]/30 hover:border-[#92400e]/60 hover:bg-[#92400e]/10';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#92400e]/20 text-[#b45309]';
+                                    btnStyle = isActive ? 'bg-[#92400e] text-white shadow-md shadow-[#92400e]/30 border border-transparent font-bold' : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#92400e]/50 hover:bg-amber-50';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
                                 } else if (cat === 'Wine') {
-                                    btnStyle = isActive ? 'bg-[#722F37] text-white shadow-md shadow-[#722F37]/30 border border-transparent font-bold' : 'bg-[#1a1a2e] text-[#9f1239] border border-[#722F37]/30 hover:border-[#722F37]/60 hover:bg-[#722F37]/10';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#722F37]/20 text-[#9f1239]';
+                                    btnStyle = isActive ? 'bg-[#722F37] text-white shadow-md shadow-[#722F37]/30 border border-transparent font-bold' : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#722F37]/50 hover:bg-red-50';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
                                 } else if (cat === 'Craft Beer') {
-                                    btnStyle = isActive ? 'bg-[#B8860B] text-white shadow-md shadow-[#B8860B]/30 border border-transparent font-bold' : 'bg-[#1a1a2e] text-[#ca8a04] border border-[#B8860B]/30 hover:border-[#B8860B]/60 hover:bg-[#B8860B]/10';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-[#B8860B]/20 text-[#ca8a04]';
-                                } else {
-                                    btnStyle = isActive ? 'bg-[#d4a853] text-[#0a0a0a] shadow-md shadow-[#d4a853]/30 border border-transparent font-bold hover:bg-[#c9a84c]' : 'bg-[#1a1a2e] text-[#d4a853] border border-[#d4a853]/30 hover:border-[#d4a853]/60 hover:bg-[#d4a853]/10';
-                                    badgeStyle = isActive ? 'bg-[#0a0a0a]/20 text-[#0a0a0a]' : 'bg-[#d4a853]/20 text-[#d4a853]';
+                                    btnStyle = isActive ? 'bg-[#B8860B] text-white shadow-md shadow-[#B8860B]/30 border border-transparent font-bold' : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#B8860B]/50 hover:bg-yellow-50';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
                                 }
                                 // Beverage SVG icons per category
-                                const categoryIcon = cat === 'Whisky' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    width: "48",
-                                    height: "56",
-                                    viewBox: "0 0 48 72",
-                                    fill: "none",
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    className: "drop-shadow-[0_4px_12px_rgba(139,69,19,0.45)] flex-shrink-0",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "19",
-                                            y: "0",
-                                            width: "10",
-                                            height: "6",
-                                            rx: "2",
-                                            fill: "#c9a84c"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 173,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "20",
-                                            y: "6",
-                                            width: "8",
-                                            height: "14",
-                                            rx: "3",
-                                            fill: "#8B4513"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 174,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "21",
-                                            y: "6",
-                                            width: "3",
-                                            height: "14",
-                                            fill: "#a0522d",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 175,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M16 20 Q10 28 10 36 L38 36 Q38 28 32 20 Z",
-                                            fill: "#8B4513"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 176,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M16 20 Q13 28 13 36 L20 36 L20 20 Z",
-                                            fill: "#a0522d",
-                                            opacity: "0.4"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 177,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "36",
-                                            width: "28",
-                                            height: "30",
-                                            rx: "3",
-                                            fill: "#8B4513"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 178,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "36",
-                                            width: "9",
-                                            height: "30",
-                                            rx: "2",
-                                            fill: "#a0522d",
-                                            opacity: "0.3"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 179,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "13",
-                                            y: "40",
-                                            width: "22",
-                                            height: "18",
-                                            rx: "2",
-                                            fill: "#f5deb3",
-                                            opacity: "0.9"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 180,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "15",
-                                            y: "44",
-                                            width: "18",
-                                            height: "2",
-                                            rx: "1",
-                                            fill: "#8B4513",
-                                            opacity: "0.7"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 181,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "16",
-                                            y: "48",
-                                            width: "14",
-                                            height: "1.5",
-                                            rx: "1",
-                                            fill: "#8B4513",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 182,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "17",
-                                            y: "51",
-                                            width: "12",
-                                            height: "1.5",
-                                            rx: "1",
-                                            fill: "#8B4513",
-                                            opacity: "0.4"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 183,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "66",
-                                            width: "28",
-                                            height: "4",
-                                            rx: "2",
-                                            fill: "#6b3510"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 184,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "13",
-                                            y: "22",
-                                            width: "3",
-                                            height: "30",
-                                            rx: "1.5",
-                                            fill: "white",
-                                            opacity: "0.12"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 185,
-                                            columnNumber: 41
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/landing/ProductsSection.tsx",
-                                    lineNumber: 172,
-                                    columnNumber: 37
-                                }, this) : cat === 'Wine' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    width: "44",
-                                    height: "56",
-                                    viewBox: "0 0 44 72",
-                                    fill: "none",
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    className: "drop-shadow-[0_4px_12px_rgba(114,47,55,0.45)] flex-shrink-0",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "18",
-                                            y: "0",
-                                            width: "8",
-                                            height: "5",
-                                            rx: "1.5",
-                                            fill: "#d2a679"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 189,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "17",
-                                            y: "4",
-                                            width: "10",
-                                            height: "5",
-                                            rx: "1",
-                                            fill: "#722F37"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 190,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "18",
-                                            y: "9",
-                                            width: "8",
-                                            height: "16",
-                                            rx: "3",
-                                            fill: "#2d1b1b"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 191,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "19",
-                                            y: "9",
-                                            width: "3",
-                                            height: "16",
-                                            fill: "#3d2b2b",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 192,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M14 25 Q7 34 7 42 L37 42 Q37 34 30 25 Z",
-                                            fill: "#2d1b1b"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 193,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M14 25 Q10 34 10 42 L18 42 L18 25 Z",
-                                            fill: "#3d2b2b",
-                                            opacity: "0.4"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 194,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "7",
-                                            y: "42",
-                                            width: "30",
-                                            height: "26",
-                                            rx: "3",
-                                            fill: "#2d1b1b"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 195,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "7",
-                                            y: "42",
-                                            width: "10",
-                                            height: "26",
-                                            rx: "2",
-                                            fill: "#3d2b2b",
-                                            opacity: "0.3"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 196,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "46",
-                                            width: "24",
-                                            height: "16",
-                                            rx: "2",
-                                            fill: "#722F37",
-                                            opacity: "0.9"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 197,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "12",
-                                            y: "48",
-                                            width: "20",
-                                            height: "2",
-                                            rx: "1",
-                                            fill: "#f5c2c7",
-                                            opacity: "0.8"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 198,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "13",
-                                            y: "52",
-                                            width: "16",
-                                            height: "1.5",
-                                            rx: "1",
-                                            fill: "#f5c2c7",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 199,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "14",
-                                            y: "55",
-                                            width: "14",
-                                            height: "1.5",
-                                            rx: "1",
-                                            fill: "#f5c2c7",
-                                            opacity: "0.4"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 200,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "7",
-                                            y: "68",
-                                            width: "30",
-                                            height: "3",
-                                            rx: "1.5",
-                                            fill: "#1a0e0e"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 201,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "27",
-                                            width: "3",
-                                            height: "32",
-                                            rx: "1.5",
-                                            fill: "white",
-                                            opacity: "0.1"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 202,
-                                            columnNumber: 41
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/landing/ProductsSection.tsx",
-                                    lineNumber: 188,
-                                    columnNumber: 37
-                                }, this) : cat === 'Craft Beer' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    width: "54",
-                                    height: "56",
-                                    viewBox: "0 0 60 72",
-                                    fill: "none",
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    className: "drop-shadow-[0_4px_12px_rgba(184,134,11,0.45)] flex-shrink-0",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M44 26 Q58 26 58 38 Q58 50 44 50",
-                                            stroke: "#B8860B",
-                                            strokeWidth: "6",
-                                            fill: "none",
-                                            strokeLinecap: "round"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 206,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                            d: "M44 26 Q54 26 54 38 Q54 50 44 50",
-                                            stroke: "#d4a853",
-                                            strokeWidth: "2",
-                                            fill: "none",
-                                            strokeLinecap: "round",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 207,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "6",
-                                            y: "20",
-                                            width: "40",
-                                            height: "46",
-                                            rx: "4",
-                                            fill: "#B8860B"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 208,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "6",
-                                            y: "20",
-                                            width: "13",
-                                            height: "46",
-                                            rx: "3",
-                                            fill: "#c9a84c",
-                                            opacity: "0.3"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 209,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "8",
-                                            y: "32",
-                                            width: "36",
-                                            height: "32",
-                                            rx: "2",
-                                            fill: "#d4a853"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 210,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "8",
-                                            y: "32",
-                                            width: "12",
-                                            height: "32",
-                                            rx: "2",
-                                            fill: "#e0b84d",
-                                            opacity: "0.3"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 211,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
-                                            cx: "14",
-                                            cy: "32",
-                                            rx: "6",
-                                            ry: "5",
-                                            fill: "white",
-                                            opacity: "0.95"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 212,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
-                                            cx: "24",
-                                            cy: "30",
-                                            rx: "7",
-                                            ry: "6",
-                                            fill: "white",
-                                            opacity: "0.95"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 213,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
-                                            cx: "34",
-                                            cy: "32",
-                                            rx: "6",
-                                            ry: "5",
-                                            fill: "white",
-                                            opacity: "0.95"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 214,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ellipse", {
-                                            cx: "42",
-                                            cy: "33",
-                                            rx: "4",
-                                            ry: "4",
-                                            fill: "white",
-                                            opacity: "0.90"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 215,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "8",
-                                            y: "30",
-                                            width: "36",
-                                            height: "8",
-                                            fill: "white",
-                                            opacity: "0.85"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 216,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "4",
-                                            y: "64",
-                                            width: "44",
-                                            height: "6",
-                                            rx: "3",
-                                            fill: "#8B640A"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 217,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                                            x: "10",
-                                            y: "22",
-                                            width: "4",
-                                            height: "38",
-                                            rx: "2",
-                                            fill: "white",
-                                            opacity: "0.12"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 218,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
-                                            cx: "18",
-                                            cy: "50",
-                                            r: "2",
-                                            fill: "#e8c66a",
-                                            opacity: "0.6"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 219,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
-                                            cx: "28",
-                                            cy: "44",
-                                            r: "1.5",
-                                            fill: "#e8c66a",
-                                            opacity: "0.5"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 220,
-                                            columnNumber: 41
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
-                                            cx: "36",
-                                            cy: "54",
-                                            r: "2",
-                                            fill: "#e8c66a",
-                                            opacity: "0.6"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 221,
-                                            columnNumber: 41
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/landing/ProductsSection.tsx",
-                                    lineNumber: 205,
-                                    columnNumber: 37
-                                }, this) : null;
+                                const categoryIcon = getCategoryIcon(cat, 48);
                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex flex-col items-center gap-2",
                                     children: [
@@ -3518,7 +3561,7 @@ function ProductsSection() {
                                             children: categoryIcon
                                         }, void 0, false, {
                                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 228,
+                                            lineNumber: 178,
                                             columnNumber: 45
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3530,7 +3573,7 @@ function ProductsSection() {
                                                     children: cat
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                                                    lineNumber: 236,
+                                                    lineNumber: 186,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3538,41 +3581,41 @@ function ProductsSection() {
                                                     children: count
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                                                    lineNumber: 237,
+                                                    lineNumber: 187,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                                            lineNumber: 232,
+                                            lineNumber: 182,
                                             columnNumber: 41
                                         }, this)
                                     ]
                                 }, `${cat}-${index}`, true, {
                                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                                    lineNumber: 226,
+                                    lineNumber: 176,
                                     columnNumber: 37
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 140,
+                            lineNumber: 147,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true),
                 filteredProducts.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "text-center py-24 text-[#6b6b6b] bg-[#111111] rounded-3xl border border-[#1f1f1f]",
+                    className: "text-center py-24 text-slate-500 bg-[#fafaf7] rounded-3xl border border-[#e8e4dd]",
                     style: {
                         animation: 'productsFadeIn 0.5s ease-out forwards'
                     },
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-xl font-medium text-white mb-2",
-                            children: selectedCategory !== 'All' ? 'No products in this category yet' : 'No products found'
+                            className: "text-xl font-medium text-[#1a1a1a] mb-2",
+                            children: "No products in this category yet"
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 251,
+                            lineNumber: 201,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3580,23 +3623,13 @@ function ProductsSection() {
                             children: "Try exploring our other categories."
                         }, void 0, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 254,
+                            lineNumber: 204,
                             columnNumber: 25
-                        }, this),
-                        selectedCategory !== 'All' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            suppressHydrationWarning: true,
-                            onClick: ()=>setSelectedCategory('All'),
-                            className: "mt-6 px-8 py-3 bg-[#d4a853] text-[#0a0a0a] rounded-full text-sm font-bold hover:bg-[#c9a84c] transition-colors shadow-lg shadow-[#d4a853]/20",
-                            children: "Show All Products"
-                        }, void 0, false, {
-                            fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 256,
-                            columnNumber: 29
                         }, this)
                     ]
                 }, "empty", true, {
                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                    lineNumber: 250,
+                    lineNumber: 200,
                     columnNumber: 21
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8",
@@ -3607,27 +3640,27 @@ function ProductsSection() {
                             product: product
                         }, `${product.id}-${index}`, false, {
                             fileName: "[project]/components/landing/ProductsSection.tsx",
-                            lineNumber: 267,
+                            lineNumber: 209,
                             columnNumber: 29
                         }, this))
                 }, selectedCategory, false, {
                     fileName: "[project]/components/landing/ProductsSection.tsx",
-                    lineNumber: 265,
+                    lineNumber: 207,
                     columnNumber: 21
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/landing/ProductsSection.tsx",
-            lineNumber: 117,
+            lineNumber: 124,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/landing/ProductsSection.tsx",
-        lineNumber: 116,
+        lineNumber: 123,
         columnNumber: 9
     }, this);
 }
-_s(ProductsSection, "f260njujObl9ZJ0j+JK7pDMW0GM=", false, function() {
+_s(ProductsSection, "zEo+XKLgbAkgN9M2xcTcsbjrnWk=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$usePublicStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePublicStore"]
     ];
@@ -6158,4 +6191,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=_5ccb69e0._.js.map
+//# sourceMappingURL=_def6f1a5._.js.map

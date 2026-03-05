@@ -1,12 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
+import Image from 'next/image';
 import { Save, CreditCard, Banknote, ShieldCheck, ChevronRight, ChevronDown, CheckCircle2, Wallet, Building2, ImageIcon, AlertCircle, X, Truck, Landmark, ChevronLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { getSettings, saveSettings } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 import { StoreSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
+
+const StatusBadge = ({ active }: { active: boolean }) => (
+    <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+        {active ? 'Active' : 'Not configured'}
+    </span>
+);
 
 export default function PaymentSettings() {
     const { storeId, settings: ctxSettings, reload } = useStore();
@@ -79,11 +86,7 @@ export default function PaymentSettings() {
         setExpandedSection(prev => prev === section ? null : section);
     };
 
-    const StatusBadge = ({ active }: { active: boolean }) => (
-        <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-            {active ? 'Active' : 'Not configured'}
-        </span>
-    );
+    // StatusBadge moved outside the component
 
     if (loading) return <div className="p-8 text-slate-400 flex items-center justify-center min-h-[50vh]">Loading Payment Profiles...</div>;
 
@@ -108,7 +111,7 @@ export default function PaymentSettings() {
                 <AlertCircle size={18} className="text-blue-500 mt-0.5 shrink-0" />
                 <div className="text-sm text-blue-700 dark:text-blue-300">
                     <p className="font-medium">Online payments (Stripe, ToyyibPay) are coming soon.</p>
-                    <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Your customers currently see: <strong>Cash on Delivery</strong> and <strong>Bank Transfer / DuitNow QR</strong>. You can save your Stripe & ToyyibPay keys now — they'll activate automatically when integration is ready.</p>
+                    <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Your customers currently see: <strong>Cash on Delivery</strong> and <strong>Bank Transfer / DuitNow QR</strong>. You can save your Stripe & ToyyibPay keys now &mdash; they&apos;ll activate automatically when integration is ready.</p>
                 </div>
             </div>
             <div>
@@ -178,7 +181,7 @@ export default function PaymentSettings() {
                                 </label>
                                 {formData.qr_code_url ? (
                                     <div className="relative inline-block border bg-white dark:bg-slate-800 p-2 rounded-xl">
-                                        <img src={formData.qr_code_url} alt="QR" className="w-32 h-32 object-contain" />
+                                        <Image src={formData.qr_code_url} alt="QR Code" width={128} height={128} className="w-32 h-32 object-contain" />
                                         <button onClick={() => setFormData({ ...formData, qr_code_url: '' })} className="absolute -top-3 -right-3 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"><X size={14} /></button>
                                     </div>
                                 ) : (

@@ -17,13 +17,18 @@ export default function AdminProductPage() {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-    useEffect(() => { if (storeId) loadProducts(); }, [storeId]);
-
     const loadProducts = async () => {
         setLoading(true);
         setProducts(await getProducts(storeId!));
         setLoading(false);
     };
+
+    useEffect(() => {
+        if (storeId) {
+            const timer = setTimeout(() => loadProducts(), 0);
+            return () => clearTimeout(timer);
+        }
+    }, [storeId]);
 
     const handleCreateNew = () => { setEditingProduct(null); setIsFormOpen(true); };
     const handleEditProduct = (product: Product) => { setEditingProduct(product); setIsFormOpen(true); };

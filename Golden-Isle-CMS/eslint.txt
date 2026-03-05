@@ -1,0 +1,519 @@
+﻿
+C:\Project-mantaps-BEER\Golden-Isle-CMS\app\admin\login\page.tsx
+   25:23  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   40:65  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   89:18  warning  'err' is defined but never used                                  @typescript-eslint/no-unused-vars
+   89:23  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  109:18  warning  'err' is defined but never used                                  @typescript-eslint/no-unused-vars
+  109:23  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx
+  20:36  error    Error: Cannot access variable before it is declared
+
+`loadProducts` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx:20:36
+  18 |     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  19 |
+> 20 |     useEffect(() => { if (storeId) loadProducts(); }, [storeId]);
+     |                                    ^^^^^^^^^^^^ `loadProducts` accessed before it is declared
+  21 |
+  22 |     const loadProducts = async () => {
+  23 |         setLoading(true);
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx:22:5
+  20 |     useEffect(() => { if (storeId) loadProducts(); }, [storeId]);
+  21 |
+> 22 |     const loadProducts = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 23 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 24 |         setProducts(await getProducts(storeId!));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 25 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 26 |     };
+     | ^^^^^^^ `loadProducts` is declared here
+  27 |
+  28 |     const handleCreateNew = () => { setEditingProduct(null); setIsFormOpen(true); };
+  29 |     const handleEditProduct = (product: Product) => { setEditingProduct(product); setIsFormOpen(true); };  react-hooks/immutability
+  20:55  warning  React Hook useEffect has a missing dependency: 'loadProducts'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Analytics.tsx
+   69:52   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:60   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  144:57   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:155  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx
+    6:10  warning  'Package' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   21:12  warning  'products' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   90:60  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  106:18  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:106:18
+  104 |             <h2 className="text-xl font-bold text-slate-800 dark:text-white">Business Overview</h2>
+  105 |             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+> 106 |                 <StatCard title="Total Revenue" value={`RM ${totalRevenue.toFixed(2)}`} icon={DollarSign} color="bg-emerald-500" />
+      |                  ^^^^^^^^ This component is created during render
+  107 |                 <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" />
+  108 |                 <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" />
+  109 |                 <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" />
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:90:22
+   88 |     const statusDist = getStatusDist();
+   89 |
+>  90 |     const StatCard = ({ title, value, icon: Icon, color }: any) => (
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  91 |         <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  92 |             <div>
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  99 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |     );
+      | ^^^^^^ The component is created during render here
+  101 |
+  102 |     return (
+  103 |         <div className="space-y-6">  react-hooks/static-components
+  107:18  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:107:18
+  105 |             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  106 |                 <StatCard title="Total Revenue" value={`RM ${totalRevenue.toFixed(2)}`} icon={DollarSign} color="bg-emerald-500" />
+> 107 |                 <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" />
+      |                  ^^^^^^^^ This component is created during render
+  108 |                 <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" />
+  109 |                 <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" />
+  110 |             </div>
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:90:22
+   88 |     const statusDist = getStatusDist();
+   89 |
+>  90 |     const StatCard = ({ title, value, icon: Icon, color }: any) => (
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  91 |         <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  92 |             <div>
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  99 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |     );
+      | ^^^^^^ The component is created during render here
+  101 |
+  102 |     return (
+  103 |         <div className="space-y-6">                                                                                   react-hooks/static-components
+  108:18  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:108:18
+  106 |                 <StatCard title="Total Revenue" value={`RM ${totalRevenue.toFixed(2)}`} icon={DollarSign} color="bg-emerald-500" />
+  107 |                 <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" />
+> 108 |                 <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" />
+      |                  ^^^^^^^^ This component is created during render
+  109 |                 <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" />
+  110 |             </div>
+  111 |             {!loading && (
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:90:22
+   88 |     const statusDist = getStatusDist();
+   89 |
+>  90 |     const StatCard = ({ title, value, icon: Icon, color }: any) => (
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  91 |         <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  92 |             <div>
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  99 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |     );
+      | ^^^^^^ The component is created during render here
+  101 |
+  102 |     return (
+  103 |         <div className="space-y-6">                                                                                                                            react-hooks/static-components
+  109:18  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:109:18
+  107 |                 <StatCard title="Total Orders" value={ordersList.length} icon={ShoppingBag} color="bg-blue-600" />
+  108 |                 <StatCard title="Pending Orders" value={pendingOrders} icon={Clock} color="bg-orange-500" />
+> 109 |                 <StatCard title="Today's Orders" value={todaysOrders} icon={Calendar} color="bg-purple-500" />
+      |                  ^^^^^^^^ This component is created during render
+  110 |             </div>
+  111 |             {!loading && (
+  112 |                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Dashboard.tsx:90:22
+   88 |     const statusDist = getStatusDist();
+   89 |
+>  90 |     const StatCard = ({ title, value, icon: Icon, color }: any) => (
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  91 |         <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex items-start justify-between transition-colors duration-300">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  92 |             <div>
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  99 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |     );
+      | ^^^^^^ The component is created during render here
+  101 |
+  102 |     return (
+  103 |         <div className="space-y-6">                                                                                                                                                                                        react-hooks/static-components
+  131:52  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\InquiriesDashboard.tsx
+   39:25   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   56:97   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   57:25   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  109:119  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  109:131  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\MarketingSettings.tsx
+  4:45  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\OrderList.tsx
+    5:70   warning  'Clock' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+    5:161  warning  'Square' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   16:46   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   35:8    warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array                                                                                                                                                                              react-hooks/exhaustive-deps
+   82:18   warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  143:22   warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  155:18   warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  557:73   warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                              jsx-a11y/alt-text
+  565:73   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  583:82   warning  'err' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  619:84   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  623:106  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx
+    4:78   warning  'CheckCircle2' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+    4:92   warning  'Wallet' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+    4:100  warning  'Building2' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  111:247  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react/no-unescaped-entities
+  181:41   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @next/next/no-img-element
+  218:42   error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx:218:42
+  216 |                                     <div className="flex items-center gap-2 mb-0.5">
+  217 |                                         <p className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">Stripe</p>
+> 218 |                                         <StatusBadge active={formData.is_stripe_enabled} />
+      |                                          ^^^^^^^^^^^ This component is created during render
+  219 |                                     </div>
+  220 |                                     <p className="text-xs text-slate-500">Cards, Apple Pay</p>
+  221 |                                 </div>
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx:82:25
+  80 |     };
+  81 |
+> 82 |     const StatusBadge = ({ active }: { active: boolean }) => (
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 83 |         <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 84 |             {active ? 'Active' : 'Not configured'}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 85 |         </span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 86 |     );
+     | ^^^^^^ The component is created during render here
+  87 |
+  88 |     if (loading) return <div className="p-8 text-slate-400 flex items-center justify-center min-h-[50vh]">Loading Payment Profiles...</div>;
+  89 |          react-hooks/static-components
+  258:42   error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx:258:42
+  256 |                                     <div className="flex items-center gap-2 mb-0.5">
+  257 |                                         <p className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">ToyyibPay</p>
+> 258 |                                         <StatusBadge active={formData.is_toyyibpay_enabled} />
+      |                                          ^^^^^^^^^^^ This component is created during render
+  259 |                                     </div>
+  260 |                                     <p className="text-xs text-slate-500">FPX Online Banking</p>
+  261 |                                 </div>
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\PaymentSettings.tsx:82:25
+  80 |     };
+  81 |
+> 82 |     const StatusBadge = ({ active }: { active: boolean }) => (
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 83 |         <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 84 |             {active ? 'Active' : 'Not configured'}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 85 |         </span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 86 |     );
+     | ^^^^^^ The component is created during render here
+  87 |
+  88 |     if (loading) return <div className="p-8 text-slate-400 flex items-center justify-center min-h-[50vh]">Loading Payment Profiles...</div>;
+  89 |  react-hooks/static-components
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\ProductForm.tsx
+   44:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   67:23   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  128:33   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  163:107  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\ProductTableRow.tsx
+  53:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Settings.tsx
+    4:27  warning  'Phone' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+    4:48  warning  'CreditCard' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+    4:82  warning  'BanknoteIcon' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  223:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Sidebar.tsx
+    3:68   warning  'ExternalLink' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+    3:102  warning  'Sun' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+    3:107  warning  'Moon' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+    3:113  warning  'Megaphone' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    3:124  warning  'CreditCard' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    3:136  warning  'ShieldCheck' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   10:10   warning  'useNotifications' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   12:10   warning  'useAuth' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   14:8    warning  'StoreSwitcher' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   24:13   warning  'store' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   28:21   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\Sidebar.tsx:28:21
+  26 |     const [mounted, setMounted] = useState(false);
+  27 |
+> 28 |     useEffect(() => setMounted(true), []);
+     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |     const router = useRouter();
+  30 |     const pathname = usePathname();
+  31 |     const storeName = settings.store_name || "Golden Isle Wholesale";  react-hooks/set-state-in-effect
+   68:57   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+  101:21   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @next/next/no-img-element
+  117:29   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\SuperAdminDashboard.tsx
+   76:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:18  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  110:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\auth\OnboardingPage.tsx
+  26:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\auth\RegisterPage.tsx
+    9:5   warning  'Layers' is defined but never used        @typescript-eslint/no-unused-vars
+  129:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\CTASection.tsx
+  39:25  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  78:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\CollectionCarousel.tsx
+  147:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\GallerySection.tsx
+  56:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\HeroSection.tsx
+  4:42  warning  'Droplets' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+  6:8   warning  'Image' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  9:1   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\ProductsSection.tsx
+   7:32  warning  'Search' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+   7:40  warning  'X' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  20:7   warning  'filterCategories' is assigned a value but never used                                                       @typescript-eslint/no-unused-vars
+  55:57  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  71:8   warning  React Hook useEffect has a missing dependency: 'storeId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\SpotlightSection.tsx
+  92:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\landing\TestimonialsSection.tsx
+  42:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  42:53  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\CartPage.tsx
+  16:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\CartPage.tsx:16:9
+  14 |
+  15 |     useEffect(() => {
+> 16 |         loadCart();
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |     }, []);
+  18 |
+  19 |     const notifyCartUpdate = () => window.dispatchEvent(new Event('cart-updated'));  react-hooks/set-state-in-effect
+  81:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\CheckoutPage.tsx
+   28:12  warning  'products' is assigned a value but never used                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   28:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   61:70  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  206:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  246:66  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\OrderConfirmationPage.tsx
+  18:46  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  19:40  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  23:29  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\OrderConfirmationPage.tsx:23:29
+  21 |
+  22 |     useEffect(() => {
+> 23 |         if (publicSettings) setSettings(publicSettings);
+     |                             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |     }, [publicSettings]);
+  25 |
+  26 |     useEffect(() => {  react-hooks/set-state-in-effect
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\OrderReviewPage.tsx
+  155:89   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  235:49   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  239:70   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  298:33   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  322:135  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  326:37   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  360:41   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\PaymentSection.tsx
+   4:10  warning  'CreditCard' is defined but never used    @typescript-eslint/no-unused-vars
+   4:22  warning  'Banknote' is defined but never used      @typescript-eslint/no-unused-vars
+  17:46  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\ProductCard.tsx
+   5:10  warning  'Package' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  46:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  54:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\ProductPage.tsx
+  190:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\store\StoreMarketingPixels.tsx
+  15:31   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:39   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:47   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:55   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:64   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:73   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  15:82   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  18:25   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  18:40   error    Use the spread operator instead of '.apply()'                          prefer-spread
+  18:62   error    Use the rest parameters instead of 'arguments'                         prefer-rest-params
+  18:88   error    Use the rest parameters instead of 'arguments'                         prefer-rest-params
+  26:28   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  27:28   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  38:28   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  38:56   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  39:40   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  39:60   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  40:28   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  47:31   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  47:39   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  47:47   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:50   error    Unexpected var, use let or const instead                               no-var
+  48:79   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  48:258  error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:266  error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:339  error    Use the rest parameters instead of 'arguments'                         prefer-rest-params
+  48:365  error    Unexpected var, use let or const instead                               no-var
+  48:442  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  48:470  error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:482  error    Unexpected var, use let or const instead                               no-var
+  48:614  error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:623  error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  48:630  error    Unexpected var, use let or const instead                               no-var
+  48:691  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  48:838  error    Unexpected var, use let or const instead                               no-var
+  48:989  error    Unexpected var, use let or const instead                               no-var
+  61:55   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  62:24   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  64:63   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  65:24   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  67:59   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  68:24   error    Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\system\ErrorBoundary.tsx
+  15:37  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\system\ProtectedRoute.tsx
+  6:10  warning  'useStore' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\context\StoreContext.tsx
+   3:78  warning  'useRef' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   7:22  warning  'useStoreHook' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   7:36  warning  'generateSlug' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  35:13  warning  'user' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  61:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\context\StoreContext.tsx:61:9
+  59 |     useEffect(() => {
+  60 |         if (authLoading) return;
+> 61 |         setSettingsLoading(false);
+     |         ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  62 |     }, [authLoading]);
+  63 |
+  64 |     const reload = useCallback(() => {  react-hooks/set-state-in-effect
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\hooks\useAuth.ts
+  7:5  error  'superAdminCache' is never reassigned. Use 'const' instead    prefer-const
+  8:5  error  'superAdminPending' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\hooks\useNotifications.tsx
+   51:73  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  100:54  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  133:54  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  151:8   warning  React Hook useEffect has a missing dependency: 'playSound'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\lib\storage.ts
+   13:35  warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+   28:46  warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+   59:26  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:35  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:5   warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+   87:26  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:35  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:49  warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+  179:44  warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+  225:5   warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+  237:5   warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+  258:5   warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+  321:5   warning  'storeId' is defined but never used       @typescript-eslint/no-unused-vars
+
+Γ£û 183 problems (102 errors, 81 warnings)
+  7 errors and 0 warnings potentially fixable with the `--fix` option.
+

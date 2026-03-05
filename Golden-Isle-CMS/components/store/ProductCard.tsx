@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Product } from '@/types';
 import { Package } from 'lucide-react';
 import { WhiskyIcon, WineIcon, BeerIcon, AllCategoryIcon } from '@/components/icons';
@@ -51,10 +52,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative">
                 {imageUrl ? (
                     <>
-                        <img
+                        <Image
                             src={imageUrl}
                             alt={product.name}
-                            loading="lazy"
+                            width={500}
+                            height={500}
                             className="w-[85%] h-[85%] object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                             onError={(e) => {
                                 e.currentTarget.style.display = 'none';
