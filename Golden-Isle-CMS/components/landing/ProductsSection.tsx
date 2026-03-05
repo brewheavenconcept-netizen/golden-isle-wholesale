@@ -33,6 +33,7 @@ export default function ProductsSection() {
         );
 
         async function loadData() {
+            if (!storeId) return;
             setLoading(true);
             try {
                 console.log('Fetching products for store:', storeId);
@@ -40,6 +41,7 @@ export default function ProductsSection() {
                 const { data, error } = await supabase
                     .from('products')
                     .select('id, name, price, image_url, category, stock_status, description')
+                    .eq('store_id', storeId)
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -68,7 +70,7 @@ export default function ProductsSection() {
             }
         }
         loadData();
-    }, []);
+    }, [storeId]);
 
     // Listen to custom category filter events from other components (like Carousel)
     useEffect(() => {

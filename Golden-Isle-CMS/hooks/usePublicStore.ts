@@ -26,7 +26,7 @@ export function usePublicStore(slug?: string): PublicStoreState {
                 if (slug) {
                     storeQuery = storeQuery.eq('slug', slug);
                 } else {
-                    storeQuery = storeQuery.order('updated_at', { ascending: false });
+                    storeQuery = storeQuery.order('created_at', { ascending: false });
                 }
                 const { data: storeData } = await storeQuery.limit(1).maybeSingle();
                 if (cancelled) return;
