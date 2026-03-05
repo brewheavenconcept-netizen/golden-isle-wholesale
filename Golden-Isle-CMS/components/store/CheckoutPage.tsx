@@ -62,8 +62,8 @@ export default function CheckoutPage() {
         for (const item of currentCart) {
             const product = currentProducts.find(p => p.id === item.product.id);
             if (!product) continue;
-            if (product.stock < item.qty) {
-                setStockError(`${product.name} only has ${product.stock} left in stock. Please update your cart.`);
+            if (product.stock_status === 'out_of_stock') {
+                setStockError(`${product.name} is currently out of stock. Please update your cart.`);
                 return false;
             }
         }

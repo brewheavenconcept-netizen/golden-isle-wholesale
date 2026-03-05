@@ -119,42 +119,34 @@ export async function createOrderWithStockCheck(
 ): Promise<{ success: true; order: Order } | { success: false; error: string }> {
     if (!storeId) return { success: false, error: 'Store ID is required' };
 
+    // 1. Validate stock status instead of numeric stock
     for (const item of order.items) {
         const { data: product, error: fetchError } = await supabase
             .from('products')
-            .select('stock, name')
+            .select('stock_status, name')
             .eq('id', item.product.id)
             .single();
+
         if (fetchError || !product) {
             return { success: false, error: `Product not found: ${item.product.name}` };
         }
-        if (product.stock < item.qty) {
+
+        if (product.stock_status === 'out_of_stock') {
             return {
                 success: false,
-                error: `"${product.name}" only has ${product.stock} left in stock (you requested ${item.qty}).`
+                error: `"${product.name}" is currently out of stock.`
             };
         }
     }
 
+    // 2. Create the order
     const createdOrder = await createOrder(order, storeId);
     if (!createdOrder) {
         return { success: false, error: 'Failed to create order in database.' };
     }
 
-    for (const item of order.items) {
-        const { data: product } = await supabase
-            .from('products')
-            .select('stock')
-            .eq('id', item.product.id)
-            .single();
-        if (product) {
-            const newStock = Math.max(0, product.stock - item.qty);
-            await supabase
-                .from('products')
-                .update({ stock: newStock })
-                .eq('id', item.product.id);
-        }
-    }
+    // Note: Removed the numeric stock deduction loop because the Supabase 'products'
+    // table currently uses a string-based 'stock_status' instead of an integer 'stock'.
 
     return { success: true, order: createdOrder };
 }
