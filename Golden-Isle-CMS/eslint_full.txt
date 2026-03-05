@@ -1,0 +1,15 @@
+﻿
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\AdminProductPage.tsx
+  31:8  warning  React Hook useEffect has a missing dependency: 'loadProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\ProductForm.tsx
+   70:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   93:23   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  154:33   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  192:107  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\Project-mantaps-BEER\Golden-Isle-CMS\components\admin\ProductTableRow.tsx
+  53:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+Γ£û 6 problems (3 errors, 3 warnings)
+

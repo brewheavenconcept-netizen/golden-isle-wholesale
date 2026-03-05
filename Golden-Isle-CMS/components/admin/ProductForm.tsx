@@ -67,8 +67,9 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                 setImagePreview(url);
                 setFormData(prev => ({ ...prev, images: [url] }));
                 toast.success('Image uploaded successfully');
-            } catch (err: any) {
-                toast.error(err.message || 'Failed to upload image');
+            } catch (err: unknown) {
+                const error = err as Error;
+                toast.error(error.message || 'Failed to upload image');
                 // Reset file input
                 e.target.value = '';
             } finally {
@@ -90,8 +91,9 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             }
             toast.success("Product saved successfully!");
             onSuccess();
-        } catch (err: any) {
-            toast.error(`Error: ${err.message || err}`);
+        } catch (err: unknown) {
+            const error = err as Error;
+            toast.error(`Error: ${error.message || error}`);
         } finally {
             setLoading(false);
         }
@@ -189,7 +191,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Availability</label>
                             <select className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
                                 value={formData.stock_status || 'in_stock'}
-                                onChange={e => setFormData({ ...formData, stock_status: e.target.value as any })}>
+                                onChange={e => setFormData({ ...formData, stock_status: e.target.value as Product['stock_status'] })}>
                                 <option value="in_stock">✅ In Stock</option>
                                 <option value="low_stock">⚠️ Low Stock</option>
                                 <option value="out_of_stock">❌ Out of Stock</option>

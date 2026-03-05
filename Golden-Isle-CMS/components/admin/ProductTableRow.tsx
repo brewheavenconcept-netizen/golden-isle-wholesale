@@ -81,7 +81,7 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
             </td>
 
             {/* Category */}
-            <td className="md:table-cell md:px-6 md:py-4 col-start-2 -mt-1 md:mt-0 md:col-auto">
+            <td className="md:table-cell md:w-32 md:px-6 md:py-4 col-start-2 -mt-1 md:mt-0 md:col-auto">
                 <div className="flex items-center">
                     {(() => {
                         const c = product.category || 'Other';
@@ -94,7 +94,7 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                         };
                         const { cls } = cfg[c] || cfg['Other'];
                         return (
-                            <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls}`}>
+                            <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls} whitespace-nowrap`}>
                                 {c}
                             </span>
                         );
@@ -103,7 +103,7 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
             </td>
 
             {/* Status / Stock */}
-            <td className="md:table-cell md:w-32 md:px-6 md:py-4 col-start-2 -mt-2 md:mt-0 md:col-auto">
+            <td className="md:table-cell md:w-40 md:px-6 md:py-4 col-start-2 -mt-2 md:mt-0 md:col-auto">
                 <div className="flex flex-row md:flex-col gap-2 md:gap-1 items-center md:items-start">
                     {(() => {
                         const s = product.stock_status || 'in_stock';
@@ -114,7 +114,7 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                         };
                         const { label, cls } = cfg[s] ?? cfg.in_stock;
                         return (
-                            <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls}`}>
+                            <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls} whitespace-nowrap`}>
                                 {label}
                             </span>
                         );

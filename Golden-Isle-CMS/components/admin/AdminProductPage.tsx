@@ -133,8 +133,8 @@ export default function AdminProductPage() {
                                     </th>
                                     <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider w-20 md:table-cell hidden">Image</th>
                                     <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider md:table-cell hidden">Product Info</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider md:table-cell hidden">Category</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider w-32 md:table-cell hidden">Status / Stock</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider w-32 md:table-cell hidden">Category</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider w-40 md:table-cell hidden">Status / Stock</th>
                                     <th className="px-6 py-4 w-12 md:table-cell hidden"></th>
                                 </tr>
                             </thead>
