@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientToaster } from "@/components/providers/ClientToaster";
 import { FloatingWhatsApp } from '@/components/ui/FloatingWhatsApp';
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/store/CartDrawer";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -69,7 +71,10 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
         >
-          {children}
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
           <ClientToaster />
           <FloatingWhatsApp />
         </ThemeProvider>

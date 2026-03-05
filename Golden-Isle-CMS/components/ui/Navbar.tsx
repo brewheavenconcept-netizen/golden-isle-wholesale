@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, MessageCircle, GlassWater, X, User } from "lucide-react";
+import { Menu, MessageCircle, GlassWater, X, User, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { getWhatsAppLink } from '@/lib/config';
+import { useCart } from "@/context/CartContext";
 
 export function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { totalItems, setIsCartOpen } = useCart();
 
     const navLinks = [
         { name: "Home", href: "#" },
@@ -66,6 +68,23 @@ export function Navbar() {
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center space-x-4">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative p-2.5 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full transition-all group"
+                        >
+                            <ShoppingCart className="w-6 h-6 group-hover:text-[#b8960c]" />
+                            {totalItems > 0 && (
+                                <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="absolute top-0 right-0 w-5 h-5 bg-[#b8960c] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+                                >
+                                    {totalItems}
+                                </motion.span>
+                            )}
+                        </motion.button>
                         <Link href="/admin/login">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
@@ -88,6 +107,17 @@ export function Navbar() {
 
                     {/* Mobile Actions & Hamburger */}
                     <div className="md:hidden flex items-center gap-3">
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative p-2 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full"
+                        >
+                            <ShoppingCart className="w-6 h-6" />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#b8960c] text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </button>
                         <Link href="/admin/login">
                             <motion.button
                                 whileTap={{ scale: 0.95 }}

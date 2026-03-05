@@ -7,6 +7,8 @@ import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft, Package, Loader2, Wine, Beer, GlassWater, MessageCircle, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { WHATSAPP_NUMBER } from '@/lib/config';
+import { useCart } from '@/context/CartContext';
+import { Product as GlobalProduct } from '@/types';
 
 type Product = {
     id: string;
@@ -25,6 +27,7 @@ export default function ProductPage() {
     const params = useParams();
     const id = params?.id as string;
     const router = useRouter();
+    const { addToCart } = useCart();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
@@ -115,7 +118,25 @@ export default function ProductPage() {
     };
 
     const handleAddToOrder = () => {
-        toast.success(`${product?.name} added to order!`, {
+        if (!product) return;
+
+        // Map local product type to global Product type
+        const globalProduct: GlobalProduct = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            category: product.category || '',
+            stock_status: product.stock_status as any,
+            images: product.image_url ? [product.image_url] : [],
+            description: product.description || '',
+            stock: 999,
+            status: 'active',
+            created_at: product.created_at || new Date().toISOString()
+        };
+
+        addToCart(globalProduct);
+
+        toast.success(`${product.name} added to order!`, {
             style: {
                 background: '#1a1a1a',
                 color: '#d4a853',
