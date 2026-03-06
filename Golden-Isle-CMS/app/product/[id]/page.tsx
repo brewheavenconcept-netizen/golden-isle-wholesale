@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Metadata } from 'next';
 import ProductPage from '@/components/store/ProductPage';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await params;
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL || '',
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     const { data } = await supabase
         .from('products')
         .select('name, description, image_url')
-        .eq('id', params.id)
+        .eq('id', id)
         .single();
 
     if (!data) {
@@ -42,7 +43,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
 }
 
-export default function ProductRoute() {
+export default async function ProductRoute({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">

@@ -82,28 +82,28 @@ export default function ProductPage() {
 
     const getCategoryStyle = (category: string | null) => {
         const cat = category?.toLowerCase() || '';
-        if (cat.includes('wine')) return 'bg-rose-900/30 text-rose-300 border-rose-700/40';
-        if (cat.includes('beer')) return 'bg-amber-900/30 text-amber-300 border-amber-700/40';
-        if (cat.includes('whisky')) return 'bg-yellow-900/30 text-yellow-300 border-yellow-700/40';
-        return 'bg-[#b8960c]/10 text-[#d4a853] border-[#b8960c]/30';
+        if (cat.includes('wine')) return 'bg-rose-100 text-rose-800 border-rose-200';
+        if (cat.includes('beer')) return 'bg-amber-100 text-amber-800 border-amber-200';
+        if (cat.includes('whisky')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-[#C9A84C]/10 text-[#1a1a0e] border-[#C9A84C]/30';
     };
 
     const getStockBadge = (status: string) => {
         if (status === 'out_of_stock') return (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-900/30 text-red-400 border border-red-700/40">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#1a1a0e]/80 text-red-400 border border-red-500/30 backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
                 Out of Stock
             </span>
         );
         if (status === 'low_stock') return (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-900/30 text-amber-400 border border-amber-700/40">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#1a1a0e]/80 text-amber-400 border border-amber-500/30 backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
                 Low Stock
             </span>
         );
         return (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-900/30 text-emerald-400 border border-emerald-700/40">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#1a1a0e]/80 text-[#C9A84C] border border-[#C9A84C]/30 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] inline-block" />
                 In Stock
             </span>
         );
@@ -183,19 +183,19 @@ export default function ProductPage() {
 
     // ── Product detail ───────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-[#0a0a0a]">
+        <div className="min-h-screen bg-[#f5f0e8] font-sans text-[#1a1a0e]">
             {/* Top nav bar */}
-            <div className="sticky top-0 z-40 bg-[#0a0a0a]/90 backdrop-blur-md border-b border-[#1f1f1f]">
+            <div className="sticky top-0 z-40 bg-[#f5f0e8]/90 backdrop-blur-md border-b border-[#1a1a0e]/5">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-2 text-[#6b6b6b] hover:text-[#d4a853] transition-colors text-sm font-medium group"
+                        className="flex items-center gap-2 text-[#1a1a0e]/60 hover:text-[#C9A84C] transition-colors text-sm font-medium group"
                     >
                         <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                         Back to Products
                     </button>
-                    <span className="text-[#2a2a2a]">/</span>
-                    <span className="text-[#6b6b6b] text-sm truncate max-w-[200px]">{product.name}</span>
+                    <span className="text-[#1a1a0e]/30">/</span>
+                    <span className="text-[#1a1a0e]/60 text-sm truncate max-w-[200px]">{product.name}</span>
                 </div>
             </div>
 
@@ -205,7 +205,7 @@ export default function ProductPage() {
 
                     {/* LEFT — Image */}
                     <div className="relative w-full lg:sticky lg:top-24">
-                        <div className={`relative w-full h-auto max-h-[400px] lg:max-h-none aspect-square rounded-2xl lg:overflow-hidden border border-[#1f1f1f] bg-[#111111] shadow-2xl shadow-black/60 ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+                        <div className={`relative w-full h-auto max-h-[400px] lg:max-h-none aspect-square rounded-[12px] lg:overflow-hidden border border-[#2d2918] bg-[#1a1a0e] shadow-xl ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                             {product.image_url ? (
                                 <>
                                     <img
@@ -220,13 +220,13 @@ export default function ProductPage() {
                                     />
                                     <div className="hidden absolute inset-0 flex flex-col items-center justify-center">
                                         {getCategoryIcon(product.category)}
-                                        <span className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mt-3 font-semibold">Preview Unavailable</span>
+                                        <span className="text-[10px] text-[#f5f0e8]/50 uppercase tracking-widest mt-3 font-semibold">Preview Unavailable</span>
                                     </div>
                                 </>
                             ) : (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                                     {getCategoryIcon(product.category)}
-                                    <span className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mt-3 font-semibold">No Image Available</span>
+                                    <span className="text-[10px] text-[#f5f0e8]/50 uppercase tracking-widest mt-3 font-semibold">No Image Available</span>
                                 </div>
                             )}
 
@@ -237,7 +237,7 @@ export default function ProductPage() {
                         </div>
 
                         {/* Glow effect beneath image */}
-                        <div className="w-3/4 h-4 mx-auto bg-[#b8960c]/10 blur-xl rounded-full mt-1" />
+                        <div className="w-3/4 h-4 mx-auto bg-[#C9A84C]/20 blur-xl rounded-full mt-1" />
                     </div>
 
                     {/* RIGHT — Info */}
@@ -251,47 +251,47 @@ export default function ProductPage() {
 
                         {/* Name */}
                         <div>
-                            <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold text-[#d4a853] leading-tight tracking-tight mb-2">
+                            <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold font-serif text-[#1a1a0e] leading-tight tracking-tight mb-2">
                                 {product.name}
                             </h1>
-                            <div className="w-12 h-0.5 bg-gradient-to-r from-[#b8960c] to-transparent rounded-full" />
+                            <div className="w-12 h-0.5 bg-gradient-to-r from-[#C9A84C] to-transparent rounded-full" />
                         </div>
 
                         {/* Price */}
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-white tracking-tight">
-                                RM <span className="text-[#d4a853]">{product.price.toFixed(2)}</span>
+                            <span className="text-4xl font-bold font-serif text-[#C9A84C] tracking-tight">
+                                RM {product.price.toFixed(2)}
                             </span>
-                            <span className="text-[#4a4a4a] text-sm">per unit</span>
+                            <span className="text-[#1a1a0e]/60 text-sm">per unit</span>
                         </div>
 
                         {/* Description */}
-                        <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-5">
-                            <h3 className="text-xs font-semibold text-[#4a4a4a] uppercase tracking-widest mb-3">Description</h3>
-                            <p className="text-[#9a9a9a] leading-relaxed text-sm">
+                        <div className="bg-[#f5f0e8] border border-[#C9A84C]/20 rounded-[12px] p-5">
+                            <h3 className="text-xs font-semibold text-[#1a1a0e]/70 uppercase tracking-widest mb-3">Description</h3>
+                            <p className="text-[#1a1a0e]/80 leading-relaxed text-sm">
                                 {product.description || 'A premium product from our curated Golden Isle Wholesale collection. Contact us for full product details and bulk pricing.'}
                             </p>
                         </div>
 
                         {/* Wholesale note */}
-                        <div className="flex items-start gap-3 bg-[#b8960c]/5 border border-[#b8960c]/15 rounded-xl p-4">
-                            <ShoppingBag size={16} className="text-[#d4a853] shrink-0 mt-0.5" />
-                            <p className="text-[#9a9a9a] text-xs leading-relaxed">
-                                <span className="text-[#d4a853] font-semibold">Wholesale pricing available.</span> Prices shown are per unit. Bulk discounts and MOQ info available on enquiry.
+                        <div className="flex items-start gap-3 bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-[12px] p-4">
+                            <ShoppingBag size={16} className="text-[#C9A84C] shrink-0 mt-0.5" />
+                            <p className="text-[#1a1a0e]/80 text-xs leading-relaxed">
+                                <span className="text-[#C9A84C] font-semibold">Wholesale pricing available.</span> Prices shown are per unit. Bulk discounts and MOQ info available on enquiry.
                             </p>
                         </div>
 
                         {/* Divider */}
-                        <div className="border-t border-[#1f1f1f]" />
+                        <div className="border-t border-[#1a1a0e]/10" />
 
                         {/* CTAs */}
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={handleAddToOrder}
                                 disabled={isOutOfStock}
-                                className={`w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-bold text-base transition-all duration-200 shadow-lg ${isOutOfStock
-                                    ? 'bg-[#1a1a1a] text-[#4a4a4a] border border-[#2a2a2a] cursor-not-allowed'
-                                    : 'bg-[#b8960c] hover:bg-[#d4a853] text-black shadow-[#b8960c]/20 hover:shadow-[#d4a853]/30 hover:-translate-y-0.5 active:translate-y-0'
+                                className={`w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-[12px] font-bold text-base transition-all duration-200 shadow-lg ${isOutOfStock
+                                    ? 'bg-[#e5dfd3] text-[#1a1a0e]/40 border border-[#1a1a0e]/10 cursor-not-allowed'
+                                    : 'bg-[#C9A84C] hover:brightness-110 text-[#1a1a0e] shadow-[#C9A84C]/20 hover:shadow-[#C9A84C]/30 hover:-translate-y-0.5 active:translate-y-0'
                                     }`}
                             >
                                 <ShoppingBag size={18} />
@@ -300,7 +300,7 @@ export default function ProductPage() {
 
                             <button
                                 onClick={handleWhatsApp}
-                                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-bold text-base bg-[#25D366] hover:bg-[#20c05c] text-white transition-all duration-200 shadow-lg shadow-[#25D366]/20 hover:shadow-[#25D366]/30 hover:-translate-y-0.5 active:translate-y-0"
+                                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-[12px] font-bold text-base bg-[#1a1a0e] border border-[#C9A84C] hover:brightness-110 text-[#f5f0e8] transition-all duration-200 shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                             >
                                 <MessageCircle size={18} />
                                 WhatsApp Enquiry
@@ -309,13 +309,13 @@ export default function ProductPage() {
 
                         {/* Meta info */}
                         <div className="grid grid-cols-2 gap-3 pt-2">
-                            <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 text-center">
-                                <p className="text-[#4a4a4a] text-[10px] uppercase tracking-widest mb-1">Category</p>
-                                <p className="text-white font-semibold text-sm">{product.category || '—'}</p>
+                            <div className="bg-[#f5f0e8] border border-[#C9A84C]/20 rounded-[12px] p-4 text-center">
+                                <p className="text-[#1a1a0e]/60 text-[10px] uppercase tracking-widest mb-1">Category</p>
+                                <p className="text-[#1a1a0e] font-semibold text-sm">{product.category || '—'}</p>
                             </div>
-                            <div className="bg-[#111111] border border-[#1f1f1f] rounded-xl p-4 text-center">
-                                <p className="text-[#4a4a4a] text-[10px] uppercase tracking-widest mb-1">Availability</p>
-                                <p className={`font-semibold text-sm ${product.stock_status === 'in_stock' ? 'text-emerald-400' : product.stock_status === 'low_stock' ? 'text-amber-400' : 'text-red-400'}`}>
+                            <div className="bg-[#f5f0e8] border border-[#C9A84C]/20 rounded-[12px] p-4 text-center">
+                                <p className="text-[#1a1a0e]/60 text-[10px] uppercase tracking-widest mb-1">Availability</p>
+                                <p className={`font-semibold text-sm ${product.stock_status === 'in_stock' ? 'text-emerald-600' : product.stock_status === 'low_stock' ? 'text-amber-600' : 'text-red-600'}`}>
                                     {product.stock_status === 'in_stock' ? 'In Stock' : product.stock_status === 'low_stock' ? 'Low Stock' : 'Out of Stock'}
                                 </p>
                             </div>

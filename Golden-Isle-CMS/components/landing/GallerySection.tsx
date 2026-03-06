@@ -68,10 +68,11 @@ export default function GallerySection() {
                 </motion.div>
 
                 <div className="mt-12 text-center">
-                    <Link href="#">
-                        <button className="bg-transparent border-2 border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white font-bold px-8 py-4 rounded-full text-sm transition-all flex items-center justify-center gap-2 mx-auto uppercase tracking-widest">
-                            <Instagram className="w-4 h-4" /> Follow Instagram
-                        </button>
+                    <Link
+                        href="#"
+                        className="bg-transparent border-2 border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white font-bold px-8 py-4 rounded-full text-sm transition-all inline-flex items-center justify-center gap-2 mx-auto uppercase tracking-widest"
+                    >
+                        <Instagram className="w-4 h-4" /> Follow Instagram
                     </Link>
                 </div>
 
