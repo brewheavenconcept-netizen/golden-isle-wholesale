@@ -103,21 +103,21 @@ export default function OrderConfirmationPage() {
 
     if (loading || storeLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-                <Loader2 className="animate-spin text-blue-600 w-10 h-10 mb-4" />
-                <p className="text-slate-500 font-medium">Loading your order details...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+                <Loader2 className="animate-spin text-emerald-500 w-10 h-10 mb-4" />
+                <p className="text-gray-500 font-medium tracking-wide">Loading your order details...</p>
             </div>
         );
     }
 
     if (!order) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-                <div className="bg-white p-8 rounded-3xl shadow-xl max-w-sm w-full text-center space-y-4">
+            <div className="min-h-screen flex items-center justify-center bg-white p-4">
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 max-w-sm w-full text-center space-y-4 shadow-sm">
                     <AlertCircle className="mx-auto text-red-500 w-12 h-12" />
-                    <h2 className="text-xl font-bold">Order Not Found</h2>
-                    <p className="text-slate-500">Could not retrieve order details for ID: {orderId}</p>
-                    <button onClick={() => router.push('/')} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Back to Home</button>
+                    <h2 className="text-xl font-bold text-gray-900 tracking-wide">Order Not Found</h2>
+                    <p className="text-gray-500 tracking-wide">Could not retrieve order details for ID: {orderId}</p>
+                    <button onClick={() => router.push('/')} className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold tracking-wide">Back to Home</button>
                 </div>
             </div>
         );
@@ -126,54 +126,54 @@ export default function OrderConfirmationPage() {
     const currentStatus = order.payment_status || 'pending_payment';
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4">
-            <div className="max-w-xl mx-auto space-y-8">
-
+        <div className="min-h-screen bg-white py-12 px-4 font-sans text-gray-900">
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="max-w-xl mx-auto space-y-8 tracking-wide"
+            >
                 {/* 1. Success Header & Summary Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden"
-                >
-                    <div className="bg-slate-900 p-8 text-center text-white relative">
-                        <CheckCircle className="mx-auto w-16 h-16 mb-4 text-green-400 drop-shadow-md" />
-                        <h1 className="text-3xl font-black italic tracking-tight">Order Confirmed!</h1>
-                        <p className="opacity-70 font-medium mt-1">Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                    <div className="bg-white p-8 text-center border-b border-gray-100 relative">
+                        <CheckCircle className="mx-auto w-16 h-16 mb-4 text-emerald-500" />
+                        <h1 className="text-3xl font-light tracking-tight text-gray-900">Order Confirmed</h1>
+                        <p className="text-gray-500 font-medium mt-2 text-sm uppercase tracking-widest">Order #{order.id.slice(0, 8)}</p>
                     </div>
 
                     <div className="p-8 space-y-6">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-slate-800">Review Information</h2>
+                            <h2 className="text-lg font-semibold text-gray-800 tracking-wide">Review Information</h2>
                             {currentStatus === 'pending_payment' || currentStatus === 'unpaid' ? (
                                 <button
                                     onClick={() => router.push('/checkout')}
-                                    className="text-slate-600 font-bold text-sm flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-full hover:bg-slate-200 transition-colors"
+                                    className="text-gray-500 font-medium text-sm flex items-center gap-1 hover:text-gray-900 transition-colors"
                                 >
-                                    <Edit size={14} /> Edit Info
+                                    <Edit size={14} /> Edit
                                 </button>
                             ) : null}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-200 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-2xl text-sm">
                             <div className="space-y-1">
-                                <p className="text-slate-400 uppercase font-black tracking-wider text-[10px]">Full Name</p>
-                                <p className="font-bold text-slate-800">{order.customer_name}</p>
+                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Full Name</p>
+                                <p className="font-medium text-gray-900">{order.customer_name}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-slate-400 uppercase font-black tracking-wider text-[10px]">Phone Number</p>
-                                <p className="font-bold text-slate-800">{order.phone || order.customer_phone}</p>
+                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Phone Number</p>
+                                <p className="font-medium text-gray-900">{order.phone || order.customer_phone}</p>
                             </div>
                             <div className="md:col-span-2 space-y-1">
-                                <p className="text-slate-400 uppercase font-black tracking-wider text-[10px]">Delivery Address</p>
-                                <p className="font-medium text-slate-700">{order.address || order.delivery_address}</p>
+                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Delivery Address</p>
+                                <p className="font-medium text-gray-700 leading-relaxed">{order.address || order.delivery_address}</p>
                             </div>
-                            <div className="md:col-span-2 space-y-1 pt-4 border-t border-slate-200 mt-2">
-                                <p className="text-slate-400 uppercase font-black tracking-wider text-[10px]">Total Amount</p>
-                                <p className="text-3xl font-black text-slate-900">RM {Number(order.total).toFixed(2)}</p>
+                            <div className="md:col-span-2 space-y-1 pt-4 border-t border-gray-100 mt-2">
+                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Total Amount</p>
+                                <p className="text-3xl font-light text-gray-900 tracking-tight">RM {Number(order.total).toFixed(2)}</p>
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
                 {/* CONDITIONAL UI LOGIC BASED ON STATUS */}
                 <AnimatePresence mode="wait">
@@ -182,33 +182,34 @@ export default function OrderConfirmationPage() {
                     {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
                         <motion.div
                             key="pending"
-                            initial={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-8 space-y-6"
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.4 }}
+                            className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm"
                         >
                             <div className="text-center">
-                                <h2 className="text-xl font-bold text-slate-900">Select Payment Method</h2>
-                                <p className="text-slate-500 text-sm mt-1">Please transfer the exact amount to complete your order</p>
+                                <h2 className="text-xl font-semibold text-gray-900 tracking-wide">Select Payment Method</h2>
+                                <p className="text-gray-500 text-sm mt-1">Please transfer the exact amount to complete your order</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={() => setPaymentMethod(paymentMethod === 'qr' ? null : 'qr')}
-                                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === 'qr' ? 'border-slate-900 bg-slate-50 shadow-md transform scale-[1.02]' : 'border-slate-200 bg-white hover:border-slate-300'
+                                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border transition-all ${paymentMethod === 'qr' ? 'border-gray-900 bg-gray-50/50' : 'border-gray-100 bg-white hover:border-gray-300'
                                         }`}
                                 >
-                                    <QrCode className={paymentMethod === 'qr' ? 'text-slate-900' : 'text-slate-400'} size={32} />
-                                    <span className={`text-xs font-bold mt-3 ${paymentMethod === 'qr' ? 'text-slate-900' : 'text-slate-600'}`}>DuitNow QR</span>
+                                    <QrCode className={paymentMethod === 'qr' ? 'text-gray-900' : 'text-gray-400'} size={28} />
+                                    <span className={`text-xs font-semibold mt-3 tracking-wide ${paymentMethod === 'qr' ? 'text-gray-900' : 'text-gray-500'}`}>DuitNow QR</span>
                                 </button>
 
                                 <button
                                     onClick={() => setPaymentMethod(paymentMethod === 'manual' ? null : 'manual')}
-                                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === 'manual' ? 'border-slate-900 bg-slate-50 shadow-md transform scale-[1.02]' : 'border-slate-200 bg-white hover:border-slate-300'
+                                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border transition-all ${paymentMethod === 'manual' ? 'border-gray-900 bg-gray-50/50' : 'border-gray-100 bg-white hover:border-gray-300'
                                         }`}
                                 >
-                                    <Banknote className={paymentMethod === 'manual' ? 'text-slate-900' : 'text-slate-400'} size={32} />
-                                    <span className={`text-xs font-bold mt-3 ${paymentMethod === 'manual' ? 'text-slate-900' : 'text-slate-600'}`}>Bank Transfer</span>
+                                    <Banknote className={paymentMethod === 'manual' ? 'text-gray-900' : 'text-gray-400'} size={28} />
+                                    <span className={`text-xs font-semibold mt-3 tracking-wide ${paymentMethod === 'manual' ? 'text-gray-900' : 'text-gray-500'}`}>Bank Transfer</span>
                                 </button>
                             </div>
 
@@ -220,21 +221,23 @@ export default function OrderConfirmationPage() {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden bg-slate-50 rounded-2xl p-6 border border-slate-200 text-center space-y-5 shadow-inner"
+                                        className="overflow-hidden bg-white rounded-2xl border border-gray-100 text-center shadow-sm"
                                     >
-                                        <div className="bg-white p-4 rounded-2xl inline-block shadow-sm border border-slate-200">
-                                            <img
-                                                src={settings?.qr_code_url || "https://placeholder.com/200x200?text=DuitNow+QR"}
-                                                alt="QR"
-                                                className="w-48 h-48 mx-auto object-contain"
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-slate-800 text-lg">Scan to pay RM {Number(order.total).toFixed(2)}</p>
-                                            <p className="text-xs font-medium text-slate-500 mt-1">Use your banking app to scan the DuitNow QR</p>
-                                        </div>
-                                        <div className="pt-4 border-t border-slate-200">
-                                            {renderUploadUI()}
+                                        <div className="p-8 space-y-6">
+                                            <div className="bg-white p-2 rounded-2xl inline-block border border-gray-100 shadow-sm">
+                                                <img
+                                                    src={settings?.qr_code_url || "https://placeholder.com/200x200?text=DuitNow+QR"}
+                                                    alt="QR"
+                                                    className="w-48 h-48 mx-auto object-contain"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-gray-900 text-lg tracking-wide">Scan to pay RM {Number(order.total).toFixed(2)}</p>
+                                                <p className="text-xs font-medium text-gray-500 mt-1">Use your banking app to scan the DuitNow QR</p>
+                                            </div>
+                                            <div className="pt-6 border-t border-gray-100">
+                                                {renderUploadUI()}
+                                            </div>
                                         </div>
                                     </motion.div>
                                 )}
@@ -245,31 +248,31 @@ export default function OrderConfirmationPage() {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-4 shadow-inner"
+                                        className="overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm"
                                     >
-                                        <div className="space-y-3">
-                                            <div className="bg-white p-5 rounded-2xl border border-slate-200 flex justify-between items-center shadow-sm">
+                                        <div className="p-6 space-y-4">
+                                            <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center text-left">
                                                 <div>
-                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Bank Name</p>
-                                                    <p className="font-black text-slate-800 text-lg mt-0.5">{settings?.bank_name || 'Maybank'}</p>
+                                                    <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Bank Name</p>
+                                                    <p className="font-semibold text-gray-900 text-lg mt-0.5">{settings?.bank_name || 'Maybank'}</p>
                                                 </div>
                                             </div>
-                                            <div className="bg-white p-5 rounded-2xl border border-slate-200 flex justify-between items-center group shadow-sm">
+                                            <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center group text-left">
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Account Information</p>
-                                                    <p className="font-mono text-xl font-black text-slate-800 tracking-wider mt-1">{settings?.bank_account_number || '1234567890'}</p>
-                                                    <p className="text-xs font-bold text-slate-500 mt-1">{settings?.bank_holder_name || 'GOLDEN ISLE WHOLESALE'}</p>
+                                                    <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Account Information</p>
+                                                    <p className="font-mono text-xl font-semibold text-gray-900 tracking-wider mt-1">{settings?.bank_account_number || '1234567890'}</p>
+                                                    <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-wide">{settings?.bank_holder_name || 'GOLDEN ISLE WHOLESALE'}</p>
                                                 </div>
                                                 <button
                                                     onClick={handleCopyAccount}
-                                                    className={`p-3 rounded-xl transition-all shadow-sm ${copySuccess ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                                                    className={`p-3 rounded-xl transition-all ${copySuccess ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500 hover:text-gray-900 border border-gray-200 shadow-sm'}`}
                                                 >
-                                                    {copySuccess ? <Check size={20} /> : <Copy size={20} />}
+                                                    {copySuccess ? <Check size={18} /> : <Copy size={18} />}
                                                 </button>
                                             </div>
-                                        </div>
-                                        <div className="pt-4 border-t border-slate-200">
-                                            {renderUploadUI()}
+                                            <div className="pt-4 border-t border-gray-100">
+                                                {renderUploadUI()}
+                                            </div>
                                         </div>
                                     </motion.div>
                                 )}
@@ -281,26 +284,27 @@ export default function OrderConfirmationPage() {
                     {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification') && (
                         <motion.div
                             key="verifying"
-                            initial={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-[2rem] shadow-xl border border-amber-100 p-10 text-center space-y-6 relative overflow-hidden"
+                            transition={{ duration: 0.5 }}
+                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-sm relative overflow-hidden"
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300 animate-pulse" />
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-100 via-emerald-400 to-emerald-100 animate-pulse" />
 
-                            <div className="bg-amber-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto relative">
-                                <Hourglass className="text-amber-600 w-10 h-10 animate-pulse" />
-                                <div className="absolute inset-0 border-4 border-amber-200 rounded-full animate-spin border-t-amber-500" style={{ animationDuration: '3s' }} />
+                            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto relative">
+                                <Hourglass className="text-emerald-500 w-10 h-10 animate-pulse" />
+                                <div className="absolute inset-0 border-[3px] border-emerald-50 rounded-full animate-spin border-t-emerald-400" style={{ animationDuration: '2.5s' }} />
                             </div>
 
-                            <div className="space-y-3">
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Payment Received & Verifying</h2>
-                                <p className="text-slate-600 font-medium leading-relaxed max-w-sm mx-auto">
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-light text-gray-900 tracking-tight">Payment Verifying</h2>
+                                <p className="text-gray-500 font-medium leading-relaxed max-w-sm mx-auto text-sm tracking-wide">
                                     Our financial team is reviewing your transfer. You will receive an update via WhatsApp or email shortly.
                                 </p>
                             </div>
 
-                            <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-full text-xs font-bold text-slate-500">
-                                <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                            <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-100 px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-gray-500">
+                                <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
                                 Please wait for confirmation
                             </div>
                         </motion.div>
@@ -310,25 +314,26 @@ export default function OrderConfirmationPage() {
                     {currentStatus === 'paid' && (
                         <motion.div
                             key="paid"
-                            initial={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-[2rem] shadow-xl border border-emerald-100 p-10 text-center space-y-6 relative overflow-hidden"
+                            transition={{ duration: 0.6 }}
+                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-sm relative overflow-hidden"
                         >
                             <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500" />
 
-                            <div className="bg-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto">
-                                <CheckCircle className="text-emerald-600 w-12 h-12" />
+                            <div className="bg-emerald-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto">
+                                <CheckCircle className="text-emerald-500 w-10 h-10" />
                             </div>
 
-                            <div className="space-y-2">
-                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Payment Successful!</h2>
-                                <p className="text-slate-600 font-medium max-w-sm mx-auto">
+                            <div className="space-y-3">
+                                <h2 className="text-3xl font-light text-gray-900 tracking-tight">Payment Successful</h2>
+                                <p className="text-gray-500 font-medium max-w-sm mx-auto tracking-wide">
                                     Your order is confirmed and will be processed right away.
                                 </p>
                             </div>
 
-                            <button className="mx-auto flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-full font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20">
-                                <Download size={18} />
+                            <button className="mx-auto flex items-center gap-3 bg-gray-900 text-white px-8 py-3.5 rounded-full font-semibold tracking-wide hover:bg-gray-800 transition-colors shadow-sm text-sm">
+                                <Download size={16} />
                                 Download Invoice
                             </button>
                         </motion.div>
@@ -339,7 +344,7 @@ export default function OrderConfirmationPage() {
                 {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
                     <button
                         onClick={() => router.push('/')}
-                        className="w-full py-4 text-slate-500 font-bold text-sm bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                        className="w-full py-4 text-gray-500 font-semibold text-sm tracking-widest uppercase bg-transparent hover:text-gray-900 transition-colors"
                     >
                         Save & Continue Shopping
                     </button>
@@ -347,37 +352,37 @@ export default function OrderConfirmationPage() {
                 {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification' || currentStatus === 'paid') && (
                     <button
                         onClick={() => router.push('/')}
-                        className="w-full py-4 text-slate-900 font-black text-sm bg-white rounded-2xl border-2 border-slate-900 hover:bg-slate-50 transition-colors shadow-sm"
+                        className="w-full py-4 text-gray-900 font-semibold text-sm tracking-widest uppercase bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors"
                     >
                         Back to Store
                     </button>
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 
     // Reuseable Upload UI Section
     function renderUploadUI() {
         return (
-            <div className="space-y-4 pt-2">
+            <div className="space-y-5 pt-2">
                 <div
                     onClick={() => fileInputRef.current?.click()}
-                    className={`cursor-pointer border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all group ${receipt ? 'border-slate-800 bg-slate-50' : 'border-slate-300 bg-white hover:border-slate-800 hover:bg-slate-50'
+                    className={`cursor-pointer border border-dashed rounded-2xl p-6 flex flex-col items-center justify-center transition-all group ${receipt ? 'border-gray-300 bg-gray-50/50' : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50'
                         }`}
                 >
                     {receipt ? (
-                        <div className="flex items-center gap-3 text-slate-900">
-                            <ImageIcon size={24} />
+                        <div className="flex items-center gap-3 text-gray-900">
+                            <ImageIcon size={20} className="text-emerald-500" />
                             <div className="text-left">
-                                <p className="text-sm font-bold truncate max-w-[200px]">{receipt.name}</p>
-                                <p className="text-[10px] uppercase font-black text-green-600 mt-1">Ready to submit</p>
+                                <p className="text-sm font-medium truncate max-w-[200px] tracking-wide">{receipt.name}</p>
+                                <p className="text-[10px] uppercase font-semibold text-emerald-500 mt-1 tracking-wider">Ready to submit</p>
                             </div>
                         </div>
                     ) : (
-                        <div className="text-center group-hover:scale-105 transition-transform">
-                            <Upload className="mx-auto text-slate-400 group-hover:text-slate-900 mb-2 transition-colors" size={28} />
-                            <p className="text-xs font-bold text-slate-500 group-hover:text-slate-900 transition-colors">Click to upload receipt image</p>
-                            <p className="text-[10px] font-medium text-slate-400 mt-1">Max 2MB (JPG, PNG)</p>
+                        <div className="text-center transition-transform">
+                            <Upload className="mx-auto text-gray-400 group-hover:text-gray-900 mb-3 transition-colors" size={24} />
+                            <p className="text-xs font-semibold text-gray-500 group-hover:text-gray-900 transition-colors tracking-wide">Upload receipt image</p>
+                            <p className="text-[10px] font-medium text-gray-400 mt-1.5 uppercase tracking-widest">Max 2MB (JPG, PNG)</p>
                         </div>
                     )}
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
@@ -386,11 +391,11 @@ export default function OrderConfirmationPage() {
                 <button
                     onClick={handleSubmitPayment}
                     disabled={!receipt || uploading}
-                    className={`w-full py-4 rounded-xl font-black text-white transition-all flex items-center justify-center gap-2 shadow-lg ${!receipt || uploading ? 'bg-slate-300 shadow-none cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5 shadow-slate-900/20'
+                    className={`w-full py-4 rounded-xl font-semibold tracking-widest uppercase text-xs transition-all flex items-center justify-center gap-2 ${!receipt || uploading ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800 shadow-sm'
                         }`}
                 >
-                    {uploading ? <Loader2 className="animate-spin" size={20} /> : <Check size={20} />}
-                    {uploading ? 'UPLOADING...' : 'SUBMIT PAYMENT'}
+                    {uploading ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
+                    {uploading ? 'Processing...' : 'Confirm Payment'}
                 </button>
             </div>
         );
