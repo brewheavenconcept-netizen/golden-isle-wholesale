@@ -123,14 +123,24 @@ export function useNotifications() {
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    const markAsRead = () => {
+    const markAsRead = (id: string) => {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    };
+
+    const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    };
+
+    const clearNotification = (id: string) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
     return {
         unreadCount,
         notifications,
         markAsRead,
+        markAllAsRead,
+        clearNotification,
     };
 }
 

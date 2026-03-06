@@ -30,7 +30,7 @@ export default function Sidebar({
     }, []);
     const router = useRouter();
     const pathname = usePathname();
-    const { unreadCount, markAsRead } = useNotifications();
+    const { unreadCount, markAllAsRead } = useNotifications();
 
     const storeName = settings.store_name || "Golden Isle Wholesale";
     const [newInquiries, setNewInquiries] = useState(0);
@@ -137,7 +137,7 @@ export default function Sidebar({
                     <Link
                         href="/admin/orders"
                         onClick={() => {
-                            markAsRead();
+                            markAllAsRead();
                             closeSidebarOnMobile();
                         }}
                         className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group border-l-2 mb-2
