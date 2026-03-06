@@ -67,14 +67,13 @@ export function useNotifications() {
 
         const setupChannel = () => {
             channel = supabase
-                .channel(`orders-notifications-${Date.now()}`)
+                .channel('orders-changes')
                 .on(
                     'postgres_changes',
                     {
                         event: 'INSERT',
                         schema: 'public',
-                        table: 'orders',
-                        filter: `store_id=eq.${STORE_ID}`
+                        table: 'orders'
                     },
                     (payload) => {
                         const order = payload.new as any;
