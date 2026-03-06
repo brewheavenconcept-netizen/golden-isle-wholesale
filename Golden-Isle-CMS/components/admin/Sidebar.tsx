@@ -1,12 +1,12 @@
 'use client';
 
-import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox } from "lucide-react";
+import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox, Bell } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { useStore as useStoreData } from "@/hooks/useStore";
-import NotificationBell from "./NotificationBell";
+
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +30,8 @@ export default function Sidebar({
     }, []);
     const router = useRouter();
     const pathname = usePathname();
+    const { unreadCount, markAsRead } = useNotifications();
+
     const storeName = settings.store_name || "Golden Isle Wholesale";
     const [newInquiries, setNewInquiries] = useState(0);
 
@@ -131,7 +133,35 @@ export default function Sidebar({
 
                 {/* Nav */}
                 <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-                    <NotificationBell />
+                    {/* Notifications Bell */}
+                    <Link
+                        href="/admin/orders"
+                        onClick={() => {
+                            markAsRead();
+                            closeSidebarOnMobile();
+                        }}
+                        className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group border-l-2 mb-2
+                            ${pathname === '/admin/orders' && unreadCount === 0
+                                ? "bg-gradient-to-r from-blue-600/20 to-transparent border-blue-500 text-white"
+                                : "text-slate-400 hover:bg-white/5 hover:text-white border-transparent"
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <Bell size={20} className={`transition-transform duration-200 group-hover:scale-105 ${unreadCount > 0 ? "text-yellow-400" : ""}`} />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                )}
+                            </div>
+                            <span className="text-sm font-medium">Notifications</span>
+                        </div>
+                        {unreadCount > 0 && (
+                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                {unreadCount}
+                            </span>
+                        )}
+                    </Link>
+
                     {navItem("/admin/dashboard", "Overview", LayoutDashboard)}
                     {navItem("/admin/inquiries", "Inquiries", Inbox, newInquiries)}
                     {navItem("/admin/analytics", "Analytics", TrendingUp)}
