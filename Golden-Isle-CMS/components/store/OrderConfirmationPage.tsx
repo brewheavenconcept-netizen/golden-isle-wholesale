@@ -287,13 +287,13 @@ export default function OrderConfirmationPage() {
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5 }}
-                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-sm relative overflow-hidden"
+                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-md relative overflow-hidden"
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-100 via-emerald-400 to-emerald-100 animate-pulse" />
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 animate-pulse" />
 
                             <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto relative">
-                                <Hourglass className="text-emerald-500 w-10 h-10 animate-pulse" />
-                                <div className="absolute inset-0 border-[3px] border-emerald-50 rounded-full animate-spin border-t-emerald-400" style={{ animationDuration: '2.5s' }} />
+                                <Hourglass className="text-amber-500 w-10 h-10 animate-pulse" />
+                                <div className="absolute inset-0 border-[3px] border-amber-50 rounded-full animate-spin border-t-amber-400" style={{ animationDuration: '2.5s' }} />
                             </div>
 
                             <div className="space-y-4">
@@ -304,7 +304,7 @@ export default function OrderConfirmationPage() {
                             </div>
 
                             <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-100 px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-gray-500">
-                                <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
                                 Please wait for confirmation
                             </div>
                         </motion.div>
@@ -332,7 +332,7 @@ export default function OrderConfirmationPage() {
                                 </p>
                             </div>
 
-                            <button className="mx-auto flex items-center gap-3 bg-gray-900 text-white px-8 py-3.5 rounded-full font-semibold tracking-wide hover:bg-gray-800 transition-colors shadow-sm text-sm">
+                            <button className="mx-auto flex items-center gap-3 bg-black text-white px-8 py-3.5 rounded-full font-semibold tracking-wide hover:bg-gray-800 transition-colors shadow-sm text-sm">
                                 <Download size={16} />
                                 Download Invoice
                             </button>
@@ -344,7 +344,7 @@ export default function OrderConfirmationPage() {
                 {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
                     <button
                         onClick={() => router.push('/')}
-                        className="w-full py-4 text-gray-500 font-semibold text-sm tracking-widest uppercase bg-transparent hover:text-gray-900 transition-colors"
+                        className="w-full mt-4 flex items-center justify-center py-4 bg-white text-gray-900 border border-gray-200 rounded-2xl font-semibold text-sm tracking-widest uppercase hover:bg-gray-50 transition-colors shadow-sm"
                     >
                         Save & Continue Shopping
                     </button>
@@ -352,7 +352,7 @@ export default function OrderConfirmationPage() {
                 {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification' || currentStatus === 'paid') && (
                     <button
                         onClick={() => router.push('/')}
-                        className="w-full py-4 text-gray-900 font-semibold text-sm tracking-widest uppercase bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors"
+                        className="w-full mt-4 flex items-center justify-center py-4 bg-black text-white rounded-2xl font-semibold text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors shadow-md"
                     >
                         Back to Store
                     </button>
