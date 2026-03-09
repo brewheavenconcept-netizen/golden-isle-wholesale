@@ -213,25 +213,10 @@ Please confirm my order. Thank you!`;
                     </div>
                 </div>
 
-                {/* WHATSAPP CONFIRMATION BUTTON */}
-                {waLink && (
-                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="block">
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98]"
-                        >
-                            <MessageCircle className="w-5 h-5" />
-                            Confirm Order via WhatsApp
-                        </motion.button>
-                    </a>
-                )}
-
                 {/* CONDITIONAL UI LOGIC BASED ON STATUS */}
                 <AnimatePresence mode="wait">
 
-                    {/* STATE 1: PENDING PAYMENT */}
+                    {/* STATE 1: PENDING PAYMENT / UNPAID */}
                     {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
                         <motion.div
                             key="pending"
@@ -239,94 +224,128 @@ Please confirm my order. Thank you!`;
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={{ duration: 0.4 }}
-                            className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm"
+                            className="space-y-6"
                         >
                             <div className="text-center">
-                                <h2 className="text-xl font-semibold text-gray-900 tracking-wide">Select Payment Method</h2>
-                                <p className="text-gray-500 text-sm mt-1">Please transfer the exact amount to complete your order</p>
+                                <h2 className="text-xl font-semibold text-gray-900 tracking-wide">Select Confirmation Method</h2>
+                                <p className="text-gray-500 text-sm mt-1">Choose how you would like to proceed with your order</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* CARD 1: PAY VIA TRANSFER */}
                                 <button
-                                    onClick={() => setPaymentMethod(paymentMethod === 'qr' ? null : 'qr')}
-                                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border transition-all ${paymentMethod === 'qr' ? 'border-gray-900 bg-gray-50/50' : 'border-gray-100 bg-white hover:border-gray-300'
-                                        }`}
+                                    onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
+                                    className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all bg-white text-left border-black ring-1 ring-black shadow-sm`}
                                 >
-                                    <QrCode className={paymentMethod === 'qr' ? 'text-gray-900' : 'text-gray-400'} size={28} />
-                                    <span className={`text-xs font-semibold mt-3 tracking-wide ${paymentMethod === 'qr' ? 'text-gray-900' : 'text-gray-500'}`}>DuitNow QR</span>
+                                    <div className="absolute top-4 right-4 bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                                        RECOMMENDED
+                                    </div>
+                                    <div className={`p-3 rounded-full mb-4 bg-black text-white`}>
+                                        <QrCode size={24} />
+                                    </div>
+                                    <h3 className="font-bold text-gray-900">Pay via Transfer</h3>
+                                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">DuitNow QR or Manual Bank Transfer</p>
+                                    {paymentMethod && <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-black uppercase tracking-wider">
+                                        <Check size={12} strokeWidth={3} /> Selected
+                                    </div>}
                                 </button>
 
-                                <button
-                                    onClick={() => setPaymentMethod(paymentMethod === 'manual' ? null : 'manual')}
-                                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border transition-all ${paymentMethod === 'manual' ? 'border-gray-900 bg-gray-50/50' : 'border-gray-100 bg-white hover:border-gray-300'
-                                        }`}
-                                >
-                                    <Banknote className={paymentMethod === 'manual' ? 'text-gray-900' : 'text-gray-400'} size={28} />
-                                    <span className={`text-xs font-semibold mt-3 tracking-wide ${paymentMethod === 'manual' ? 'text-gray-900' : 'text-gray-500'}`}>Bank Transfer</span>
-                                </button>
+                                {/* CARD 2: ORDER VIA WHATSAPP */}
+                                {waLink && (
+                                    <a
+                                        href={waLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex flex-col items-start p-6 rounded-2xl border-2 border-gray-200 bg-white hover:border-gray-400 transition-all text-left shadow-sm"
+                                    >
+                                        <div className="p-3 rounded-full mb-4 bg-emerald-50 text-emerald-500">
+                                            <MessageCircle size={24} />
+                                        </div>
+                                        <h3 className="font-bold text-gray-900">Order via WhatsApp</h3>
+                                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">Chat with us to confirm your order details</p>
+                                    </a>
+                                )}
                             </div>
 
                             {/* Slide-Down Logic using AnimatePresence */}
                             <AnimatePresence mode="wait">
-                                {paymentMethod === 'qr' && (
+                                {paymentMethod && (
                                     <motion.div
-                                        key="qr"
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden bg-white rounded-2xl border border-gray-100 text-center shadow-sm"
+                                        className="overflow-hidden space-y-4"
                                     >
-                                        <div className="p-8 space-y-6">
-                                            <div className="bg-white p-2 rounded-2xl inline-block border border-gray-100 shadow-sm">
-                                                <img
-                                                    src={settings?.qr_code_url || "https://placeholder.com/200x200?text=DuitNow+QR"}
-                                                    alt="QR"
-                                                    className="w-48 h-48 mx-auto object-contain"
-                                                />
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-gray-900 text-lg tracking-wide">Scan to pay RM {Number(order.total).toFixed(2)}</p>
-                                                <p className="text-xs font-medium text-gray-500 mt-1">Use your banking app to scan the DuitNow QR</p>
-                                            </div>
-                                            <div className="pt-6 border-t border-gray-100">
-                                                {renderUploadUI()}
-                                            </div>
+                                        <div className="bg-gray-50 p-4 rounded-2xl flex items-center gap-2">
+                                            <button
+                                                onClick={() => setPaymentMethod('qr')}
+                                                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${paymentMethod === 'qr' ? 'bg-black text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+                                            >
+                                                DUITNOW QR
+                                            </button>
+                                            <button
+                                                onClick={() => setPaymentMethod('manual')}
+                                                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${paymentMethod === 'manual' ? 'bg-black text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+                                            >
+                                                BANK TRANSFER
+                                            </button>
                                         </div>
-                                    </motion.div>
-                                )}
 
-                                {paymentMethod === 'manual' && (
-                                    <motion.div
-                                        key="manual"
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm"
-                                    >
-                                        <div className="p-6 space-y-4">
-                                            <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center text-left">
+                                        {paymentMethod === 'qr' && (
+                                            <motion.div
+                                                key="qr"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="bg-white rounded-2xl border border-gray-100 text-center shadow-sm p-8 space-y-6"
+                                            >
+                                                <div className="bg-white p-2 rounded-2xl inline-block border border-gray-100 shadow-sm">
+                                                    <img
+                                                        src={settings?.qr_code_url || "https://placeholder.com/200x200?text=DuitNow+QR"}
+                                                        alt="QR"
+                                                        className="w-48 h-48 mx-auto object-contain"
+                                                    />
+                                                </div>
                                                 <div>
-                                                    <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Bank Name</p>
-                                                    <p className="font-semibold text-gray-900 text-lg mt-0.5">{settings?.bank_name || 'Maybank'}</p>
+                                                    <p className="font-semibold text-gray-900 text-lg tracking-wide">Scan to pay RM {Number(order.total).toFixed(2)}</p>
+                                                    <p className="text-xs font-medium text-gray-500 mt-1">Use your banking app to scan the DuitNow QR</p>
                                                 </div>
-                                            </div>
-                                            <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center group text-left">
-                                                <div className="flex-1">
-                                                    <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Account Information</p>
-                                                    <p className="font-mono text-xl font-semibold text-gray-900 tracking-wider mt-1">{settings?.bank_account_number || '1234567890'}</p>
-                                                    <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-wide">{settings?.bank_holder_name || 'GOLDEN ISLE WHOLESALE'}</p>
+                                                <div className="pt-6 border-t border-gray-100">
+                                                    {renderUploadUI()}
                                                 </div>
-                                                <button
-                                                    onClick={handleCopyAccount}
-                                                    className={`p-3 rounded-xl transition-all ${copySuccess ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500 hover:text-gray-900 border border-gray-200 shadow-sm'}`}
-                                                >
-                                                    {copySuccess ? <Check size={18} /> : <Copy size={18} />}
-                                                </button>
-                                            </div>
-                                            <div className="pt-4 border-t border-gray-100">
-                                                {renderUploadUI()}
-                                            </div>
-                                        </div>
+                                            </motion.div>
+                                        )}
+
+                                        {paymentMethod === 'manual' && (
+                                            <motion.div
+                                                key="manual"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4"
+                                            >
+                                                <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center text-left">
+                                                    <div>
+                                                        <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Bank Name</p>
+                                                        <p className="font-semibold text-gray-900 text-lg mt-0.5">{settings?.bank_name || 'Maybank'}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-gray-50/50 p-5 rounded-2xl flex justify-between items-center group text-left">
+                                                    <div className="flex-1">
+                                                        <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Account Information</p>
+                                                        <p className="font-mono text-xl font-semibold text-gray-900 tracking-wider mt-1">{settings?.bank_account_number || '1234567890'}</p>
+                                                        <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-wide">{settings?.bank_holder_name || 'GOLDEN ISLE WHOLESALE'}</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={handleCopyAccount}
+                                                        className={`p-3 rounded-xl transition-all ${copySuccess ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500 hover:text-gray-900 border border-gray-200 shadow-sm'}`}
+                                                    >
+                                                        {copySuccess ? <Check size={18} /> : <Copy size={18} />}
+                                                    </button>
+                                                </div>
+                                                <div className="pt-4 border-t border-gray-100">
+                                                    {renderUploadUI()}
+                                                </div>
+                                            </motion.div>
+                                        )}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
