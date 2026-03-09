@@ -17,6 +17,7 @@ import {
     Hash
 } from 'lucide-react';
 import { getOrder, updatePaymentStatus } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 
 const BANKS = [
