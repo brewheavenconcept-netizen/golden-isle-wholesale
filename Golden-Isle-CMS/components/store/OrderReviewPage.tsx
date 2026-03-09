@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { getOrder } from '@/lib/storage';
 import { Order } from '@/types';
 import { Loader2, MessageCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -19,14 +20,11 @@ export default function OrderReviewPage() {
         const fetchData = async () => {
             if (!orderId) return;
             try {
-                // 1. Fetch order
-                const { data: orderData, error: orderError } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('id', orderId)
-                    .single();
+                // 1. Fetch order using central utility to ensure field mapping
+                const orderData = await getOrder(orderId);
+                console.log('DEBUG FULL ORDER OBJECT:', orderData);
 
-                if (orderError) throw orderError;
+                if (!orderData) throw new Error('Order not found');
                 setOrder(orderData);
 
                 // 2. Fetch whatsapp number
