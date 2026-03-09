@@ -62,6 +62,15 @@ function FPXGatewayContent() {
         loadOrder();
     }, [orderId]);
 
+    useEffect(() => {
+        if (step === 'success') {
+            const timer = setTimeout(() => {
+                router.push(`/order-confirmation?orderId=${orderId}`);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [step, orderId, router]);
+
     const handleBankClick = (bank: typeof BANKS[0]) => {
         setSelectedBank(bank);
         setStep('login');
@@ -327,14 +336,6 @@ function FPXGatewayContent() {
                                     Redirecting in 5 seconds...
                                 </div>
                             </div>
-
-                            {/* Auto redirect */}
-                            {useEffect(() => {
-                                const timer = setTimeout(() => {
-                                    router.push(`/order-confirmation?orderId=${orderId}`);
-                                }, 5000);
-                                return () => clearTimeout(timer);
-                            }, [])}
                         </motion.div>
                     )}
                 </AnimatePresence>
