@@ -150,7 +150,7 @@ export default function CheckoutPage() {
             const orderReviewLink = `${window.location.origin}/order-review/${newOrder.id}`;
 
             const itemsList = cart.map(c => `• ${c.product.name} x${c.qty}`).join('\n');
-            const methodLabel = method === 'bank_transfer' ? 'Bank Transfer' : method === 'duitnow' ? 'DuitNow QR' : method === 'stripe' ? 'Credit/Debit Card' : method === 'toyyibpay' ? 'FPX Banking' : 'Cash on Delivery';
+            const methodLabel = method === 'bank_transfer' ? 'Bank Transfer' : method === 'duitnow' ? 'DuitNow QR' : method === 'stripe' ? 'Credit/Debit Card' : method === 'toyyibpay' ? 'FPX Banking' : 'Manual Payment';
             const message = `✅ *New Order Received!* \n\n` +
                 `*Order ID:* ${newOrder.id}\n` +
                 `*Customer:* ${fullName}\n` +
