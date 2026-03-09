@@ -13,10 +13,13 @@ let supabaseInstance: SupabaseClient;
 if (process.env.NODE_ENV === 'production') {
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
 } else {
-    if (!global.supabase) {
-        global.supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const globalForSupabase = globalThis as unknown as {
+        supabase: ReturnType<typeof createClient>
     }
-    supabaseInstance = global.supabase;
+    if (!globalForSupabase.supabase) {
+        globalForSupabase.supabase = createClient(supabaseUrl, supabaseAnonKey)
+    }
+    supabaseInstance = globalForSupabase.supabase
 }
 
 export const supabase = supabaseInstance;
