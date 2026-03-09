@@ -30,15 +30,16 @@ export default function Settings() {
                 .single();
 
             if (data || storeData) {
+                const fetchedData = data || {};
                 setSettings({
                     ...DEFAULT_SETTINGS,
-                    ...data,
-                    store_name: storeData?.name || data?.store_name || DEFAULT_SETTINGS.store_name,
-                    whatsapp_number: data.whatsapp || DEFAULT_SETTINGS.whatsapp_number,
-                    bank_account_number: data.bank_account || DEFAULT_SETTINGS.bank_account_number,
+                    ...fetchedData,
+                    store_name: storeData?.name || fetchedData.store_name || DEFAULT_SETTINGS.store_name,
+                    whatsapp_number: fetchedData.whatsapp_number || fetchedData.whatsapp || DEFAULT_SETTINGS.whatsapp_number,
+                    bank_account_number: fetchedData.bank_account_number || fetchedData.bank_account || DEFAULT_SETTINGS.bank_account_number,
                     operating_hours: {
                         ...DEFAULT_SETTINGS.operating_hours,
-                        ...(data.operating_hours || {})
+                        ...(fetchedData.operating_hours || {})
                     }
                 });
             }
