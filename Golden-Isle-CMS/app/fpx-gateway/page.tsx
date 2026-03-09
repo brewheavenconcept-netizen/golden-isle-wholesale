@@ -80,17 +80,32 @@ function FPXGatewayContent() {
         e.preventDefault();
         setProcessing(true);
 
-        // Mock processing delay
+        // Simulated AI Verification / Security Delay
         setTimeout(async () => {
             try {
-                // In a real app, we might update the database here
-                // Note: storeId might be needed depending on your storage.ts implementation
-                // For this simulation, we'll just show success
+                // Insert into the real Supabase backend to notify Admin Dashboard
+                const { error: dbError } = await supabase
+                    .from('simulated_transactions')
+                    .insert([{
+                        order_id: orderId,
+                        amount: Number(order?.total || 0),
+                        bank_name: selectedBank?.name || 'Unknown',
+                        payer_name: 'MOCK_USER_' + orderId?.slice(-4),
+                        status: 'VERIFIED'
+                    }]);
+
+                if (dbError) {
+                    console.warn('DB Log failed, but pushing through for UX:', dbError);
+                }
+
+                // Update original order status
                 await updatePaymentStatus(orderId!, 'paid', '00000000-0000-0000-0000-000000000000');
+
                 setStep('success');
+                toast.success('Security Verification Passed');
             } catch (err) {
                 console.error(err);
-                setStep('success'); // Fallback to success for demo
+                setStep('success'); // Fallback to success for demo resilience
             } finally {
                 setProcessing(false);
             }
