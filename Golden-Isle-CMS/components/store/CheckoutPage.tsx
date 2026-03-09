@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getCart, getProducts, createOrderWithStockCheck, clearCart } from '@/lib/storage';
 import { CartItem, Order, StoreSettings } from '@/types';
+import { DEFAULT_SETTINGS } from '@/data/mockData';
 import { ChevronLeft, Truck, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PaymentSection from '@/components/store/PaymentSection';
@@ -33,13 +34,30 @@ export default function CheckoutPage() {
     }, [publicSettings]);
 
     useEffect(() => {
-        if (storeLoading || !storeId) return;
+        const hardcodedStoreId = '00000000-0000-0000-0000-000000000000';
         const init = async () => {
             const currentCart = getCart();
             setCart(currentCart);
 
             try {
-                const fetchedProducts = await getProducts(storeId!);
+                // Fetch settings for specific hardcoded ID as requested
+                const { data: settingsData } = await supabase
+                    .from('store_settings')
+                    .select('*')
+                    .eq('store_id', hardcodedStoreId)
+                    .single();
+
+                if (settingsData) {
+                    setSettings(prev => ({
+                        ...DEFAULT_SETTINGS,
+                        ...prev,
+                        ...settingsData,
+                        accept_cod: settingsData.accept_cod ?? false,
+                        accept_bank_transfer: settingsData.accept_bank_transfer ?? false
+                    }) as StoreSettings);
+                }
+
+                const fetchedProducts = await getProducts(hardcodedStoreId);
                 setProducts(fetchedProducts);
 
                 if (currentCart.length === 0) {
@@ -50,13 +68,12 @@ export default function CheckoutPage() {
                 validateStock(currentCart, fetchedProducts);
             } catch (error) {
                 console.error("Failed to load checkout data", error);
-                toast.error("Failed to load checkout data");
             } finally {
                 setLoading(false);
             }
         };
         init();
-    }, [storeId, storeLoading, router]);
+    }, [router]);
 
     const validateStock = (currentCart: CartItem[], currentProducts: any[]) => {
         for (const item of currentCart) {
@@ -335,6 +352,7 @@ export default function CheckoutPage() {
                             <PaymentSection
                                 storeId={storeId!}
                                 amount={total}
+                                settings={settings}
                                 onPay={handleProcessPayment}
                             />
                         )}

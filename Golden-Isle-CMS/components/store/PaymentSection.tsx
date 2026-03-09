@@ -7,29 +7,22 @@ import { getSettings } from '@/lib/storage';
 interface PaymentProps {
     storeId: string;
     amount: number;
+    settings: any;
     onPay: (method: string) => void;
 }
 
 const IMPLEMENTED_METHODS = ['cod', 'bank_transfer'] as const;
 
-export default function PaymentSection({ storeId, amount, onPay }: PaymentProps) {
-    const [loading, setLoading] = useState(true);
-    const [settings, setSettings] = useState<any>(null);
+export default function PaymentSection({ storeId, amount, settings, onPay }: PaymentProps) {
     const [selectedMethod, setSelectedMethod] = useState<string>('');
 
     useEffect(() => {
-        async function loadSettings() {
-            if (!storeId) return;
-            const data = await getSettings(storeId);
-            setSettings(data);
-            if (IMPLEMENTED_METHODS.includes('bank_transfer') && data.accept_bank_transfer) setSelectedMethod('bank_transfer');
-            else if (IMPLEMENTED_METHODS.includes('cod') && data.accept_cod) setSelectedMethod('cod');
-            setLoading(false);
-        }
-        loadSettings();
-    }, [storeId]);
+        if (!settings) return;
+        if (settings.accept_bank_transfer) setSelectedMethod('bank_transfer');
+        else if (settings.accept_cod) setSelectedMethod('cod');
+    }, [settings]);
 
-    if (loading) return <div className="p-4 flex gap-2 text-slate-400"><Loader2 className="animate-spin" /> Checking payment gates...</div>;
+    if (!settings) return <div className="p-4 flex gap-2 text-slate-400"><Loader2 className="animate-spin" /> Preparing payment...</div>;
 
     const hasAvailableMethods =
         (IMPLEMENTED_METHODS.includes('cod') && settings?.accept_cod) ||
