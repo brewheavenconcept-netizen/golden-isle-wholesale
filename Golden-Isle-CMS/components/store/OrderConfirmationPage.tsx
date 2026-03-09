@@ -239,61 +239,106 @@ Please confirm my order. Thank you!`;
                             transition={{ duration: 0.4 }}
                             className="space-y-6"
                         >
-                            <div className="text-center">
-                                <h2 className="text-xl font-semibold text-gray-900 tracking-wide">Select Confirmation Method</h2>
-                                <p className="text-gray-500 text-sm mt-1">Choose how you would like to proceed with your order</p>
+                            <div className="text-center mb-12">
+                                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Select Payment Method</h1>
+                                <p className="text-gray-500 font-medium mt-3 text-lg">Choose how you would like to proceed with your payment</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
                                 {/* CARD 1: PAY VIA TRANSFER */}
-                                <button
+                                <div
                                     onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
-                                    className={`relative flex flex-col items-center text-center p-8 rounded-3xl border-2 transition-all duration-300 bg-white shadow-sm hover:shadow-md ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                            ? 'border-emerald-500 ring-4 ring-emerald-50'
-                                            : 'border-gray-100 hover:border-emerald-200'
+                                    className={`relative group flex flex-col p-1 rounded-[2.5rem] transition-all duration-500 cursor-pointer ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                            ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-2xl shadow-emerald-200'
+                                            : 'bg-transparent hover:bg-emerald-50 shadow-sm hover:shadow-xl'
                                         }`}
                                 >
-                                    <div className={`p-4 rounded-2xl mb-4 transition-all duration-300 ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                            ? 'bg-emerald-500 text-white scale-110'
-                                            : 'bg-emerald-50 text-emerald-600'
-                                        }`}>
-                                        <QrCode size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-900 text-lg">Pay via Transfer</h3>
-                                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">DuitNow QR or Manual Bank Transfer</p>
-                                    {(paymentMethod === 'qr' || paymentMethod === 'manual') && (
-                                        <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full">
-                                            <Check size={12} strokeWidth={3} /> Active Selection
+                                    <div className="flex flex-col h-full bg-white rounded-[2.3rem] p-8 relative overflow-hidden">
+                                        {/* Header */}
+                                        <div className="flex items-center gap-4 mb-6 z-10">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-inner">
+                                                <QrCode size={30} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="font-black text-gray-900 text-xl leading-tight">Pay via Transfer</h3>
+                                                <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mt-1">Manual Verification</p>
+                                            </div>
                                         </div>
-                                    )}
-                                </button>
 
-                                {/* CARD 2: PAY VIA FPX (PREMIUM CENTERPIECE) */}
-                                <button
+                                        <p className="text-gray-500 text-sm font-medium leading-relaxed mb-6 z-10">
+                                            DuitNow QR or <br />Manual Bank Transfer
+                                        </p>
+
+                                        {/* Illustration */}
+                                        <div className="relative h-48 mb-8 group-hover:scale-105 transition-transform duration-700 ease-out z-10 flex items-center justify-center">
+                                            <img
+                                                src="/illustrations/transfer.png"
+                                                alt="Transfer Illustration"
+                                                className="w-full h-full object-contain drop-shadow-2xl"
+                                            />
+                                            {/* Glow effect */}
+                                            <div className="absolute inset-x-0 bottom-0 h-10 bg-emerald-100/50 blur-3xl -z-10 rounded-full scale-110" />
+                                        </div>
+
+                                        {/* CTA Button */}
+                                        <div className={`mt-auto w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] text-center transition-all duration-300 z-10 ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                                ? 'bg-emerald-500 text-white shadow-lg'
+                                                : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                            }`}>
+                                            {paymentMethod ? 'SELECTED' : 'TRANSFER NOW'}
+                                        </div>
+
+                                        {/* Decorative Background Elements */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+                                    </div>
+                                </div>
+
+                                {/* CARD 2: PAY VIA FPX (RECOMMENDED) */}
+                                <div
                                     onClick={handleFPXCheckout}
-                                    className="relative flex flex-col items-center text-center p-8 rounded-3xl border-2 border-amber-200 bg-gradient-to-b from-amber-50/50 to-white shadow-lg shadow-amber-100/50 transition-all duration-500 hover:scale-[1.03] hover:border-amber-400 hover:shadow-xl hover:shadow-amber-200/50 group overflow-hidden"
+                                    className="relative group flex flex-col p-1 rounded-[2.5rem] transition-all duration-500 cursor-pointer bg-gradient-to-br from-amber-300 via-amber-500 to-amber-600 shadow-2xl shadow-amber-200/50 hover:scale-[1.02]"
                                 >
-                                    <div className="absolute top-0 right-0">
-                                        <div className="bg-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl tracking-tighter uppercase shadow-sm animate-pulse">
+                                    <div className="flex flex-col h-full bg-white rounded-[2.3rem] p-8 relative overflow-hidden">
+                                        {/* Premium Badge */}
+                                        <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-black px-5 py-2 rounded-bl-3xl tracking-widest uppercase shadow-sm z-20 animate-pulse">
                                             RECOMMENDED
                                         </div>
-                                    </div>
 
-                                    <div className="p-4 rounded-2xl mb-4 bg-amber-500 text-white shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform duration-500">
-                                        <Banknote size={28} />
-                                    </div>
+                                        {/* Header */}
+                                        <div className="flex items-center gap-4 mb-6 z-10">
+                                            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shadow-inner">
+                                                <Banknote size={30} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="font-black text-gray-900 text-xl leading-tight">Pay via FPX</h3>
+                                                <p className="text-xs text-amber-600 font-bold uppercase tracking-widest mt-1">Instant Verification</p>
+                                            </div>
+                                        </div>
 
-                                    <div className="space-y-1">
-                                        <h3 className="font-extrabold text-gray-900 text-xl tracking-tight">Pay via FPX</h3>
-                                        <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest text-[10px]">Instant Verification</p>
-                                    </div>
+                                        <p className="text-gray-500 text-sm font-medium leading-relaxed mb-6 z-10">
+                                            Instant verification, <br />safe and secure
+                                        </p>
 
-                                    <p className="text-sm text-gray-600 mt-3 leading-relaxed font-medium">Safe, secure, and no receipt upload needed.</p>
+                                        {/* Illustration */}
+                                        <div className="relative h-48 mb-8 group-hover:scale-110 transition-transform duration-700 ease-out z-10 flex items-center justify-center">
+                                            <img
+                                                src="/illustrations/fpx.png"
+                                                alt="FPX Illustration"
+                                                className="w-full h-full object-contain drop-shadow-2xl"
+                                            />
+                                            {/* Glow effect */}
+                                            <div className="absolute inset-x-0 bottom-0 h-10 bg-amber-100/50 blur-3xl -z-10 rounded-full scale-110" />
+                                        </div>
 
-                                    <div className="mt-6 w-full py-2 bg-amber-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest group-hover:bg-amber-600 transition-colors shadow-sm">
-                                        Proceed to Bank
+                                        {/* CTA Button */}
+                                        <div className="mt-auto w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] text-center shadow-lg shadow-amber-200 hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 z-10">
+                                            PROCEED TO BANK
+                                        </div>
+
+                                        {/* Decorative Background Elements */}
+                                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-50 rounded-full -ml-16 -mb-16 blur-2xl opacity-50" />
                                     </div>
-                                </button>
+                                </div>
 
                                 {/* CARD 3: ORDER VIA WHATSAPP */}
                                 {waLink ? (
@@ -301,21 +346,53 @@ Please confirm my order. Thank you!`;
                                         href={waLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex flex-col items-center text-center p-8 rounded-3xl border-2 border-gray-100 bg-white hover:border-emerald-200 transition-all duration-300 shadow-sm hover:shadow-md group"
+                                        className="relative group flex flex-col p-1 rounded-[2.5rem] transition-all duration-500 bg-transparent hover:bg-emerald-50 shadow-sm hover:shadow-xl"
                                     >
-                                        <div className="p-4 rounded-2xl mb-4 bg-emerald-50 text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                                            <MessageCircle size={28} />
+                                        <div className="flex flex-col h-full bg-white rounded-[2.3rem] p-8 relative overflow-hidden">
+                                            {/* Header */}
+                                            <div className="flex items-center gap-4 mb-6 z-10">
+                                                <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-inner">
+                                                    <MessageCircle size={30} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-black text-gray-900 text-xl leading-tight">Order via WhatsApp</h3>
+                                                    <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mt-1">Personal Service</p>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-gray-500 text-sm font-medium leading-relaxed mb-6 z-10">
+                                                Chat with us to <br />confirm order details
+                                            </p>
+
+                                            {/* Illustration */}
+                                            <div className="relative h-48 mb-8 group-hover:scale-105 transition-transform duration-700 ease-out z-10 flex items-center justify-center">
+                                                <img
+                                                    src="/illustrations/whatsapp.png"
+                                                    alt="WhatsApp Illustration"
+                                                    className="w-full h-full object-contain drop-shadow-2xl"
+                                                />
+                                                {/* Glow effect */}
+                                                <div className="absolute inset-x-0 bottom-0 h-10 bg-emerald-100/50 blur-3xl -z-10 rounded-full scale-110" />
+                                            </div>
+
+                                            {/* CTA Button */}
+                                            <div className="mt-auto w-full py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-xs uppercase tracking-[0.2em] text-center hover:bg-emerald-500 hover:text-white transition-all duration-300 z-10">
+                                                CHAT NOW
+                                            </div>
                                         </div>
-                                        <h3 className="font-bold text-gray-900 text-lg">Order via WhatsApp</h3>
-                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">Chat with us to confirm your order details</p>
                                     </a>
                                 ) : (
-                                    <div className="flex flex-col items-center text-center p-8 rounded-3xl border-2 border-gray-50 bg-gray-50/50 opacity-60 shadow-sm">
-                                        <div className="p-4 rounded-2xl mb-4 bg-gray-200 text-gray-400">
-                                            <MessageCircle size={28} />
+                                    <div className="relative flex flex-col p-1 rounded-[2.5rem] bg-gray-50 opacity-60">
+                                        <div className="flex flex-col h-full bg-white rounded-[2.3rem] p-8">
+                                            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 mb-6">
+                                                <MessageCircle size={30} />
+                                            </div>
+                                            <h3 className="font-black text-gray-400 text-xl mb-4">Order via WhatsApp</h3>
+                                            <div className="h-48 mb-8 bg-gray-50 rounded-2xl animate-pulse" />
+                                            <div className="mt-auto w-full py-4 bg-gray-100 text-gray-400 rounded-2xl font-black text-xs text-center uppercase tracking-widest">
+                                                CONNECTING...
+                                            </div>
                                         </div>
-                                        <h3 className="font-bold text-gray-400 text-lg">Order via WhatsApp</h3>
-                                        <p className="text-sm text-gray-400 mt-2 leading-relaxed">System connecting...</p>
                                     </div>
                                 )}
                             </div>
