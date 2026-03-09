@@ -16,7 +16,8 @@ import {
     Check,
     Image as ImageIcon,
     Hourglass,
-    Download
+    Download,
+    MessageCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -125,6 +126,19 @@ export default function OrderConfirmationPage() {
 
     const currentStatus = order.payment_status || 'pending_payment';
 
+    const waMessage = `Hi Golden Isle Wholesale! 🥃
+
+I have just placed an order:
+📋 Order ID: ${order.id}
+👤 Name: ${order.customer_name}
+💰 Total: RM ${Number(order.total).toFixed(2)}
+
+Please confirm my order. Thank you!`;
+
+    const waLink = settings?.whatsapp_number
+        ? `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(waMessage)}`
+        : null;
+
     return (
         <div className="min-h-screen bg-white py-12 px-4 font-sans text-gray-900">
             <motion.div
@@ -174,6 +188,21 @@ export default function OrderConfirmationPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* WHATSAPP CONFIRMATION BUTTON */}
+                {waLink && (
+                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="block">
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98]"
+                        >
+                            <MessageCircle className="w-5 h-5" />
+                            Confirm Order via WhatsApp
+                        </motion.button>
+                    </a>
+                )}
 
                 {/* CONDITIONAL UI LOGIC BASED ON STATUS */}
                 <AnimatePresence mode="wait">

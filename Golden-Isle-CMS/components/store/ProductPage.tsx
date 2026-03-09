@@ -205,33 +205,33 @@ export default function ProductPage() {
 
                     {/* LEFT — Image */}
                     <div className="relative w-full lg:sticky lg:top-24">
-                        <div className={`relative w-full h-auto max-h-[400px] lg:max-h-none aspect-square rounded-[12px] lg:overflow-hidden border border-[#2d2918] bg-[#1a1a0e] shadow-xl ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+                        <div className={`relative w-full aspect-square rounded-[12px] overflow-hidden border border-[#2d2918]/20 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${isOutOfStock ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                             {product.image_url ? (
                                 <>
                                     <img
                                         src={product.image_url}
                                         alt={product.name}
-                                        className="w-[85%] h-[85%] object-contain absolute inset-0 m-auto"
+                                        className="w-full h-full object-cover"
                                         onError={(e) => {
                                             e.currentTarget.style.display = 'none';
                                             const sibling = e.currentTarget.nextElementSibling as HTMLElement | null;
                                             if (sibling) sibling.classList.remove('hidden');
                                         }}
                                     />
-                                    <div className="hidden absolute inset-0 flex flex-col items-center justify-center">
+                                    <div className="hidden absolute inset-0 flex flex-col items-center justify-center bg-[#f5f0e8]/50 backdrop-blur-sm">
                                         {getCategoryIcon(product.category)}
-                                        <span className="text-[10px] text-[#f5f0e8]/50 uppercase tracking-widest mt-3 font-semibold">Preview Unavailable</span>
+                                        <span className="text-[10px] text-[#1a1a0e]/50 uppercase tracking-widest mt-3 font-semibold">Preview Unavailable</span>
                                     </div>
                                 </>
                             ) : (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f5f0e8]/50">
                                     {getCategoryIcon(product.category)}
-                                    <span className="text-[10px] text-[#f5f0e8]/50 uppercase tracking-widest mt-3 font-semibold">No Image Available</span>
+                                    <span className="text-[10px] text-[#1a1a0e]/50 uppercase tracking-widest mt-3 font-semibold">No Image Available</span>
                                 </div>
                             )}
 
                             {/* Corner gold accent */}
-                            <div className="absolute top-4 left-4">
+                            <div className="absolute top-4 left-4 z-10">
                                 {getStockBadge(product.stock_status)}
                             </div>
                         </div>
@@ -251,7 +251,7 @@ export default function ProductPage() {
 
                         {/* Name */}
                         <div>
-                            <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold font-serif text-[#1a1a0e] leading-tight tracking-tight mb-2">
+                            <h1 className="text-4xl md:text-5xl font-bold font-serif text-[#1a1a0e] leading-tight tracking-tight mb-2">
                                 {product.name}
                             </h1>
                             <div className="w-12 h-0.5 bg-gradient-to-r from-[#C9A84C] to-transparent rounded-full" />

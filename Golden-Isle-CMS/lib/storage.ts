@@ -369,7 +369,7 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
     const settingsPayload = {
         store_id: storeId,
         store_name: settings.store_name,
-        whatsapp: settings.whatsapp_number,
+        whatsapp_number: settings.whatsapp_number,
         currency: settings.currency,
         theme_color: settings.theme_color,
         logo_url: settings.logo_url,
@@ -379,7 +379,7 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
         enable_self_pickup: settings.enable_self_pickup,
         accept_cod: settings.accept_cod,
         accept_bank_transfer: settings.accept_bank_transfer,
-        bank_account: settings.bank_account_number,
+        bank_account_number: settings.bank_account_number,
         bank_name: settings.bank_name,
         bank_holder_name: settings.bank_holder_name,
         qr_code_url: settings.qr_code_url,
