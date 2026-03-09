@@ -118,6 +118,19 @@ export default function OrderConfirmationPage() {
         }
     };
 
+    const handleFPXCheckout = () => {
+        if (!orderId) {
+            toast.error('Order ID is missing.');
+            return;
+        }
+
+        // Transition user to the Simulated Bank Gateway
+        toast.loading('Redirecting to secure FPX gateway...', { duration: 1500 });
+        setTimeout(() => {
+            router.push(`/fpx-gateway?orderId=${orderId}`);
+        }, 1500);
+    };
+
     if (loading || storeLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -231,16 +244,13 @@ Please confirm my order. Thank you!`;
                                 <p className="text-gray-500 text-sm mt-1">Choose how you would like to proceed with your order</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* CARD 1: PAY VIA TRANSFER */}
                                 <button
                                     onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
-                                    className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all bg-white text-left border-black ring-1 ring-black shadow-sm`}
+                                    className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all bg-white text-left shadow-sm ${paymentMethod ? 'border-black ring-1 ring-black' : 'border-gray-200 hover:border-gray-400'}`}
                                 >
-                                    <div className="absolute top-4 right-4 bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
-                                        RECOMMENDED
-                                    </div>
-                                    <div className={`p-3 rounded-full mb-4 bg-black text-white`}>
+                                    <div className={`p-3 rounded-full mb-4 transition-colors ${paymentMethod ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}>
                                         <QrCode size={24} />
                                     </div>
                                     <h3 className="font-bold text-gray-900">Pay via Transfer</h3>
@@ -250,8 +260,23 @@ Please confirm my order. Thank you!`;
                                     </div>}
                                 </button>
 
-                                {/* CARD 2: ORDER VIA WHATSAPP */}
-                                {waLink && (
+                                {/* CARD 2: PAY VIA FPX (RECOMMENDED) */}
+                                <button
+                                    onClick={handleFPXCheckout}
+                                    className="relative flex flex-col items-start p-6 rounded-2xl border-2 border-amber-500/50 bg-gray-900 text-left shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-amber-400 hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] overflow-hidden group"
+                                >
+                                    <div className="absolute top-4 right-4 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                                        RECOMMENDED
+                                    </div>
+                                    <div className="p-3 rounded-full mb-4 bg-amber-500/20 text-amber-500 group-hover:bg-amber-500/30 transition-colors">
+                                        <Banknote size={24} />
+                                    </div>
+                                    <h3 className="font-bold text-white">Pay via FPX</h3>
+                                    <p className="text-xs text-amber-100/70 mt-1 leading-relaxed">Instant Verification. No receipt needed.</p>
+                                </button>
+
+                                {/* CARD 3: ORDER VIA WHATSAPP */}
+                                {waLink ? (
                                     <a
                                         href={waLink}
                                         target="_blank"
@@ -264,6 +289,14 @@ Please confirm my order. Thank you!`;
                                         <h3 className="font-bold text-gray-900">Order via WhatsApp</h3>
                                         <p className="text-xs text-gray-500 mt-1 leading-relaxed">Chat with us to confirm your order details</p>
                                     </a>
+                                ) : (
+                                    <div className="flex flex-col items-start p-6 rounded-2xl border-2 border-gray-200 bg-gray-50 opacity-50 text-left shadow-sm">
+                                        <div className="p-3 rounded-full mb-4 bg-gray-200 text-gray-400">
+                                            <MessageCircle size={24} />
+                                        </div>
+                                        <h3 className="font-bold text-gray-500">Order via WhatsApp</h3>
+                                        <p className="text-xs text-gray-400 mt-1 leading-relaxed">Connecting...</p>
+                                    </div>
                                 )}
                             </div>
 
