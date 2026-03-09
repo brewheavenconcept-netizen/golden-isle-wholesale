@@ -239,84 +239,74 @@ Please confirm my order. Thank you!`;
                             transition={{ duration: 0.4 }}
                             className="space-y-6"
                         >
-                            <div className="text-center mb-10">
-                                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Select Payment Method</h1>
-                                <p className="text-gray-500 font-medium mt-3 text-lg">Choose how you would like to proceed with your payment</p>
+                            <div className="text-center mb-8">
+                                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Select Payment Method</h1>
+                                <p className="text-gray-500 font-medium mt-2 text-base">Choose how you would like to proceed with your payment</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
+                            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                                 {/* CARD 1: PAY VIA TRANSFER */}
                                 <div
                                     onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
-                                    className={`relative group flex flex-col rounded-[2.5rem] bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-xl hover:shadow-2xl ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                            ? 'ring-4 ring-emerald-400/50 scale-[1.02]'
-                                            : 'hover:scale-[1.02]'
+                                    className={`relative group flex flex-row md:flex-col p-4 bg-white rounded-2xl shadow-md transition-all duration-300 cursor-pointer gap-4 ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                            ? 'ring-2 ring-emerald-500'
+                                            : 'hover:shadow-lg'
                                         }`}
                                 >
-                                    <div className="flex flex-col h-full">
-                                        {/* Illustration Section */}
-                                        <div className="relative h-56 w-full bg-gradient-to-br from-emerald-50 to-green-100 overflow-hidden">
-                                            <img
-                                                src="/payment/transfer.png"
-                                                alt="Transfer Illustration"
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
-                                        </div>
+                                    {/* Image Section */}
+                                    <div className="flex-shrink-0 w-28 h-28 md:w-full md:h-40 overflow-hidden rounded-2xl bg-emerald-50">
+                                        <img
+                                            src="/payment/transfer.png"
+                                            alt="Transfer"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
 
-                                        {/* Content Section */}
-                                        <div className="p-8 flex flex-col flex-1 text-center">
-                                            <h3 className="font-bold text-gray-900 text-2xl mb-2">Pay via Transfer</h3>
-                                            <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
-                                                DuitNow QR or Manual <br />Bank Transfer
-                                            </p>
-
-                                            <div className="mt-auto">
-                                                <button className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-[0.2em] transition-all duration-300 ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                                        ? 'bg-emerald-600 text-white'
-                                                        : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                                                    }`}>
-                                                    {paymentMethod ? 'SELECTED' : 'TRANSFER NOW'}
-                                                </button>
-                                            </div>
+                                    {/* Info & Button Section */}
+                                    <div className="flex-1 flex flex-col justify-between md:text-center gap-3">
+                                        <div className="space-y-1">
+                                            <h3 className="font-bold text-gray-900 text-lg">Pay via Transfer</h3>
+                                            <p className="text-gray-500 text-xs font-medium leading-tight">DuitNow QR or Manual Bank Transfer</p>
                                         </div>
+                                        <button className={`w-full py-2 px-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-300 ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                                ? 'bg-emerald-600 text-white'
+                                                : 'bg-emerald-500 text-white'
+                                            }`}>
+                                            {paymentMethod ? 'SELECTED' : 'TRANSFER NOW'}
+                                        </button>
                                     </div>
                                 </div>
 
                                 {/* CARD 2: PAY VIA FPX (RECOMMENDED) */}
                                 <div
                                     onClick={handleFPXCheckout}
-                                    className="relative group flex flex-col rounded-[2.5rem] bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-2xl border-2 border-amber-400 scale-[1.05] z-10 hover:scale-[1.07]"
+                                    className="relative group flex flex-row md:flex-col p-4 bg-white rounded-2xl shadow-md border-2 border-amber-400 transition-all duration-300 cursor-pointer gap-4 hover:shadow-lg"
                                 >
-                                    {/* Premium Badge */}
-                                    <div className="absolute top-4 right-4 z-20">
-                                        <div className="bg-amber-500 text-white text-[10px] font-black px-4 py-2 rounded-full tracking-widest uppercase shadow-lg">
+                                    {/* Recommended Badge */}
+                                    <div className="absolute -top-2.5 right-4 z-20">
+                                        <div className="bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full tracking-widest uppercase shadow-sm">
                                             RECOMMENDED
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col h-full">
-                                        {/* Illustration Section */}
-                                        <div className="relative h-56 w-full bg-gradient-to-br from-amber-50 to-yellow-100 overflow-hidden">
-                                            <img
-                                                src="/payment/fpx.png"
-                                                alt="FPX Illustration"
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
-                                        </div>
+                                    {/* Image Section */}
+                                    <div className="flex-shrink-0 w-28 h-28 md:w-full md:h-40 overflow-hidden rounded-2xl bg-amber-50">
+                                        <img
+                                            src="/payment/fpx.png"
+                                            alt="FPX"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
 
-                                        {/* Content Section */}
-                                        <div className="p-8 flex flex-col flex-1 text-center">
-                                            <h3 className="font-extrabold text-gray-900 text-2xl mb-2">Pay via FPX</h3>
-                                            <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
-                                                Instant verification, <br />safe and secure
-                                            </p>
-
-                                            <div className="mt-auto">
-                                                <button className="w-full py-4 bg-amber-500 text-white rounded-full font-bold text-xs uppercase tracking-[0.2em] hover:bg-amber-600 transition-all shadow-lg shadow-amber-200">
-                                                    PROCEED TO BANK
-                                                </button>
-                                            </div>
+                                    {/* Info & Button Section */}
+                                    <div className="flex-1 flex flex-col justify-between md:text-center gap-3">
+                                        <div className="space-y-1">
+                                            <h3 className="font-bold text-gray-900 text-lg">Pay via FPX</h3>
+                                            <p className="text-gray-500 text-xs font-medium leading-tight">Instant verification, safe and secure</p>
                                         </div>
+                                        <button className="w-full py-2 px-4 bg-amber-500 text-white rounded-full font-bold text-xs uppercase tracking-wider hover:bg-amber-600 transition-all">
+                                            PROCEED TO BANK
+                                        </button>
                                     </div>
                                 </div>
 
@@ -326,43 +316,38 @@ Please confirm my order. Thank you!`;
                                         href={waLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="relative group flex flex-col rounded-[2.5rem] bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02]"
+                                        className="relative group flex flex-row md:flex-col p-4 bg-white rounded-2xl shadow-md transition-all duration-300 cursor-pointer gap-4 hover:shadow-lg"
                                     >
-                                        <div className="flex flex-col h-full">
-                                            {/* Illustration Section */}
-                                            <div className="relative h-56 w-full bg-gradient-to-br from-green-50 to-emerald-100 overflow-hidden">
-                                                <img
-                                                    src="/payment/whatsapp.png"
-                                                    alt="WhatsApp Illustration"
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                />
+                                        {/* Image Section */}
+                                        <div className="flex-shrink-0 w-28 h-28 md:w-full md:h-40 overflow-hidden rounded-2xl bg-green-50">
+                                            <img
+                                                src="/payment/whatsapp.png"
+                                                alt="WhatsApp"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+
+                                        {/* Info & Button Section */}
+                                        <div className="flex-1 flex flex-col justify-between md:text-center gap-3">
+                                            <div className="space-y-1">
+                                                <h3 className="font-bold text-gray-900 text-lg">Order via WhatsApp</h3>
+                                                <p className="text-gray-500 text-xs font-medium leading-tight">Chat with us to confirm order details</p>
                                             </div>
-
-                                            {/* Content Section */}
-                                            <div className="p-8 flex flex-col flex-1 text-center">
-                                                <h3 className="font-bold text-gray-900 text-2xl mb-2">Order via WhatsApp</h3>
-                                                <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
-                                                    Chat with us to confirm <br />your order details
-                                                </p>
-
-                                                <div className="mt-auto">
-                                                    <div className="w-full py-4 bg-green-500 text-white rounded-full font-bold text-xs uppercase tracking-[0.2em] text-center hover:bg-green-600 transition-all">
-                                                        CHAT NOW
-                                                    </div>
-                                                </div>
+                                            <div className="w-full py-2 px-4 bg-green-500 text-white rounded-full font-bold text-xs uppercase tracking-wider text-center">
+                                                CHAT NOW
                                             </div>
                                         </div>
                                     </a>
                                 ) : (
-                                    <div className="relative flex flex-col rounded-[2.5rem] bg-gray-50 opacity-60 overflow-hidden shadow-md">
-                                        <div className="flex flex-col h-full">
-                                            <div className="h-56 w-full bg-gray-200 animate-pulse" />
-                                            <div className="p-8 text-center">
-                                                <h3 className="font-bold text-gray-400 text-2xl mb-2">Order via WhatsApp</h3>
-                                                <p className="text-gray-400 text-sm mb-8">Connecting to service...</p>
-                                                <div className="w-full py-4 bg-gray-200 text-gray-400 rounded-full font-bold text-xs uppercase tracking-widest">
-                                                    CONNECTING...
-                                                </div>
+                                    <div className="relative flex flex-row md:flex-col p-4 bg-gray-50 rounded-2xl shadow-sm border border-gray-100 opacity-60 gap-4">
+                                        <div className="flex-shrink-0 w-28 h-28 md:w-full md:h-40 bg-gray-200 rounded-2xl animate-pulse" />
+                                        <div className="flex-1 flex flex-col justify-between md:text-center gap-3">
+                                            <div className="space-y-1">
+                                                <h3 className="font-bold text-gray-400 text-lg">Order via WhatsApp</h3>
+                                                <p className="text-gray-400 text-xs">Connecting...</p>
+                                            </div>
+                                            <div className="w-full py-2 bg-gray-200 text-gray-400 rounded-full font-bold text-xs uppercase tracking-widest text-center">
+                                                ...
                                             </div>
                                         </div>
                                     </div>
