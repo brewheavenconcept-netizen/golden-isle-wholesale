@@ -244,35 +244,55 @@ Please confirm my order. Thank you!`;
                                 <p className="text-gray-500 text-sm mt-1">Choose how you would like to proceed with your order</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {/* CARD 1: PAY VIA TRANSFER */}
                                 <button
                                     onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
-                                    className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all bg-white text-left shadow-sm ${paymentMethod ? 'border-black ring-1 ring-black' : 'border-gray-200 hover:border-gray-400'}`}
+                                    className={`relative flex flex-col items-center text-center p-8 rounded-3xl border-2 transition-all duration-300 bg-white shadow-sm hover:shadow-md ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                            ? 'border-emerald-500 ring-4 ring-emerald-50'
+                                            : 'border-gray-100 hover:border-emerald-200'
+                                        }`}
                                 >
-                                    <div className={`p-3 rounded-full mb-4 transition-colors ${paymentMethod ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}>
-                                        <QrCode size={24} />
+                                    <div className={`p-4 rounded-2xl mb-4 transition-all duration-300 ${paymentMethod === 'qr' || paymentMethod === 'manual'
+                                            ? 'bg-emerald-500 text-white scale-110'
+                                            : 'bg-emerald-50 text-emerald-600'
+                                        }`}>
+                                        <QrCode size={28} />
                                     </div>
-                                    <h3 className="font-bold text-gray-900">Pay via Transfer</h3>
-                                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">DuitNow QR or Manual Bank Transfer</p>
-                                    {paymentMethod && <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-black uppercase tracking-wider">
-                                        <Check size={12} strokeWidth={3} /> Selected
-                                    </div>}
+                                    <h3 className="font-bold text-gray-900 text-lg">Pay via Transfer</h3>
+                                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">DuitNow QR or Manual Bank Transfer</p>
+                                    {(paymentMethod === 'qr' || paymentMethod === 'manual') && (
+                                        <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full">
+                                            <Check size={12} strokeWidth={3} /> Active Selection
+                                        </div>
+                                    )}
                                 </button>
 
-                                {/* CARD 2: PAY VIA FPX (RECOMMENDED) */}
+                                {/* CARD 2: PAY VIA FPX (PREMIUM CENTERPIECE) */}
                                 <button
                                     onClick={handleFPXCheckout}
-                                    className="relative flex flex-col items-start p-6 rounded-2xl border-2 border-amber-500/50 bg-gray-900 text-left shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-amber-400 hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] overflow-hidden group"
+                                    className="relative flex flex-col items-center text-center p-8 rounded-3xl border-2 border-amber-200 bg-gradient-to-b from-amber-50/50 to-white shadow-lg shadow-amber-100/50 transition-all duration-500 hover:scale-[1.03] hover:border-amber-400 hover:shadow-xl hover:shadow-amber-200/50 group overflow-hidden"
                                 >
-                                    <div className="absolute top-4 right-4 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
-                                        RECOMMENDED
+                                    <div className="absolute top-0 right-0">
+                                        <div className="bg-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl tracking-tighter uppercase shadow-sm animate-pulse">
+                                            RECOMMENDED
+                                        </div>
                                     </div>
-                                    <div className="p-3 rounded-full mb-4 bg-amber-500/20 text-amber-500 group-hover:bg-amber-500/30 transition-colors">
-                                        <Banknote size={24} />
+
+                                    <div className="p-4 rounded-2xl mb-4 bg-amber-500 text-white shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform duration-500">
+                                        <Banknote size={28} />
                                     </div>
-                                    <h3 className="font-bold text-white">Pay via FPX</h3>
-                                    <p className="text-xs text-amber-100/70 mt-1 leading-relaxed">Instant Verification. No receipt needed.</p>
+
+                                    <div className="space-y-1">
+                                        <h3 className="font-extrabold text-gray-900 text-xl tracking-tight">Pay via FPX</h3>
+                                        <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest text-[10px]">Instant Verification</p>
+                                    </div>
+
+                                    <p className="text-sm text-gray-600 mt-3 leading-relaxed font-medium">Safe, secure, and no receipt upload needed.</p>
+
+                                    <div className="mt-6 w-full py-2 bg-amber-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest group-hover:bg-amber-600 transition-colors shadow-sm">
+                                        Proceed to Bank
+                                    </div>
                                 </button>
 
                                 {/* CARD 3: ORDER VIA WHATSAPP */}
@@ -281,21 +301,21 @@ Please confirm my order. Thank you!`;
                                         href={waLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex flex-col items-start p-6 rounded-2xl border-2 border-gray-200 bg-white hover:border-gray-400 transition-all text-left shadow-sm"
+                                        className="flex flex-col items-center text-center p-8 rounded-3xl border-2 border-gray-100 bg-white hover:border-emerald-200 transition-all duration-300 shadow-sm hover:shadow-md group"
                                     >
-                                        <div className="p-3 rounded-full mb-4 bg-emerald-50 text-emerald-500">
-                                            <MessageCircle size={24} />
+                                        <div className="p-4 rounded-2xl mb-4 bg-emerald-50 text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                                            <MessageCircle size={28} />
                                         </div>
-                                        <h3 className="font-bold text-gray-900">Order via WhatsApp</h3>
-                                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">Chat with us to confirm your order details</p>
+                                        <h3 className="font-bold text-gray-900 text-lg">Order via WhatsApp</h3>
+                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">Chat with us to confirm your order details</p>
                                     </a>
                                 ) : (
-                                    <div className="flex flex-col items-start p-6 rounded-2xl border-2 border-gray-200 bg-gray-50 opacity-50 text-left shadow-sm">
-                                        <div className="p-3 rounded-full mb-4 bg-gray-200 text-gray-400">
-                                            <MessageCircle size={24} />
+                                    <div className="flex flex-col items-center text-center p-8 rounded-3xl border-2 border-gray-50 bg-gray-50/50 opacity-60 shadow-sm">
+                                        <div className="p-4 rounded-2xl mb-4 bg-gray-200 text-gray-400">
+                                            <MessageCircle size={28} />
                                         </div>
-                                        <h3 className="font-bold text-gray-500">Order via WhatsApp</h3>
-                                        <p className="text-xs text-gray-400 mt-1 leading-relaxed">Connecting...</p>
+                                        <h3 className="font-bold text-gray-400 text-lg">Order via WhatsApp</h3>
+                                        <p className="text-sm text-gray-400 mt-2 leading-relaxed">System connecting...</p>
                                     </div>
                                 )}
                             </div>
