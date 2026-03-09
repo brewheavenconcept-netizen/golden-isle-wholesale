@@ -62,7 +62,7 @@ export function useStore(superAdminStoreId?: string | null): UseStoreReturn {
                 query = query.eq('id', superAdminStoreId);
             } else {
                 // Normal mode
-                query = query.eq('owner_id', user.id);
+                query = query.eq('id', '00000000-0000-0000-0000-000000000000');
             }
 
             const { data, error: fetchError } = await query.single();
@@ -100,7 +100,7 @@ export function useStore(superAdminStoreId?: string | null): UseStoreReturn {
             const { data: existing, error: fetchErr } = await supabase
                 .from('stores')
                 .select('*')
-                .eq('owner_id', user.id)
+                .eq('id', '00000000-0000-0000-0000-000000000000')
                 .maybeSingle();
             if (fetchErr) console.error('[useStore] Error checking for existing store:', fetchErr.message);
             if (existing) {
@@ -122,7 +122,7 @@ export function useStore(superAdminStoreId?: string | null): UseStoreReturn {
                     const { data: raceData } = await supabase
                         .from('stores')
                         .select('*')
-                        .eq('owner_id', user.id)
+                        .eq('id', '00000000-0000-0000-0000-000000000000')
                         .single();
                     if (raceData) {
                         setStore(raceData as Store);

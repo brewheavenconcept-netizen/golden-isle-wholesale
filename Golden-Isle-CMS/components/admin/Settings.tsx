@@ -7,6 +7,7 @@ import { getSettings, saveSettings, updateStoreName } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 import { StoreSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
+import { supabase } from '@/lib/supabase';
 
 export default function Settings() {
     const { reload, storeId } = useStore();
@@ -16,19 +17,34 @@ export default function Settings() {
 
     useEffect(() => {
         const loadSettings = async () => {
-            if (!storeId) return;                          // wait for store to load
-            const currentSettings = await getSettings(storeId);
-            setSettings({
-                ...DEFAULT_SETTINGS,
-                ...currentSettings,
-                operating_hours: {
-                    ...DEFAULT_SETTINGS.operating_hours,
-                    ...(currentSettings.operating_hours || {})
-                }
-            });
+            const { data, error } = await supabase
+                .from('store_settings')
+                .select('*')
+                .eq('store_id', '00000000-0000-0000-0000-000000000000')
+                .single();
+
+            const { data: storeData } = await supabase
+                .from('stores')
+                .select('name')
+                .eq('id', '00000000-0000-0000-0000-000000000000')
+                .single();
+
+            if (data || storeData) {
+                setSettings({
+                    ...DEFAULT_SETTINGS,
+                    ...data,
+                    store_name: storeData?.name || data?.store_name || DEFAULT_SETTINGS.store_name,
+                    whatsapp_number: data.whatsapp || DEFAULT_SETTINGS.whatsapp_number,
+                    bank_account_number: data.bank_account || DEFAULT_SETTINGS.bank_account_number,
+                    operating_hours: {
+                        ...DEFAULT_SETTINGS.operating_hours,
+                        ...(data.operating_hours || {})
+                    }
+                });
+            }
         };
         loadSettings();
-    }, [storeId]); // re-fetch when store is resolved
+    }, []);
 
     const updateSettings = (updates: Partial<StoreSettings>) => {
         setSettings({ ...settings, ...updates });
