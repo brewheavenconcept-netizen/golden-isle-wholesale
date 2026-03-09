@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { getOrder, uploadPaymentProof, updatePaymentProof } from '@/lib/storage';
 import { usePublicStore } from '@/hooks/usePublicStore';
+import { supabase } from '@/lib/supabase';
 
 export default function OrderConfirmationPage() {
     const router = useRouter();
@@ -38,7 +39,22 @@ export default function OrderConfirmationPage() {
     const [receipt, setReceipt] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
     const [copySuccess, setCopySuccess] = useState(false);
+    const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const fetchWhatsapp = async () => {
+            const { data } = await supabase
+                .from('store_settings')
+                .select('whatsapp_number')
+                .eq('store_id', '00000000-0000-0000-0000-000000000000')
+                .single();
+            if (data?.whatsapp_number) {
+                setWhatsappNumber(data.whatsapp_number);
+            }
+        };
+        fetchWhatsapp();
+    }, []);
 
     useEffect(() => {
         const loadOrder = async () => {
@@ -135,8 +151,8 @@ I have just placed an order:
 
 Please confirm my order. Thank you!`;
 
-    const waLink = settings?.whatsapp_number
-        ? `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(waMessage)}`
+    const waLink = whatsappNumber
+        ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMessage)}`
         : null;
 
     return (
