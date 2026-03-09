@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox, Bell } from "lucide-react";
+import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox, Bell, Banknote } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -166,6 +166,7 @@ export default function Sidebar({
                     {navItem("/admin/analytics", "Analytics", TrendingUp)}
                     {navItem("/admin/products", "Products", Package)}
                     {navItem("/admin/orders", "Orders", ShoppingBag)}
+                    {navItem("/admin/payments", "Fintech Ledger", Banknote)}
                     {navItem("/admin/payment", "Payment Settings", CreditCard)}
                     {navItem("/admin/settings", "Settings", Settings)}
                 </nav>
