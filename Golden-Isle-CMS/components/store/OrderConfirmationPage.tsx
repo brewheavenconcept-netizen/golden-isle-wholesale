@@ -142,12 +142,20 @@ export default function OrderConfirmationPage() {
 
     const currentStatus = order.payment_status || 'pending_payment';
 
-    const waMessage = `Hi Golden Isle Wholesale! 🥃
+    const itemsList = order.items?.map((item: any) => `- ${item.product.name} x${item.qty}`).join('\n') || '';
+    const orderReviewLink = `https://goldenisle-wholesale.vercel.app/order-review/${order.id}`;
 
+    const waMessage = `Hi Golden Isle Wholesale! 🥃
 I have just placed an order:
+
 📋 Order ID: ${order.id}
 👤 Name: ${order.customer_name}
+📞 Phone: ${order.phone || order.customer_phone}
+📍 Address: ${order.address || order.delivery_address}
+🛒 Items: 
+${itemsList}
 💰 Total: RM ${Number(order.total).toFixed(2)}
+🔗 Details: ${orderReviewLink}
 
 Please confirm my order. Thank you!`;
 
