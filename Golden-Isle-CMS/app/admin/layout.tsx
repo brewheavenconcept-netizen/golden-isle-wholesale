@@ -5,7 +5,7 @@ import Sidebar from '@/components/admin/Sidebar';
 import ErrorBoundary from '@/components/system/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 import { StoreProvider } from '@/context/StoreContext';
-import { NotificationsProvider } from '@/hooks/useNotifications';
+import { NotificationsProvider, useNotifications } from '@/hooks/useNotifications';
 import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/hooks/useAuth';
 import { usePathname, useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { storeId } = useStore();
     const { user, loading } = useAuth();
+    const notificationsData = useNotifications(); // ONE persistent subscription
     const pathname = usePathname();
     const router = useRouter();
 
@@ -48,7 +49,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <NotificationsProvider storeId={storeId}>
+        <NotificationsProvider value={notificationsData}>
             <div className="flex min-h-screen bg-slate-50 dark:bg-[#0a0a0a] transition-colors duration-300">
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main className="w-full min-w-0 ml-0 p-6 md:ml-64 mt-14 md:mt-0 bg-slate-50 dark:bg-[#0a0a0a] min-h-screen transition-colors duration-300">

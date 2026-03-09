@@ -3,11 +3,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, BellRing, X, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useNotifications, NotificationItem } from '@/hooks/useNotifications';
+import { useNotificationsContext, NotificationItem } from '@/hooks/useNotifications';
 
 export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
-    const { notifications, unreadCount, markAllAsRead, markAsRead, clearNotification } = useNotifications();
+    const { notifications, unreadCount, markAllAsRead, markAsRead, clearNotification } = useNotificationsContext();
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 

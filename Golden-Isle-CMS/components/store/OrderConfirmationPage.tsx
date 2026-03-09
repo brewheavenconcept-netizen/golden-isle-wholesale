@@ -413,14 +413,7 @@ Please confirm my order. Thank you!`;
 
                 </AnimatePresence>
 
-                {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
-                    <button
-                        onClick={() => router.push('/')}
-                        className="w-full mt-4 flex items-center justify-center py-4 bg-white text-gray-900 border border-gray-200 rounded-2xl font-semibold text-sm tracking-widest uppercase hover:bg-gray-50 transition-colors shadow-sm"
-                    >
-                        Save & Continue Shopping
-                    </button>
-                )}
+
                 {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification' || currentStatus === 'paid') && (
                     <button
                         onClick={() => router.push('/')}

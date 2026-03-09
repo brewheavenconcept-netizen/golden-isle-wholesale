@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { useStore as useStoreData } from "@/hooks/useStore";
 
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationsContext } from "@/hooks/useNotifications";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
@@ -30,7 +30,7 @@ export default function Sidebar({
     }, []);
     const router = useRouter();
     const pathname = usePathname();
-    const { unreadCount, markAllAsRead } = useNotifications();
+    const { unreadCount, markAllAsRead } = useNotificationsContext();
 
     const storeName = settings.store_name || "Golden Isle Wholesale";
     const [newInquiries, setNewInquiries] = useState(0);

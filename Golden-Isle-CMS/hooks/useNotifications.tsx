@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,16 @@ export interface NotificationItem {
     createdAt: string;
     read: boolean;
 }
+
+interface NotificationsContextType {
+    unreadCount: number;
+    notifications: NotificationItem[];
+    markAsRead: (id: string) => void;
+    markAllAsRead: () => void;
+    clearNotification: (id: string) => void;
+}
+
+const NotificationsContext = createContext<NotificationsContextType | null>(null);
 
 const STORAGE_KEY = 'golden_isle_notifications';
 const STORE_ID = '00000000-0000-0000-0000-000000000000';
@@ -59,6 +69,8 @@ export function useNotifications() {
     };
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
+
         if ('Notification' in window && Notification.permission !== 'denied') {
             Notification.requestPermission();
         }
@@ -143,7 +155,18 @@ export function useNotifications() {
     };
 }
 
-// Export a dummy provider to avoid breaking existing imports in app/admin/layout.tsx
-export function NotificationsProvider({ children }: { children: React.ReactNode, storeId?: string | null }) {
-    return <>{children}</>;
+export function NotificationsProvider({ children, value }: { children: React.ReactNode, value: NotificationsContextType }) {
+    return (
+        <NotificationsContext.Provider value={value}>
+            {children}
+        </NotificationsContext.Provider>
+    );
+}
+
+export function useNotificationsContext() {
+    const context = useContext(NotificationsContext);
+    if (!context) {
+        throw new Error('useNotificationsContext must be used within a NotificationsProvider');
+    }
+    return context;
 }
