@@ -108,6 +108,8 @@ export default function Settings() {
                 saveSettings(settings, storeId),
             ]);
 
+            setSaveLoading(false); // SET LOADING TO FALSE FIRST
+
             reload(); // refresh StoreContext so Navbar/Footer pick up the new name
             toast.success('Settings saved successfully!', {
                 duration: 3000,
@@ -123,12 +125,11 @@ export default function Settings() {
             });
         } catch (error) {
             console.error('[Settings] Save failed:', error);
+            setSaveLoading(false); // SET LOADING TO FALSE IN CATCH
             toast.error('Failed to save settings. Please try again.', {
                 duration: 4000,
                 position: 'top-center',
             });
-        } finally {
-            setSaveLoading(false);
         }
     };
 
