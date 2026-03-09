@@ -150,8 +150,8 @@ I have just placed an order:
 
 📋 Order ID: ${order.id}
 👤 Name: ${order.customer_name}
-📞 Phone: ${order.phone || order.customer_phone}
-📍 Address: ${order.address || order.delivery_address}
+📞 Phone: ${order.customer_phone}
+📍 Address: ${order.delivery_address}
 🛒 Items: 
 ${itemsList}
 💰 Total: RM ${Number(order.total).toFixed(2)}

@@ -175,7 +175,12 @@ export async function getOrder(id: string, storeId?: string): Promise<Order | nu
         console.error('[getOrder] Error:', error.message);
         return null;
     }
-    return data;
+    if (!data) return null;
+    return {
+        ...data,
+        customer_phone: data.customer_phone || data.phone || '',
+        delivery_address: data.delivery_address || data.address || '',
+    };
 }
 
 export async function createOrder(order: Order, storeId: string): Promise<Order | null> {
