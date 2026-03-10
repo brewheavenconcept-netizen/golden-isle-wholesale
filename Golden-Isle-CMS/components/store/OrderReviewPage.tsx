@@ -91,14 +91,14 @@ export default function OrderReviewPage() {
                 </div>
 
                 {/* Items Table */}
-                <div className="mb-8 overflow-hidden border border-black">
-                    <table className="w-full text-left text-sm border-collapse">
+                <div className="mb-8 border border-black overflow-x-auto w-full">
+                    <table className="w-full text-left text-sm border-collapse min-w-[400px]">
                         <thead>
-                            <tr className="bg-black text-white uppercase text-[10px] tracking-widest">
-                                <th className="p-3 border-r border-black font-bold">Item</th>
-                                <th className="p-3 border-r border-black font-bold text-center">Qty</th>
-                                <th className="p-3 border-r border-black font-bold text-right">Unit Price</th>
-                                <th className="p-3 font-bold text-right">Subtotal</th>
+                            <tr className="bg-black text-white uppercase text-[9px] md:text-[11px] tracking-widest shrink-0">
+                                <th className="p-3 border-r border-black font-bold whitespace-nowrap">Item</th>
+                                <th className="p-3 border-r border-black font-bold text-center whitespace-nowrap">Qty</th>
+                                <th className="p-3 border-r border-black font-bold text-right whitespace-nowrap">Price</th>
+                                <th className="p-3 font-bold text-right whitespace-nowrap">Total</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-black">
