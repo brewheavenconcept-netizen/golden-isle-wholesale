@@ -47,10 +47,10 @@ export default async function ProductRoute({ params }: { params: Promise<{ id: s
     const { id } = await params;
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+            <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#d4a853]" />
-                    <p className="text-[#6b6b6b] text-sm font-medium tracking-widest uppercase">Loading Product...</p>
+                    <Loader2 className="w-10 h-10 animate-spin text-[#C9A84C]" />
+                    <p className="text-[#5a5a4a] text-sm font-medium tracking-widest uppercase font-sans">Loading Selection...</p>
                 </div>
             </div>
         }>

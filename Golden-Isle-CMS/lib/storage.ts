@@ -303,7 +303,7 @@ export const deleteProductImage = async (imageUrl: string): Promise<void> => {
 export async function updatePaymentProof(
     orderId: string,
     proofUrl: string,
-    paymentStatus: 'unpaid' | 'pending_verification' | 'paid' = 'pending_verification'
+    paymentStatus: 'unpaid' | 'pending_verification' | 'paid' | 'verifying_payment' = 'pending_verification'
 ): Promise<void> {
     const { error } = await supabase
         .from('orders')
@@ -314,7 +314,7 @@ export async function updatePaymentProof(
 
 export async function updatePaymentStatus(
     orderId: string,
-    status: 'unpaid' | 'pending_verification' | 'paid',
+    status: 'unpaid' | 'pending_verification' | 'paid' | 'verifying_payment',
     storeId: string
 ): Promise<void> {
     const { error } = await supabase

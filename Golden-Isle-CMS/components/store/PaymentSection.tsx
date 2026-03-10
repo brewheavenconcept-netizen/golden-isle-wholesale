@@ -35,29 +35,13 @@ export default function PaymentSection({ storeId, amount, settings, onPay }: Pay
 
     return (
         <div className="space-y-6">
-            <h3 className="font-bold text-slate-800 text-lg">Select Payment Method</h3>
-            <div className="grid gap-3">
-                {settings.accept_bank_transfer && (
-                    <label className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedMethod === 'bank_transfer' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 hover:border-sky-200'}`}>
-                        <input type="radio" name="payment" value="bank_transfer" className="hidden" checked={selectedMethod === 'bank_transfer'} onChange={() => setSelectedMethod('bank_transfer')} />
-                        <div className={`p-3 rounded-full ${selectedMethod === 'bank_transfer' ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            <QrCode size={20} />
-                        </div>
-                        <div>
-                            <div className="font-bold text-slate-800">Bank Transfer / DuitNow QR</div>
-                            <div className="text-xs text-slate-500">Manual verification required</div>
-                        </div>
-                        {selectedMethod === 'bank_transfer' && <div className="absolute right-4 text-sky-600 font-bold">✓</div>}
-                    </label>
-                )}
-            </div>
             <button
                 onClick={() => onPay(selectedMethod)}
                 disabled={!selectedMethod}
                 className="w-full py-4 rounded-xl font-bold text-white shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-900 hover:bg-slate-800"
             >
                 <Lock size={16} />
-                {selectedMethod === 'bank_transfer' ? `Pay RM${amount.toFixed(2)} via Transfer` : 'Choose Payment Method'}
+                {selectedMethod === 'bank_transfer' ? `PAY NOW RM${amount.toFixed(2)}` : 'Choose Payment Method'}
             </button>
             <p className="text-center text-xs text-slate-400 flex items-center justify-center gap-1">
                 <Lock size={12} /> Payments are secure and encrypted.

@@ -203,7 +203,7 @@ export default function OrderList() {
             order.customer_name?.toLowerCase().includes(q) ||
             order.customer_phone?.includes(searchQuery)
         );
-    };
+    }
 
     if (dateFrom) {
         filteredOrders = filteredOrders.filter(order => new Date(order.created_at) >= new Date(dateFrom));
@@ -213,6 +213,13 @@ export default function OrderList() {
         endDate.setHours(23, 59, 59, 999);
         filteredOrders = filteredOrders.filter(order => new Date(order.created_at) <= endDate);
     }
+
+    // Sort: verifying_payment first, then by date desc
+    filteredOrders = [...filteredOrders].sort((a, b) => {
+        if (a.status === 'verifying_payment' && b.status !== 'verifying_payment') return -1;
+        if (a.status !== 'verifying_payment' && b.status === 'verifying_payment') return 1;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
     const filteredIds = filteredOrders.map(o => o.id);
     const isAllSelected = filteredOrders.length > 0 && filteredIds.every(id => selectedOrderIds.has(id));
@@ -227,6 +234,8 @@ export default function OrderList() {
     const statusTabs: Array<{ label: string; value: Order['status'] | 'all' }> = [
         { label: 'All', value: 'all' },
         { label: 'Pending', value: 'pending' },
+        { label: 'Verifying', value: 'verifying_payment' },
+        { label: 'Confirmed', value: 'confirmed' },
         { label: 'Processing', value: 'processing' },
         { label: 'Shipped', value: 'shipped' },
         { label: 'Delivered', value: 'delivered' },
@@ -459,7 +468,14 @@ export default function OrderList() {
                                             className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                         />
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-gray-900 dark:text-white text-base truncate">{order.customer_name}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-semibold text-gray-900 dark:text-white text-base truncate">{order.customer_name}</p>
+                                                {order.status === 'verifying_payment' && (
+                                                    <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider rounded-md animate-pulse border border-amber-200 dark:border-amber-800">
+                                                        🔍 Awaiting Verification
+                                                    </span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(order.created_at)}</p>
                                         </div>
                                         {expandedOrderIds.has(order.id) ? <ChevronUp size={16} className="text-gray-400 mt-1" /> : <ChevronDown size={16} className="text-gray-400 mt-1" />}
@@ -572,23 +588,44 @@ export default function OrderList() {
                                                             )}
 
                                                             {/* Verify Payment Button */}
-                                                            {order.payment_status === 'pending_verification' && (
-                                                                <button
-                                                                    onClick={async (e) => {
-                                                                        e.stopPropagation();
-                                                                        try {
-                                                                            await updatePaymentStatus(order.id, 'paid', storeId!);
-                                                                            setOrders(prev => prev.map(o => o.id === order.id ? { ...o, payment_status: 'paid' } : o));
-                                                                            toast.success(`Payment verified for ${order.customer_name}`);
-                                                                        } catch (err) {
-                                                                            toast.error('Failed to verify payment');
-                                                                        }
-                                                                    }}
-                                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-sm transition-colors shadow-sm"
-                                                                >
-                                                                    <CheckCircle size={16} />
-                                                                    Verify Payment
-                                                                </button>
+                                                            {(order.payment_status === 'pending_verification' || order.status === 'verifying_payment') && (
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        onClick={async (e) => {
+                                                                            e.stopPropagation();
+                                                                            try {
+                                                                                await updatePaymentStatus(order.id, 'paid', storeId!);
+                                                                                await updateOrderStatus(order.id, 'confirmed', storeId!);
+                                                                                setOrders(prev => prev.map(o => o.id === order.id ? { ...o, payment_status: 'paid', status: 'confirmed' } : o));
+                                                                                toast.success(`Payment verified and order confirmed!`);
+                                                                            } catch (err) {
+                                                                                toast.error('Failed to verify payment');
+                                                                            }
+                                                                        }}
+                                                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-sm transition-colors shadow-sm"
+                                                                    >
+                                                                        <CheckCircle size={16} />
+                                                                        Approve
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={async (e) => {
+                                                                            e.stopPropagation();
+                                                                            if (window.confirm('Reject this payment? The order will return to Pending status.')) {
+                                                                                try {
+                                                                                    await updatePaymentStatus(order.id, 'unpaid', storeId!);
+                                                                                    await updateOrderStatus(order.id, 'pending', storeId!);
+                                                                                    setOrders(prev => prev.map(o => o.id === order.id ? { ...o, payment_status: 'unpaid', status: 'pending' } : o));
+                                                                                    toast.success(`Payment rejected`);
+                                                                                } catch (err) {
+                                                                                    toast.error('Failed to reject payment');
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        className="px-4 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 font-medium text-sm transition-colors"
+                                                                    >
+                                                                        Reject
+                                                                    </button>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>

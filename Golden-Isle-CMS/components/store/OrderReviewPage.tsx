@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getOrder } from '@/lib/storage';
 import { Order } from '@/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function OrderReviewPage() {
@@ -137,7 +137,7 @@ export default function OrderReviewPage() {
                 <div className="text-center space-y-8">
                     <p className="text-xs text-gray-400 font-medium">Thank you for your business.</p>
 
-                    <div className="flex flex-col items-center gap-4">
+                    <div className="flex flex-col items-center gap-4 no-print">
                         {(order.notified_at || order.status !== 'pending') ? (
                             <button
                                 disabled
@@ -171,8 +171,25 @@ export default function OrderReviewPage() {
                                 </svg>
                             </button>
                         )}
+
+                        <button
+                            onClick={() => window.print()}
+                            className="no-print inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-black font-bold py-3 px-8 w-full max-w-sm rounded-full transition-all border border-black/80 active:scale-95 text-sm uppercase tracking-wider"
+                        >
+                            <Download size={16} />
+                            <span>Download Receipt</span>
+                        </button>
                     </div>
                 </div>
+
+                <style>{`
+                    @media print {
+                        .no-print { display: none !important; }
+                        body { background: white !important; }
+                        .min-h-screen { padding: 0 !important; }
+                        .max-w-3xl { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
+                    }
+                `}</style>
             </div>
         </div>
     );

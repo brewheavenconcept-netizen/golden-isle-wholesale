@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientToaster } from "@/components/providers/ClientToaster";
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/store/CartDrawer";
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -63,7 +57,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${dmSans.variable} ${cormorant.variable} font-body antialiased overflow-x-hidden`}
+        className={`${dmSans.variable} font-body antialiased overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"
