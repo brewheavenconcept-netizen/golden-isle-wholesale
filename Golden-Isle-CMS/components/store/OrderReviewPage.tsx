@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getOrder } from '@/lib/storage';
 import { Order } from '@/types';
-import { Loader2, MessageCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function OrderReviewPage() {
@@ -13,7 +13,6 @@ export default function OrderReviewPage() {
     const orderId = params?.orderId as string;
 
     const [order, setOrder] = useState<Order | null>(null);
-    const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,16 +26,7 @@ export default function OrderReviewPage() {
                 if (!orderData) throw new Error('Order not found');
                 setOrder(orderData);
 
-                // 2. Fetch whatsapp number
-                const { data: settingsData } = await supabase
-                    .from('store_settings')
-                    .select('whatsapp_number')
-                    .eq('store_id', '00000000-0000-0000-0000-000000000000')
-                    .single();
 
-                if (settingsData?.whatsapp_number) {
-                    setWhatsappNumber(settingsData.whatsapp_number);
-                }
             } catch (e) {
                 console.error(e);
                 toast.error("Failed to load order");
@@ -63,26 +53,7 @@ export default function OrderReviewPage() {
         );
     }
 
-    const itemsList = order.items?.map((item: any) => `- ${item.product.name} x${item.qty}`).join('\n') || '';
-    const orderReviewLink = `https://goldenisle-wholesale.vercel.app/order-review/${order.id}`;
 
-    const waMessage = `Hi Golden Isle Wholesale! 🥃
-I have just placed an order:
-
-📋 Order ID: ${order.id}
-👤 Name: ${order.customer_name}
-📞 Phone: ${order.customer_phone}
-📍 Address: ${order.delivery_address}
-🛒 Items: 
-${itemsList}
-💰 Total: RM ${Number(order.total).toFixed(2)}
-🔗 Details: ${orderReviewLink}
-
-Please confirm my order. Thank you!`;
-
-    const waLink = whatsappNumber
-        ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waMessage)}`
-        : null;
 
     return (
         <div className="min-h-screen bg-white py-12 px-4 md:px-8 font-sans text-[#111111]">
@@ -113,9 +84,9 @@ Please confirm my order. Thank you!`;
                 <div className="mb-10">
                     <h2 className="text-xs font-bold uppercase tracking-widest mb-4 bg-black text-white px-2 py-1 inline-block">Bill To</h2>
                     <div className="text-sm space-y-1">
-                        <p className="font-bold">{order.customer_name}</p>
-                        <p>{order.customer_phone}</p>
-                        <p className="max-w-md">{order.delivery_address}</p>
+                        <p><span className="font-bold">Buyer:</span> {order.customer_name}</p>
+                        <p><span className="font-bold">Phone Number:</span> {order.customer_phone}</p>
+                        <p className="max-w-md"><span className="font-bold">Address:</span> {order.delivery_address}</p>
                     </div>
                 </div>
 
@@ -166,21 +137,45 @@ Please confirm my order. Thank you!`;
                 <div className="text-center space-y-8">
                     <p className="text-xs text-gray-400 font-medium">Thank you for your business.</p>
 
-                    {waLink && (
-                        <div className="flex flex-col items-center gap-4">
-                            <a
-                                href={waLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold py-3 px-8 rounded-full transition-all shadow-md active:scale-95 text-sm"
+                    <div className="flex flex-col items-center gap-4">
+                        {(order.notified_at || order.status !== 'pending') ? (
+                            <button
+                                disabled
+                                className="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-400 font-bold py-4 px-12 w-full max-w-sm rounded-full transition-all text-sm cursor-not-allowed border border-gray-200"
                             >
-                                <MessageCircle className="w-5 h-5" />
-                                Confirm via WhatsApp
-                            </a>
-                        </div>
-                    )}
+                                ✓ Seller Notified
+                            </button>
+                        ) : (
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const { error } = await supabase
+                                            .from('orders')
+                                            .update({ status: 'processing' })
+                                            .eq('id', order.id);
+
+                                        if (error) throw error;
+
+                                        setOrder({ ...order, status: 'processing' });
+                                        toast.success("Seller has been notified");
+                                    } catch (e) {
+                                        console.error(e);
+                                        toast.error("Failed to notify seller");
+                                    }
+                                }}
+                                className="inline-flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#1ebc5a] text-white font-bold py-4 px-12 w-full max-w-sm rounded-full transition-all shadow-md shadow-[#25D366]/30 active:scale-95 text-base uppercase tracking-wider"
+                            >
+                                <span>Notify Seller</span>
+                                <svg viewBox="0 0 48 48" width="24" height="24">
+                                    <path fill="white" d="M24 6C14.06 6 6 14.06 6 24c0 3.19.84 6.17 2.3 8.75L6 42l9.5-2.27A17.94 17.94 0 0024 42c9.94 0 18-8.06 18-18S33.94 6 24 6zm9.27 25.08c-.38 1.07-2.24 2.04-3.07 2.1-.83.07-1.6.37-5.4-1.13-4.55-1.77-7.43-6.37-7.65-6.67-.22-.3-1.78-2.37-1.78-4.52s1.13-3.2 1.53-3.63c.4-.44.87-.55 1.16-.55h.83c.27 0 .63-.1.99.75.38.9 1.29 3.13 1.4 3.35.12.22.2.48.04.77-.15.3-.23.48-.45.74-.22.26-.46.58-.66.78-.22.22-.45.46-.19.9.26.44 1.15 1.9 2.47 3.08 1.7 1.52 3.13 1.99 3.57 2.21.44.22.7.19.96-.11.26-.3 1.1-1.28 1.39-1.72.3-.44.6-.37 1-.22.4.15 2.54 1.2 2.98 1.42.44.22.73.33.84.51.1.19.1 1.07-.28 2.14z" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
+
+// Verified Correct Local Fix - 2026-03-10

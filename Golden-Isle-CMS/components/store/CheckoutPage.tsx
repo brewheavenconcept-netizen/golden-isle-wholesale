@@ -147,29 +147,12 @@ export default function CheckoutPage() {
 
             clearCart();
 
-            const orderReviewLink = `${window.location.origin}/order-review/${newOrder.id}`;
 
-            const itemsList = cart.map(c => `• ${c.product.name} x${c.qty}`).join('\n');
-            const methodLabel = method === 'bank_transfer' ? 'Bank Transfer' : method === 'duitnow' ? 'DuitNow QR' : method === 'stripe' ? 'Credit/Debit Card' : method === 'toyyibpay' ? 'FPX Banking' : 'Manual Payment';
-            const message = `✅ *New Order Received!* \n\n` +
-                `*Order ID:* ${newOrder.id}\n` +
-                `*Customer:* ${fullName}\n` +
-                `*Phone:* ${phone}\n` +
-                `*Address:* ${address}\n\n` +
-                `*Items:*\n${itemsList}\n\n` +
-                `*Total:* RM ${total.toFixed(2)}\n` +
-                `*Payment:* ${methodLabel}\n` +
-                `*Notes:* ${notes || 'None'}\n\n` +
-                `📋 *Order Review Link:*\n${orderReviewLink}\n\n` +
-                `Please process this request. Thank you!`;
 
-            const whatsappNumber = settings?.whatsapp_number || '60123456789';
-            const adminPhone = whatsappNumber.replace(/[^0-9]/g, '');
+
 
             // Commenting out the auto WhatsApp redirection so users see the payment QR / Bank info first.
-            // if (adminPhone) {
-            //     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
-            // }
+
 
             if (method === 'toyyibpay') {
                 toast.loading('Initializing FPX Payment...', { id: 'payment' });

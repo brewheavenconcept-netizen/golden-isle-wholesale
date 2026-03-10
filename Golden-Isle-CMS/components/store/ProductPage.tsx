@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { ArrowLeft, Package, Loader2, Wine, Beer, GlassWater, MessageCircle, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Package, Loader2, Wine, Beer, GlassWater, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { WHATSAPP_NUMBER } from '@/lib/config';
 import { useCart } from '@/context/CartContext';
@@ -109,13 +109,7 @@ export default function ProductPage() {
         );
     };
 
-    const handleWhatsApp = () => {
-        if (!product) return;
-        const message = encodeURIComponent(
-            `Hi, I'm interested in *${product.name}* priced at RM ${product.price.toFixed(2)}. Can you share more details?`
-        );
-        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-    };
+
 
     const handleAddToOrder = () => {
         if (!product) return;
@@ -298,13 +292,7 @@ export default function ProductPage() {
                                 {isOutOfStock ? 'Currently Unavailable' : 'Add to Order'}
                             </button>
 
-                            <button
-                                onClick={handleWhatsApp}
-                                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-[12px] font-bold text-base bg-[#1a1a0e] border border-[#C9A84C] hover:brightness-110 text-[#f5f0e8] transition-all duration-200 shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-                            >
-                                <MessageCircle size={18} />
-                                WhatsApp Enquiry
-                            </button>
+
                         </div>
 
                         {/* Meta info */}

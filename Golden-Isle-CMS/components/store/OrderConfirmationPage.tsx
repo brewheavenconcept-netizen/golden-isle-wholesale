@@ -56,6 +56,7 @@ export default function OrderConfirmationPage() {
         fetchWhatsapp();
     }, []);
 
+
     useEffect(() => {
         const loadOrder = async () => {
             if (orderId) {
@@ -155,26 +156,30 @@ export default function OrderConfirmationPage() {
 
     const currentStatus = order.payment_status || 'pending_payment';
 
-    const itemsList = order.items?.map((item: any) => `- ${item.product.name} x${item.qty}`).join('\n') || '';
-    const orderReviewLink = `https://goldenisle-wholesale.vercel.app/order-review/${order.id}`;
-
-    const waMessage = `Hi Golden Isle Wholesale! 🥃
+    const waMessage = `Hi Golden Isle Wholesale! 🍺
 I have just placed an order:
 
-📋 Order ID: ${order.id}
+🪪 Order ID: ${order.id}
 👤 Name: ${order.customer_name}
 📞 Phone: ${order.customer_phone}
 📍 Address: ${order.delivery_address}
-🛒 Items: 
-${itemsList}
-💰 Total: RM ${Number(order.total).toFixed(2)}
-🔗 Details: ${orderReviewLink}
+🛒 Items:
+${order.items?.map((i: any) => `- ${i.product?.name || i.name} x${i.qty || i.quantity}`).join('\n') || ''}
+💰 Total: RM ${order.total_amount || (order.total ? Number(order.total).toFixed(2) : '0.00')}
+🔗 Details: https://goldenisle-wholesale.vercel.app/order-review/${order.id}
 
 Please confirm my order. Thank you!`;
 
+    const encodedMessage = waMessage
+        .split('\n')
+        .map(line => encodeURIComponent(line))
+        .join('%0A');
+
     const waLink = whatsappNumber
-        ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMessage)}`
+        ? `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
         : null;
+
+
 
     return (
         <div className="min-h-screen bg-white py-12 px-4 font-sans text-gray-900">
@@ -249,8 +254,8 @@ Please confirm my order. Thank you!`;
                                 <div
                                     onClick={() => setPaymentMethod(paymentMethod ? null : 'qr')}
                                     className={`relative group flex flex-row md:flex-col p-4 bg-white rounded-2xl shadow-md transition-all duration-300 cursor-pointer gap-4 ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                            ? 'ring-2 ring-emerald-500'
-                                            : 'hover:shadow-lg'
+                                        ? 'ring-2 ring-emerald-500'
+                                        : 'hover:shadow-lg'
                                         }`}
                                 >
                                     {/* Image Section */}
@@ -269,8 +274,8 @@ Please confirm my order. Thank you!`;
                                             <p className="text-gray-500 text-xs font-medium leading-tight">DuitNow QR or Manual Bank Transfer</p>
                                         </div>
                                         <button className={`w-full py-2 px-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-300 ${paymentMethod === 'qr' || paymentMethod === 'manual'
-                                                ? 'bg-emerald-600 text-white'
-                                                : 'bg-emerald-500 text-white'
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-emerald-500 text-white'
                                             }`}>
                                             {paymentMethod ? 'SELECTED' : 'TRANSFER NOW'}
                                         </button>

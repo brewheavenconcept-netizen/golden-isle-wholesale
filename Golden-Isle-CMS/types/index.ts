@@ -71,6 +71,7 @@ export interface Order {
     payment_status?: 'paid' | 'unpaid' | 'pending_verification';
     customer_notes?: string;
     admin_notes?: string;
+    notified_at?: string;
 }
 
 export interface StoreSettings {

@@ -3,7 +3,6 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientToaster } from "@/components/providers/ClientToaster";
-import { FloatingWhatsApp } from '@/components/ui/FloatingWhatsApp';
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/store/CartDrawer";
 
@@ -76,9 +75,10 @@ export default function RootLayout({
             <CartDrawer />
           </CartProvider>
           <ClientToaster />
-          <FloatingWhatsApp />
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
+// Global Floating WhatsApp Removed - 2026-03-10
