@@ -89,17 +89,18 @@ export default function ProductCard({ product }: ProductCardProps) {
             </Link>
             
             <div className="px-3 pb-3 mt-auto">
-                <button
-                    onClick={handleAddToCart}
-                    disabled={isOutOfStock}
-                    className={`w-full py-[8px] rounded-[8px] text-[12px] font-semibold transition-all duration-200 ${
-                        isOutOfStock 
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                        : 'bg-[#1a1a0e] text-white hover:bg-[#2a2a1e] active:scale-[0.98]'
-                    }`}
-                >
-                    {isOutOfStock ? 'Sold Out' : 'Add to Order'}
-                </button>
+                <Link href={`/product/${product.id}`} className="block w-full">
+                    <button
+                        disabled={isOutOfStock}
+                        className={`w-full py-[8px] rounded-[8px] text-[12px] font-semibold transition-all duration-200 ${
+                            isOutOfStock 
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                            : 'bg-[#1a1a0e] text-white hover:bg-[#2a2a1e] active:scale-[0.98]'
+                        }`}
+                    >
+                        {isOutOfStock ? 'Sold Out' : 'Add to Order'}
+                    </button>
+                </Link>
             </div>
         </div>
     );
