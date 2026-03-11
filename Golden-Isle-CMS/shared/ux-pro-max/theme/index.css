@@ -1,0 +1,28 @@
+/* UI UX Pro Max Master Theme - Creative INK Academy Standard */
+
+@import "./colors.css";
+@import "./typography.css";
+@import "./spacing.css";
+
+/* Base Overrides for UI UX Pro Max Dark Standard */
+@layer base {
+  .pro-max-dark {
+    background-color: var(--color-fintech-bg);
+    color: var(--color-fintech-text-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .pro-max-card {
+    background-color: var(--color-fintech-surface);
+    border: 1px solid var(--color-fintech-border);
+    border-radius: var(--radius-fintech-xl);
+    box-shadow: var(--shadow-fintech-glow);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+  }
+
+  .pro-max-card:hover {
+    background-color: var(--color-fintech-surface-raised);
+    transform: translateY(-2px);
+  }
+}

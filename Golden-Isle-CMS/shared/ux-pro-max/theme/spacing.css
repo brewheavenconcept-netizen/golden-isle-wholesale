@@ -1,0 +1,22 @@
+@theme {
+  /* UI UX Pro Max Spacing & Radii - Premium Precision */
+
+  /* Radius (Fintech Modernity) */
+  --radius-fintech-sm: 0.375rem;
+  --radius-fintech-md: 0.5rem;
+  --radius-fintech-lg: 0.75rem;
+  --radius-fintech-xl: 1rem;
+  --radius-fintech-2xl: 1.5rem;
+
+  /* Spacing Grid (8px Base - Pro Max standard) */
+  --spacing-fintech-xs: 0.5rem;   /* 8px */
+  --spacing-fintech-sm: 1rem;    /* 16px */
+  --spacing-fintech-md: 1.5rem;  /* 24px */
+  --spacing-fintech-lg: 2rem;    /* 32px */
+  --spacing-fintech-xl: 3rem;    /* 48px */
+  --spacing-fintech-2xl: 4rem;   /* 64px */
+
+  /* Shadows (Fintech Depth) */
+  --shadow-fintech-glow: 0 0 20px rgba(59, 130, 246, 0.05);
+  --shadow-fintech-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}

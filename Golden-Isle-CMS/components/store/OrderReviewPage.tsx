@@ -19,14 +19,9 @@ export default function OrderReviewPage() {
         const fetchData = async () => {
             if (!orderId) return;
             try {
-                // 1. Fetch order using central utility to ensure field mapping
                 const orderData = await getOrder(orderId);
-                console.log('DEBUG FULL ORDER OBJECT:', orderData);
-
                 if (!orderData) throw new Error('Order not found');
                 setOrder(orderData);
-
-
             } catch (e) {
                 console.error(e);
                 toast.error("Failed to load order");
@@ -34,7 +29,51 @@ export default function OrderReviewPage() {
                 setLoading(false);
             }
         };
+
         fetchData();
+
+        // ── Real-time Subscription ─────────────────────────────────────────────
+        if (!orderId) return;
+
+        const channel = supabase
+            .channel(`order-sync-${orderId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'orders',
+                    filter: `id=eq.${orderId}`,
+                },
+                (payload) => {
+                    console.log('REALTIME UPDATE RECEIVED:', payload.new);
+                    // Update local state with new data from DB
+                    setOrder((prev) => {
+                        if (!prev) return payload.new as Order;
+                        return {
+                            ...prev,
+                            ...(payload.new as Partial<Order>),
+                            // Ensure phone and address mapping remains consistent with getOrder()
+                            customer_phone: (payload.new as any).customer_phone || (payload.new as any).phone || prev.customer_phone,
+                            delivery_address: (payload.new as any).delivery_address || (payload.new as any).address || prev.delivery_address,
+                        };
+                    });
+                    
+                    if ((payload.new as any).status === 'confirmed') {
+                        toast.success("Payment confirmed! Your receipt is now available.", {
+                            icon: '🎉',
+                            duration: 5000
+                        });
+                    }
+                }
+            )
+            .subscribe((status) => {
+                console.log(`Supabase Realtime Status for order ${orderId}:`, status);
+            });
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [orderId]);
 
     if (loading) {

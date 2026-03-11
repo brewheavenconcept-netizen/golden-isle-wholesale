@@ -1,0 +1,23 @@
+@theme {
+  /* UI UX Pro Max Typography Standards - Fintech High Trust Scale */
+
+  /* Fonts */
+  --font-fintech-display: "Inter", "Satoshi", system-ui, sans-serif;
+  --font-fintech-mono: "JetBrains Mono", "SF Mono", monospace;
+
+  /* Weights */
+  --font-weight-fintech-light: 300;
+  --font-weight-fintech-regular: 400;
+  --font-weight-fintech-medium: 500;
+  --font-weight-fintech-semibold: 600;
+  --font-weight-fintech-bold: 700;
+
+  /* Line Heights (Optimized for financial data readability) */
+  --leading-fintech-tight: 1.1;
+  --leading-fintech-normal: 1.5;
+  --leading-fintech-relaxed: 1.625;
+
+  /* Letter Spacing (High Trust Precision) */
+  --tracking-fintech-tight: -0.02em;
+  --tracking-fintech-wide: 0.05em;
+}

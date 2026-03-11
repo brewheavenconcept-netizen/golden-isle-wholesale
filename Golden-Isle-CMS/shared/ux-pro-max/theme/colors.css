@@ -1,0 +1,27 @@
+@theme {
+  /* Fintech Dark Theme - UI UX Pro Max Standards */
+
+  /* Backgrounds */
+  --color-fintech-bg: #0B0E14;
+  --color-fintech-surface: #171C26;
+  --color-fintech-surface-raised: #1E293B;
+
+  /* Borders & Dividers */
+  --color-fintech-border: #2D3748;
+  --color-fintech-border-muted: #1E293B;
+
+  /* Accents & Brand */
+  --color-fintech-primary: #3B82F6; /* Trust Blue */
+  --color-fintech-primary-glow: rgba(59, 130, 246, 0.15);
+  --color-fintech-success: #10B981; /* Growth/Deposits */
+  --color-fintech-danger: #EF4444;  /* Losses/Withdrawals */
+  --color-fintech-warning: #F59E0B;
+
+  /* Text Colors */
+  --color-fintech-text-base: #F8FAF9;
+  --color-fintech-text-muted: #94A3B8;
+  --color-fintech-text-dark: #64748B;
+
+  /* Overlays */
+  --color-fintech-overlay: rgba(11, 14, 20, 0.8);
+}
