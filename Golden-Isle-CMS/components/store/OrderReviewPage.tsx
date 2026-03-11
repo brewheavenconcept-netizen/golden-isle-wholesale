@@ -73,7 +73,7 @@ export default function OrderReviewPage() {
                         <p>Order ID: <span className="font-normal">{order.id}</span></p>
                         <p>Date: <span className="font-normal">{new Date(order.created_at).toLocaleDateString('en-MY', { day: '2-digit', month: 'long', year: 'numeric' })}</span></p>
                     </div>
-                    {order.status === 'paid' ? (
+                    {order.status === 'confirmed' ? (
                         <div className="px-3 py-1 border border-black bg-white text-[10px] tracking-widest">
                             STATUS: CONFIRMED
                         </div>
@@ -102,11 +102,10 @@ export default function OrderReviewPage() {
 
                 <div className="h-px bg-black w-full mb-8" />
 
-                {/* Items Table - Only visible if paid or for the buyer to see what they bought */}
+                {/* Items Table - Only visible if confirmed or for the buyer to see what they bought */}
                 {/* The instruction says "Hide the actual receipt details... UNLESS the status === 'paid'". 
-                    Usually "receipt details" refers to the confirmation/payment part, 
-                    but I will follow strictly and hide the items table if not paid. */}
-                {order.status === 'paid' ? (
+                    I'm using 'confirmed' here as it represents the 'paid' state in the system. */}
+                {order.status === 'confirmed' ? (
                     <>
                         {/* Billing Info */}
                         <div className="mb-10">
