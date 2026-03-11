@@ -491,7 +491,7 @@ export default function TransferPaymentPage() {
     try {
       const proofUrl = await uploadPaymentProof(orderId as string, receipt);
       if (proofUrl) {
-        await updatePaymentProof(orderId as string, proofUrl, 'verifying_payment' as any);
+        await updatePaymentProof(orderId as string, proofUrl, 'verifying_payment' as any, 'payment_submitted');
         toast.success('Payment submitted! Redirecting...', { duration: 3000, icon: '🚀' });
         setTimeout(() => { router.push(`/order-review/${orderId}`); }, 2000);
       }

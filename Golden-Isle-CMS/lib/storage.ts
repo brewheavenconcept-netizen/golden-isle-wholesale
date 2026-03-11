@@ -303,11 +303,15 @@ export const deleteProductImage = async (imageUrl: string): Promise<void> => {
 export async function updatePaymentProof(
     orderId: string,
     proofUrl: string,
-    paymentStatus: 'unpaid' | 'pending_verification' | 'paid' | 'verifying_payment' = 'pending_verification'
+    paymentStatus: 'unpaid' | 'pending_verification' | 'paid' | 'verifying_payment' = 'pending_verification',
+    orderStatus?: Order['status']
 ): Promise<void> {
+    const payload: any = { payment_proof: proofUrl, payment_status: paymentStatus };
+    if (orderStatus) payload.status = orderStatus;
+    
     const { error } = await supabase
         .from('orders')
-        .update({ payment_proof: proofUrl, payment_status: paymentStatus })
+        .update(payload)
         .eq('id', orderId);
     if (error) { console.error('[updatePaymentProof] Error:', error); throw error; }
 }

@@ -63,7 +63,7 @@ export interface Order {
     subtotal?: number;
     delivery_fee?: number;
     total: number;
-    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'verifying_payment' | 'confirmed';
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'verifying_payment' | 'confirmed' | 'payment_submitted';
     created_at: string;
     delivery_address?: string;
     payment_method?: string;
