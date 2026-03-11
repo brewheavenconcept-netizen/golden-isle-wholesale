@@ -13,6 +13,7 @@ interface OrderStatusDropdownProps {
 
 const statusConfig: Record<Order['status'], { label: string; bgColor: string; textColor: string }> = {
     pending: { label: '🟡 Pending', bgColor: 'bg-yellow-100', textColor: 'text-yellow-700' },
+    payment_submitted: { label: '💵 Payment Submitted', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
     verifying_payment: { label: '🔍 Awaiting Verification', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
     processing: { label: '⚙️ Processing', bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
     shipped: { label: '🚚 Shipped', bgColor: 'bg-purple-100', textColor: 'text-purple-700' },
@@ -32,6 +33,7 @@ export default function OrderStatusDropdown({ currentStatus, orderId, onStatusCh
                 className={`px-3 py-1.5 pr-7 rounded-xl text-sm font-medium capitalize ${config.bgColor} ${config.textColor} cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 appearance-none border-0`}
             >
                 <option value="pending">🟡 Pending</option>
+                <option value="payment_submitted">💵 Payment Submitted</option>
                 <option value="verifying_payment">🔍 Awaiting Verification</option>
                 <option value="processing">⚙️ Processing</option>
                 <option value="shipped">🚚 Shipped</option>
