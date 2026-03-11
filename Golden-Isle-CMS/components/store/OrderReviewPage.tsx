@@ -208,10 +208,15 @@ export default function OrderReviewPage() {
 
                         <button
                             onClick={() => window.print()}
-                            className="no-print inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-black font-bold py-3 px-8 w-full max-w-sm rounded-full transition-all border border-black/80 active:scale-95 text-sm uppercase tracking-wider"
+                            disabled={order.status !== 'confirmed'}
+                            className={`no-print inline-flex items-center justify-center gap-2 font-bold py-3 px-8 w-full max-w-sm rounded-full transition-all border active:scale-95 text-sm uppercase tracking-wider ${
+                                order.status === 'confirmed' 
+                                ? 'bg-white hover:bg-gray-50 text-black border-black/80' 
+                                : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            }`}
                         >
-                            <Download size={16} />
-                            <span>Download Receipt</span>
+                            {order.status === 'confirmed' && <Download size={16} />}
+                            <span>{order.status === 'confirmed' ? 'Download Receipt' : 'Receipt available after confirmation'}</span>
                         </button>
                     </div>
                 </div>
