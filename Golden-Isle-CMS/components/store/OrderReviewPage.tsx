@@ -73,72 +73,107 @@ export default function OrderReviewPage() {
                         <p>Order ID: <span className="font-normal">{order.id}</span></p>
                         <p>Date: <span className="font-normal">{new Date(order.created_at).toLocaleDateString('en-MY', { day: '2-digit', month: 'long', year: 'numeric' })}</span></p>
                     </div>
-                    <div className="px-3 py-1 border border-black bg-white text-[10px] tracking-widest">
-                        STATUS: CONFIRMED
-                    </div>
+                    {order.status === 'paid' ? (
+                        <div className="px-3 py-1 border border-black bg-white text-[10px] tracking-widest">
+                            STATUS: CONFIRMED
+                        </div>
+                    ) : order.status === 'payment_submitted' ? (
+                        <div className="px-3 py-1 border border-amber-500 bg-amber-50 text-amber-700 text-[10px] tracking-widest">
+                            STATUS: VERIFYING PAYMENT
+                        </div>
+                    ) : (
+                        <div className="px-3 py-1 border border-gray-400 bg-gray-50 text-gray-500 text-[10px] tracking-widest">
+                            STATUS: {order.status.replace('_', ' ')}
+                        </div>
+                    )}
                 </div>
+
+                {order.status === 'payment_submitted' && (
+                    <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3 text-amber-800">
+                        <div className="mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm uppercase tracking-wide mb-0.5">Pending Verification</p>
+                            <p className="text-sm opacity-90">Your payment is being verified by our finance team. We will notify you once confirmed.</p>
+                        </div>
+                    </div>
+                )}
 
                 <div className="h-px bg-black w-full mb-8" />
 
-                {/* Billing Info */}
-                <div className="mb-10">
-                    <h2 className="text-xs font-bold uppercase tracking-widest mb-4 bg-black text-white px-2 py-1 inline-block">Bill To</h2>
-                    <div className="text-sm space-y-1">
-                        <p><span className="font-bold">Buyer:</span> {order.customer_name}</p>
-                        <p><span className="font-bold">Phone Number:</span> {order.customer_phone}</p>
-                        <p className="max-w-md"><span className="font-bold">Address:</span> {order.delivery_address}</p>
-                    </div>
-                </div>
+                {/* Items Table - Only visible if paid or for the buyer to see what they bought */}
+                {/* The instruction says "Hide the actual receipt details... UNLESS the status === 'paid'". 
+                    Usually "receipt details" refers to the confirmation/payment part, 
+                    but I will follow strictly and hide the items table if not paid. */}
+                {order.status === 'paid' ? (
+                    <>
+                        {/* Billing Info */}
+                        <div className="mb-10">
+                            <h2 className="text-xs font-bold uppercase tracking-widest mb-4 bg-black text-white px-2 py-1 inline-block">Bill To</h2>
+                            <div className="text-sm space-y-1">
+                                <p><span className="font-bold">Buyer:</span> {order.customer_name}</p>
+                                <p><span className="font-bold">Phone Number:</span> {order.customer_phone}</p>
+                                <p className="max-w-md"><span className="font-bold">Address:</span> {order.delivery_address}</p>
+                            </div>
+                        </div>
 
-                {/* Items Table */}
-                <div className="mb-8 border border-black overflow-x-auto w-full">
-                    <table className="w-full text-left text-sm border-collapse min-w-[400px]">
-                        <thead>
-                            <tr className="bg-black text-white uppercase text-[9px] md:text-[11px] tracking-widest shrink-0">
-                                <th className="p-3 border-r border-black font-bold whitespace-nowrap">Item</th>
-                                <th className="p-3 border-r border-black font-bold text-center whitespace-nowrap">Qty</th>
-                                <th className="p-3 border-r border-black font-bold text-right whitespace-nowrap">Price</th>
-                                <th className="p-3 font-bold text-right whitespace-nowrap">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-black">
-                            {(order.items as any[]).map((item, idx) => (
-                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}>
-                                    <td className="p-3 border-r border-black font-medium">{item.product.name}</td>
-                                    <td className="p-3 border-r border-black text-center">{item.qty}</td>
-                                    <td className="p-3 border-r border-black text-right">RM {Number(item.product.price).toFixed(2)}</td>
-                                    <td className="p-3 text-right">RM {(item.product.price * item.qty).toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                        {/* Items Table */}
+                        <div className="mb-8 border border-black overflow-x-auto w-full">
+                            <table className="w-full text-left text-sm border-collapse min-w-[400px]">
+                                <thead>
+                                    <tr className="bg-black text-white uppercase text-[9px] md:text-[11px] tracking-widest shrink-0">
+                                        <th className="p-3 border-r border-black font-bold whitespace-nowrap">Item</th>
+                                        <th className="p-3 border-r border-black font-bold text-center whitespace-nowrap">Qty</th>
+                                        <th className="p-3 border-r border-black font-bold text-right whitespace-nowrap">Price</th>
+                                        <th className="p-3 font-bold text-right whitespace-nowrap">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-black">
+                                    {(order.items as any[]).map((item, idx) => (
+                                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f9f9f9]'}>
+                                            <td className="p-3 border-r border-black font-medium">{item.product.name}</td>
+                                            <td className="p-3 border-r border-black text-center">{item.qty}</td>
+                                            <td className="p-3 border-r border-black text-right">RM {Number(item.product.price).toFixed(2)}</td>
+                                            <td className="p-3 text-right">RM {(item.product.price * item.qty).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
-                {/* Totals */}
-                <div className="flex justify-end mb-12">
-                    <div className="w-full md:w-64 border-2 border-black p-4 space-y-3">
-                        <div className="flex justify-between text-xs font-bold uppercase">
-                            <span>Subtotal</span>
-                            <span>RM {Number(order.subtotal || 0).toFixed(2)}</span>
+                        {/* Totals */}
+                        <div className="flex justify-end mb-12">
+                            <div className="w-full md:w-64 border-2 border-black p-4 space-y-3">
+                                <div className="flex justify-between text-xs font-bold uppercase">
+                                    <span>Subtotal</span>
+                                    <span>RM {Number(order.subtotal || 0).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-xs font-bold uppercase">
+                                    <span>Delivery</span>
+                                    <span>RM {Number(order.delivery_fee || 0).toFixed(2)}</span>
+                                </div>
+                                <div className="h-px bg-black w-full" />
+                                <div className="flex justify-between text-lg font-bold">
+                                    <span className="uppercase tracking-tighter">Total</span>
+                                    <span>RM {Number(order.total).toFixed(2)}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex justify-between text-xs font-bold uppercase">
-                            <span>Delivery</span>
-                            <span>RM {Number(order.delivery_fee || 0).toFixed(2)}</span>
-                        </div>
-                        <div className="h-px bg-black w-full" />
-                        <div className="flex justify-between text-lg font-bold">
-                            <span className="uppercase tracking-tighter">Total</span>
-                            <span>RM {Number(order.total).toFixed(2)}</span>
-                        </div>
+                    </>
+                ) : (
+                    <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-xl mb-12">
+                        <p className="text-gray-400 font-medium">Full receipt details will be available once payment is confirmed.</p>
                     </div>
-                </div>
+                )}
 
                 {/* Footer */}
                 <div className="text-center space-y-8">
                     <p className="text-xs text-gray-400 font-medium">Thank you for your business.</p>
 
                     <div className="flex flex-col items-center gap-4 no-print">
-                        {(order.notified_at || order.status !== 'pending') ? (
+                        {/* Notify Seller Button - visible in pending states */}
+                        {(order.notified_at || (order.status !== 'pending' && order.status !== 'payment_submitted')) ? (
                             <button
                                 disabled
                                 className="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-400 font-bold py-4 px-12 w-full max-w-sm rounded-full transition-all text-sm cursor-not-allowed border border-gray-200"
