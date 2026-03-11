@@ -100,9 +100,9 @@ export default function ProductsSection() {
                         <h2 className="text-3xl md:text-5xl font-bold font-display text-[#1a1a1a] mb-4">Our Products</h2>
                     </div>
                     {/* Skeleton Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[12px]">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                            <div key={i} className="animate-pulse bg-[#fafaf7] rounded-3xl border border-[#e8e4dd] overflow-hidden aspect-[3/4]"></div>
+                            <div key={i} className="animate-pulse bg-[#fafaf7] rounded-[12px] border border-[#e8e4dd] overflow-hidden aspect-[3/4]"></div>
                         ))}
                     </div>
                 </div>
@@ -206,7 +206,7 @@ export default function ProductsSection() {
                         <p className="text-sm">Try exploring our other categories.</p>
                     </div>
                 ) : (
-                    <div key={selectedCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
+                    <div key={selectedCategory} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[12px]" style={{ animation: 'productsFadeIn 0.5s ease-out forwards' }}>
                         {filteredProducts.map((product, index) => (
                             <ProductCard key={`${product.id}-${index}`} product={product} />
                         ))}
