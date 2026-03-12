@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm install @supabase/supabase-js react-hot-toast recharts clsx tailwind-merge)",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(grep -r \"console\\\\.\\\\\\(log\\\\|error\\\\|warn\\\\|debug\\\\\\)\" \"C:/Project-mantaps-BEER/Golden-Isle-CMS\" --include=\"*.tsx\" --include=\"*.ts\" ! -path \"*/.next/*\")",
+      "Bash(grep -r \"console\\\\.\" \"C:/Project-mantaps-BEER/Golden-Isle-CMS\" --include=\"*.tsx\" --include=\"*.ts\" ! -path \"*/.next/*\")",
+      "Bash(xargs grep -l \"import.*from\")",
+      "Bash(grep -r \"NEXT_PUBLIC\\\\|process\\\\.env\" --include=\"*.tsx\" --include=\"*.ts\" ! -path \"./.next/*\" ! -path \"./node_modules/*\")",
+      "Bash(xargs -0 grep -l \"mockData\\\\|test\\\\|dummy\\\\|fake\")"
     ]
   }
 }
