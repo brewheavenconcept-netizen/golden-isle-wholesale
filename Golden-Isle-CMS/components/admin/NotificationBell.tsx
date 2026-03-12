@@ -7,7 +7,7 @@ import { useNotificationsContext, NotificationItem } from '@/hooks/useNotificati
 
 export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
-    const { notifications, unreadCount, markAllAsRead, markAsRead, clearNotification } = useNotificationsContext();
+    const { notifications, unreadCount, markAllAsRead, markAsRead, clearNotification, fetchNotifications } = useNotificationsContext();
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
@@ -18,8 +18,19 @@ export default function NotificationBell() {
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                fetchNotifications();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [fetchNotifications]);
 
     const handleItemClick = (n: NotificationItem) => {
         markAsRead(n.id);

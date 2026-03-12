@@ -21,14 +21,17 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     const [manualCategoryOverride, setManualCategoryOverride] = useState(false);
 
     const [formData, setFormData] = useState<Partial<Product>>({
-        name: '', price: 0, sku: '', stock: 1,
+        name: '', price: 0, sku: '', stock_quantity: 0,
         category: 'Whisky', description: '', status: 'active', images: [], variants: [],
         stock_status: 'in_stock',
     });
 
     useEffect(() => {
         if (initialData) {
-            setFormData(initialData);
+            setFormData({
+                ...initialData,
+                stock_quantity: initialData.stock_quantity ?? initialData.stock ?? 0
+            });
             if (initialData.images?.length) setImagePreview(initialData.images[0]);
             setManualCategoryOverride(true);
         }
@@ -227,8 +230,16 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                         <h3 className="font-semibold text-slate-700 dark:text-gray-300">Inventory</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-gray-400 mb-1">Quantity</label>
-                            <input type="number" className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white"
-                                value={formData.stock} onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })} />
+                            <input 
+                                type="number" 
+                                min="0"
+                                className="w-full p-2 bg-white dark:bg-[#111111] border dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                value={!formData.stock_quantity ? '' : formData.stock_quantity} 
+                                onChange={e => {
+                                    const val = Math.max(0, parseInt(e.target.value) || 0);
+                                    setFormData({ ...formData, stock_quantity: val, stock: val });
+                                }} 
+                            />
                         </div>
                     </div>
                 </div>

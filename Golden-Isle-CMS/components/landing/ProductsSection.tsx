@@ -40,7 +40,7 @@ export default function ProductsSection() {
                 // Fetch active products from supabase
                 const { data, error } = await supabase
                     .from('products')
-                    .select('id, name, price, image_url, category, stock_status, description')
+                    .select('id, name, price, image_url, category, stock_status, stock_quantity, description')
                     .eq('store_id', storeId)
                     .order('created_at', { ascending: false });
 
@@ -52,14 +52,12 @@ export default function ProductsSection() {
                 console.log('Products received:', data?.length || 0, data);
 
                 if (data) {
-                    // Map database image_url to UI images array if needed, 
-                    // or just ensure we handle image_url in ProductCard
                     const mappedProducts = data.map((p: any) => ({
                         ...p,
                         images: p.image_url ? [p.image_url] : [],
-                        // price is numeric in DB, ensure it's a number
                         price: Number(p.price),
-                        stock: p.stock_status === 'out_of_stock' ? 0 : 100 // fallback stock for UI
+                        stock_quantity: p.stock_quantity ?? 0,
+                        stock: p.stock_quantity ?? 0,
                     }));
                     setProducts(mappedProducts);
                 }

@@ -18,6 +18,7 @@ interface NotificationsContextType {
     markAsRead: (id: string) => void;
     markAllAsRead: () => void;
     clearNotification: (id: string) => void;
+    fetchNotifications: () => Promise<void>;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | null>(null);
@@ -146,12 +147,47 @@ export function useNotifications() {
         setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
+    const fetchNotifications = async () => {
+        try {
+            const { data } = await supabase
+                .from('orders')
+                .select('id, customer_name, total, created_at')
+                .order('created_at', { ascending: false })
+                .limit(10);
+                
+            if (data && Array.isArray(data)) {
+                let hasNew = false;
+                const newNotes: NotificationItem[] = [];
+                for (const order of data) {
+                    if (!seenOrderIds.current.has(order.id)) {
+                        seenOrderIds.current.add(order.id);
+                        hasNew = true;
+                        newNotes.push({
+                            id: order.id,
+                            customerName: order.customer_name || 'Unknown',
+                            total: order.total || 0,
+                            createdAt: order.created_at || new Date().toISOString(),
+                            read: false
+                        });
+                    }
+                }
+                if (hasNew) {
+                    setNotifications(prev => [...newNotes, ...prev]);
+                    playBeep();
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch missed notifications', e);
+        }
+    };
+
     return {
         unreadCount,
         notifications,
         markAsRead,
         markAllAsRead,
         clearNotification,
+        fetchNotifications,
     };
 }
 

@@ -21,7 +21,9 @@ export async function getProducts(storeId?: string): Promise<Product[]> {
     }
     return (data || []).map(row => ({
         ...row,
-        images: row.image_url ? [row.image_url] : []
+        images: row.image_url ? [row.image_url] : [],
+        stock_quantity: row.stock_quantity ?? row.stock ?? 0,
+        stock: row.stock_quantity ?? row.stock ?? 0
     }));
 }
 
@@ -35,7 +37,12 @@ export async function getProduct(id: string, storeId?: string): Promise<Product 
         console.error('[getProduct] Error:', error.message);
         return null;
     }
-    return data ? { ...data, images: data.image_url ? [data.image_url] : [] } : null;
+    return data ? { 
+        ...data, 
+        images: data.image_url ? [data.image_url] : [],
+        stock_quantity: data.stock_quantity ?? data.stock ?? 0,
+        stock: data.stock_quantity ?? data.stock ?? 0
+    } : null;
 }
 
 export async function getProductPublic(id: string): Promise<Product | null> {
@@ -49,7 +56,12 @@ export async function getProductPublic(id: string): Promise<Product | null> {
         console.error('[getProductPublic] Error:', error.message);
         return null;
     }
-    return data ? { ...data, images: data.image_url ? [data.image_url] : [] } : null;
+    return data ? { 
+        ...data, 
+        images: data.image_url ? [data.image_url] : [],
+        stock_quantity: data.stock_quantity ?? data.stock ?? 0,
+        stock: data.stock_quantity ?? data.stock ?? 0
+    } : null;
 }
 
 export async function addProduct(
@@ -57,13 +69,20 @@ export async function addProduct(
     storeId?: string
 ): Promise<Product | null> {
     const p = product as any;
+    
+    // Auto stock status logic
+    let stock_status = p.stock_status || 'in_stock';
+    const quantity = p.stock_quantity !== undefined ? p.stock_quantity : (p.stock ?? 0);
+    if (quantity === 0) stock_status = 'out_of_stock';
+
     const payload: Record<string, any> = {
         name: p.name,
         description: p.description ?? null,
         price: p.price,
         category: p.category,
         image_url: p.images && p.images.length > 0 ? p.images[0] : (p.image_url ?? null),
-        stock_status: p.stock_status ?? 'in_stock',
+        stock_status,
+        stock_quantity: quantity,
         is_featured: p.is_featured ?? false,
         store_id: p.store_id ?? storeId ?? null,
     };
@@ -74,7 +93,7 @@ export async function addProduct(
         .single();
     if (error) {
         console.error('[addProduct] Error:', error.message);
-        return null;
+        throw new Error(error.message);
     }
     return data;
 }
@@ -90,6 +109,17 @@ export async function updateProduct(
     if (u.description !== undefined) payload.description = u.description;
     if (u.price !== undefined) payload.price = u.price;
     if (u.category !== undefined) payload.category = u.category;
+    
+    const quantity = u.stock_quantity !== undefined ? u.stock_quantity : u.stock;
+    if (quantity !== undefined) {
+        payload.stock_quantity = quantity;
+        if (quantity === 0) {
+            payload.stock_status = 'out_of_stock';
+        } else if (u.stock_status === undefined || u.stock_status === 'out_of_stock') {
+            payload.stock_status = 'in_stock';
+        }
+    }
+    
     if (u.stock_status !== undefined) payload.stock_status = u.stock_status;
     if (u.is_featured !== undefined) payload.is_featured = u.is_featured;
     if (u.store_id !== undefined) payload.store_id = u.store_id;
@@ -216,16 +246,24 @@ export async function createOrder(order: Order, storeId: string): Promise<Order 
     return data;
 }
 
+export async function updateOrder(
+    id: string,
+    updates: Partial<Order>,
+    storeId: string
+): Promise<void> {
+    const { error } = await supabase
+        .from('orders')
+        .update(updates)
+        .eq('id', id);
+    if (error) console.error('[updateOrder] Error:', error.message);
+}
+
 export async function updateOrderStatus(
     id: string,
     status: Order['status'],
     storeId: string
 ): Promise<void> {
-    const { error } = await supabase
-        .from('orders')
-        .update({ status })
-        .eq('id', id);
-    if (error) console.error('[updateOrderStatus] Error:', error.message);
+    await updateOrder(id, { status }, storeId);
 }
 
 export async function updateOrderNotes(
@@ -356,8 +394,8 @@ export const getSettings = async (storeId: string): Promise<StoreSettings> => {
         accept_cod: data.accept_cod ?? DEFAULT_SETTINGS.accept_cod,
         accept_bank_transfer: data.accept_bank_transfer ?? DEFAULT_SETTINGS.accept_bank_transfer,
         bank_name: data.bank_name || '',
-        bank_holder_name: data.bank_holder_name || data.bank_account_name || '',
-        bank_account_number: data.bank_account || '',
+        bank_holder_name: data.bank_holder_name || '',
+        bank_account_number: data.bank_account_number || '',
         qr_code_url: data.qr_code_url || '',
         operating_hours: data.operating_hours || DEFAULT_SETTINGS.operating_hours,
         whatsapp_order_notifications: data.whatsapp_order_notifications ?? DEFAULT_SETTINGS.whatsapp_order_notifications,
@@ -388,9 +426,9 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
         enable_self_pickup: settings.enable_self_pickup,
         accept_cod: settings.accept_cod,
         accept_bank_transfer: settings.accept_bank_transfer,
-        bank_account_number: settings.bank_account_number,
         bank_name: settings.bank_name,
         bank_holder_name: settings.bank_holder_name,
+        bank_account_number: settings.bank_account_number,
         qr_code_url: settings.qr_code_url,
         operating_hours: settings.operating_hours,
         whatsapp_order_notifications: settings.whatsapp_order_notifications,
@@ -414,22 +452,44 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
     }
 }
 
+export async function uploadPaymentQR(file: File, storeId: string): Promise<string> {
+    const MAX_SIZE = 2 * 1024 * 1024;
+    if (file.size > MAX_SIZE) throw new Error('Image size must be less than 2MB');
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) throw new Error('Only JPG, PNG and WebP images are allowed');
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
+    const filePath = `${storeId}/qr-${Date.now()}-${cleanName}`;
+    const { error: uploadError } = await supabase.storage
+        .from('payment-qr')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+    if (uploadError) {
+        console.error('[uploadPaymentQR] Error:', uploadError);
+        throw new Error('Failed to upload QR code');
+    }
+    const { data } = supabase.storage.from('payment-qr').getPublicUrl(filePath);
+    return data.publicUrl;
+}
+
 export async function savePaymentSettings(settings: Partial<StoreSettings>, storeId: string): Promise<void> {
     if (!storeId) throw new Error('Store ID is required to save payment settings');
 
-    // Strict sanitization: Only include exactly what is needed to avoid schema cache errors
+    // Strict sanitization: Only include exactly what is needed
     const sanitizedPayload = {
         store_id: storeId,
-        store_name: settings.store_name,
         accept_bank_transfer: settings.accept_bank_transfer ?? false,
         accept_cod: settings.accept_cod ?? false,
         bank_name: settings.bank_name,
         bank_holder_name: settings.bank_holder_name,
         bank_account_number: settings.bank_account_number,
-        account_holder: (settings as any).account_holder,
-        account_number: (settings as any).account_number,
         qr_code_url: settings.qr_code_url,
-        qr_image_url: (settings as any).qr_image_url,
+        // Online Gateways
+        stripe_publishable_key: settings.stripe_publishable_key,
+        stripe_secret_key: settings.stripe_secret_key,
+        is_stripe_enabled: settings.is_stripe_enabled,
+        toyyibpay_secret_key: settings.toyyibpay_secret_key,
+        toyyibpay_category_code: settings.toyyibpay_category_code,
+        is_toyyibpay_enabled: settings.is_toyyibpay_enabled,
+        updated_at: new Date().toISOString(),
     };
 
     const { error } = await supabase

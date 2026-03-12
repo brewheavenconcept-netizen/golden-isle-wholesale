@@ -23,7 +23,11 @@ export default function InquiriesDashboard() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
     useEffect(() => {
-        loadInquiries();
+        loadInquiries().then((data) => {
+            if (data && data.some((i: Inquiry) => i.status === 'new')) {
+                markAllAsRead();
+            }
+        });
     }, []);
 
     const loadInquiries = async () => {
@@ -36,10 +40,27 @@ export default function InquiriesDashboard() {
 
             if (error) throw error;
             setInquiries(data || []);
+            return data;
         } catch (error: any) {
             toast.error("Failed to load inquiries: " + error.message);
+            return null;
         } finally {
             setLoading(false);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ status: 'contacted' })
+                .eq('status', 'new');
+
+            if (error) throw error;
+            
+            setInquiries(prev => prev.map(i => i.status === 'new' ? { ...i, status: 'contacted' } : i));
+        } catch (error) {
+            console.error("Failed to mark inquiries as read:", error);
         }
     };
 

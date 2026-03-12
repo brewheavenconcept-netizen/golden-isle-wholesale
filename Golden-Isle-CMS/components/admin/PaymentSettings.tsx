@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { Save, CreditCard, Banknote, ShieldCheck, ChevronRight, ChevronDown, CheckCircle2, Wallet, Building2, ImageIcon, AlertCircle, X, Truck, Landmark, ChevronLeft } from 'lucide-react';
+import { Save, CreditCard, Banknote, ShieldCheck, CheckCircle2, Wallet, Building2, ImageIcon, AlertCircle, X, Truck, Landmark, ChevronLeft, Upload, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getSettings, savePaymentSettings } from '@/lib/storage';
+import { getSettings, savePaymentSettings, uploadPaymentQR } from '@/lib/storage';
 import { useStore } from '@/context/StoreContext';
 import { StoreSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
-import { supabase } from '@/lib/supabase';
 
 const StatusBadge = ({ active }: { active: boolean }) => (
     <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
@@ -20,8 +19,10 @@ export default function PaymentSettings() {
     const { storeId, settings: ctxSettings, reload } = useStore();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
-    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const qrInputRef = useRef<HTMLInputElement>(null);
+
     const [formData, setFormData] = useState({
         stripe_publishable_key: '',
         stripe_secret_key: '',
@@ -34,7 +35,7 @@ export default function PaymentSettings() {
         bank_name: '',
         bank_holder_name: '',
         bank_account_number: '',
-        qr_code_url: ''
+        qr_code_url: '',
     });
 
     useEffect(() => {
@@ -53,8 +54,14 @@ export default function PaymentSettings() {
                 bank_name: settings.bank_name || '',
                 bank_holder_name: settings.bank_holder_name || '',
                 bank_account_number: settings.bank_account_number || '',
-                qr_code_url: settings.qr_code_url || ''
+                qr_code_url: settings.qr_code_url || '',
             });
+            
+            // Auto-expand bank section if enabled
+            if (settings.accept_bank_transfer) {
+                setExpandedSection('bank');
+            }
+            
             setLoading(false);
         }
         loadPaymentSettings();
@@ -67,43 +74,15 @@ export default function PaymentSettings() {
         }
         setSaving(true);
         try {
-            let currentQrUrl = formData.qr_code_url;
-
-            // 1. Upload new image if pending
-            if (pendingFile) {
-                const fileExt = pendingFile.name.split('.').pop();
-                const fileName = `${storeId}-qr-${Date.now()}.${fileExt}`;
-                const filePath = `${storeId}/${fileName}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('payment-qr')
-                    .upload(filePath, pendingFile, { cacheControl: '3600', upsert: true });
-
-                if (uploadError) {
-                    console.error('[PaymentSettings] QR Upload failed:', uploadError);
-                    throw new Error('Failed to upload QR image');
-                }
-
-                const { data: urlData } = supabase.storage.from('payment-qr').getPublicUrl(filePath);
-                currentQrUrl = urlData.publicUrl;
-            }
-
-            // 2. Prepare full settings object
-            const currentData = { ...formData, qr_code_url: currentQrUrl };
             const fullSettings: StoreSettings = {
                 ...DEFAULT_SETTINGS,
                 ...ctxSettings,
-                ...currentData,
+                ...formData,
             };
 
-            // 3. Save to Supabase (Upsert via savePaymentSettings)
             await savePaymentSettings(fullSettings, storeId);
-
-            setFormData(currentData);
-            setPendingFile(null);
             reload();
             toast.success('Payment Settings Saved!');
-            setExpandedSection(null);
         } catch (error: any) {
             console.error('[PaymentSettings] Save failed:', error);
             toast.error(error.message || 'Failed to save settings. Please try again.');
@@ -111,11 +90,21 @@ export default function PaymentSettings() {
         setSaving(false);
     };
 
-    const toggleSection = (section: string) => {
-        setExpandedSection(prev => prev === section ? null : section);
-    };
+    const handleQRUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !storeId) return;
 
-    // StatusBadge moved outside the component
+        setUploading(true);
+        try {
+            const url = await uploadPaymentQR(file, storeId);
+            setFormData(prev => ({ ...prev, qr_code_url: url }));
+            toast.success('QR Code uploaded!');
+        } catch (err: any) {
+            toast.error(err.message || 'Upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     if (loading) return <div className="p-8 text-slate-400 flex items-center justify-center min-h-[50vh]">Loading Payment Profiles...</div>;
 
@@ -140,27 +129,7 @@ export default function PaymentSettings() {
                 <AlertCircle size={18} className="text-blue-500 mt-0.5 shrink-0" />
                 <div className="text-sm text-blue-700 dark:text-blue-300">
                     <p className="font-medium">Online payments (Stripe, ToyyibPay) are coming soon.</p>
-                    <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Your customers currently see: <strong>Cash on Delivery</strong> and <strong>Bank Transfer / DuitNow QR</strong>. You can save your Stripe & ToyyibPay keys now &mdash; they&apos;ll activate automatically when integration is ready.</p>
-                </div>
-            </div>
-            <div>
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-1">Cash Payments</h3>
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <div className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                                <Truck size={22} />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">Cash on Delivery (COD)</p>
-                                <p className="text-xs text-slate-500">Pay by cash when order arrives</p>
-                            </div>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer ml-4">
-                            <input type="checkbox" checked={formData.accept_cod} onChange={(e) => setFormData({ ...formData, accept_cod: e.target.checked })} className="sr-only peer" />
-                            <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                    </div>
+                    <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Your customers currently see: <strong>Bank Transfer / DuitNow QR</strong>. You can save your Stripe & ToyyibPay keys now &mdash; they&apos;ll activate automatically when integration is ready.</p>
                 </div>
             </div>
 
@@ -168,7 +137,7 @@ export default function PaymentSettings() {
             <div>
                 <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-1 mt-6">Bank Transfer</h3>
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <div onClick={() => toggleSection('bank')} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                    <div className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                                 <Landmark size={22} />
@@ -179,11 +148,21 @@ export default function PaymentSettings() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <label className="relative inline-flex items-center cursor-pointer mr-2" onClick={(e) => e.stopPropagation()}>
-                                <input type="checkbox" checked={formData.accept_bank_transfer} onChange={(e) => setFormData({ ...formData, accept_bank_transfer: e.target.checked })} className="sr-only peer" />
-                                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.accept_bank_transfer} 
+                                    onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        setFormData({ ...formData, accept_bank_transfer: isChecked });
+                                        setExpandedSection(isChecked ? 'bank' : null);
+                                    }} 
+                                    className="sr-only" 
+                                />
+                                <div className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${formData.accept_bank_transfer ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                                    <div className={`absolute top-[2px] left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-transform duration-200 ease-in-out ${formData.accept_bank_transfer ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                                </div>
                             </label>
-                            {expandedSection === 'bank' ? <ChevronDown size={20} className="text-slate-400" /> : <ChevronRight size={20} className="text-slate-400" />}
                         </div>
                     </div>
 
@@ -200,33 +179,54 @@ export default function PaymentSettings() {
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wide">Account Number</label>
-                                    <input type="text" value={formData.bank_account_number} onChange={(e) => setFormData({ ...formData, bank_account_number: e.target.value })} placeholder="1234567890" className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-4 py-2.5 outline-none focus:border-blue-500 font-mono" />
+                                    <input 
+                                        type="text" 
+                                        value={formData.bank_account_number} 
+                                        onChange={(e) => setFormData({ ...formData, bank_account_number: e.target.value })} 
+                                        placeholder="1234567890" 
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-4 py-2.5 outline-none focus:border-blue-500 font-mono" 
+                                    />
                                 </div>
-                            </div>
 
-                            <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700">
-                                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-1.5">
-                                    <ImageIcon size={14} /> DuitNow QR Code
-                                </label>
-                                {formData.qr_code_url ? (
-                                    <div className="relative inline-block border bg-white dark:bg-slate-800 p-2 rounded-xl">
-                                        <Image src={formData.qr_code_url} alt="QR Code" width={128} height={128} className="w-32 h-32 object-contain" />
-                                        <button onClick={() => setFormData({ ...formData, qr_code_url: '' })} className="absolute -top-3 -right-3 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"><X size={14} /></button>
+                                <div className="md:col-span-2 pt-2">
+                                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wide">DuitNow QR Code</label>
+                                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                                        {formData.qr_code_url ? (
+                                            <div className="relative w-24 h-24 bg-white rounded-lg border border-slate-200 overflow-hidden shrink-0">
+                                                <img src={formData.qr_code_url} alt="QR Code" className="w-full h-full object-contain p-1" />
+                                                <button 
+                                                    onClick={() => setFormData(prev => ({ ...prev, qr_code_url: '' }))}
+                                                    className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 transition-colors"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                                <ImageIcon size={24} />
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex-1">
+                                            <input 
+                                                type="file" 
+                                                ref={qrInputRef}
+                                                onChange={handleQRUpload}
+                                                accept="image/*"
+                                                className="hidden" 
+                                            />
+                                            <button 
+                                                onClick={() => qrInputRef.current?.click()}
+                                                disabled={uploading}
+                                                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                                            >
+                                                {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                                                Upload DuitNow QR Code
+                                            </button>
+                                            <p className="text-[10px] text-slate-500 mt-2">Recommended: Square PNG/JPG, max 2MB.</p>
+                                        </div>
                                     </div>
-                                ) : (
-                                    <button onClick={() => document.getElementById('qr-upload')?.click()} className="flex items-center gap-2 px-5 py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-slate-500 transition-colors">
-                                        <ImageIcon size={18} />
-                                        <span className="text-sm font-medium">Upload QR Code (JPG/PNG)</span>
-                                    </button>
-                                )}
-                                <input id="qr-upload" type="file" accept="image/*" className="hidden" onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file) return;
-                                    setPendingFile(file);
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => setFormData({ ...formData, qr_code_url: reader.result as string });
-                                    reader.readAsDataURL(file);
-                                }} />
+                                </div>
                             </div>
                         </div>
                     )}
@@ -234,13 +234,14 @@ export default function PaymentSettings() {
             </div>
 
             {/* PAYMENT GATEWAYS */}
+            {/* ... (rest of the component remains similar but ensure it uses expandedSection correctly) */}
             <div>
                 <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 px-1 mt-6">Payment Gateways</h3>
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
 
                     {/* Stripe Card */}
                     <div>
-                        <div onClick={() => toggleSection('stripe')} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <div onClick={() => setExpandedSection(expandedSection === 'stripe' ? null : 'stripe')} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                                     <CreditCard size={22} />
@@ -254,7 +255,7 @@ export default function PaymentSettings() {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                {expandedSection === 'stripe' ? <ChevronDown size={20} className="text-slate-400" /> : <ChevronRight size={20} className="text-slate-400" />}
+                                {expandedSection === 'stripe' ? <X size={20} className="text-slate-400" /> : <ChevronLeft size={20} className="text-slate-400 rotate-180" />}
                             </div>
                         </div>
                         {expandedSection === 'stripe' && (
@@ -280,7 +281,7 @@ export default function PaymentSettings() {
 
                     {/* ToyyibPay Card */}
                     <div>
-                        <div onClick={() => toggleSection('toyyibpay')} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <div onClick={() => setExpandedSection(expandedSection === 'toyyibpay' ? null : 'toyyibpay')} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-orange-50 dark:bg-orange-500/10 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
                                     <Banknote size={22} />
@@ -294,7 +295,7 @@ export default function PaymentSettings() {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                {expandedSection === 'toyyibpay' ? <ChevronDown size={20} className="text-slate-400" /> : <ChevronRight size={20} className="text-slate-400" />}
+                                {expandedSection === 'toyyibpay' ? <X size={20} className="text-slate-400" /> : <ChevronLeft size={20} className="text-slate-400 rotate-180" />}
                             </div>
                         </div>
                         {expandedSection === 'toyyibpay' && (

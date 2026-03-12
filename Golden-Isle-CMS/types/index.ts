@@ -23,6 +23,7 @@ export interface Product {
     cost_per_item?: number;
     sku?: string;
     stock: number;
+    stock_quantity: number;
     stock_status?: string;
     category?: string;
     status: 'active' | 'draft' | 'archived';

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Golden Isle CMS</string>
+    <string name="title_activity_main">Golden Isle CMS</string>
+    <string name="package_name">com.goldenisle.cms</string>
+    <string name="custom_url_scheme">com.goldenisle.cms</string>
+</resources>

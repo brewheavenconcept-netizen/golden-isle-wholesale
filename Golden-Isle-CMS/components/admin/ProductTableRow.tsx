@@ -113,15 +113,13 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
                             out_of_stock: { label: 'Out of Stock', cls: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-100 dark:border-red-800' },
                         };
                         const { label, cls } = cfg[s] ?? cfg.in_stock;
+                        const qty = product.stock_quantity ?? product.stock ?? 0;
                         return (
                             <span className={`inline-flex px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${cls} whitespace-nowrap`}>
-                                {label}
+                                {label} | {qty} units
                             </span>
                         );
                     })()}
-                    <span className={`text-xs font-medium ${product.stock > 0 ? 'text-slate-500 dark:text-gray-400' : 'text-red-500 dark:text-red-400'}`}>
-                        {product.stock} in stock
-                    </span>
                 </div>
             </td>
 

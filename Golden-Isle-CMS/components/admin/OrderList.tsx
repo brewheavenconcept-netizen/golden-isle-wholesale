@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Calendar, Phone, User, ShoppingBag, ChevronDown, ChevronUp, Clock, Search, Download, Printer, MapPin, CreditCard, FileText, Save, Trash2, CheckSquare, Square, Image, CheckCircle, AlertCircle, Loader2, X } from 'lucide-react';
-import { getOrders, updateOrderStatus, updateOrderNotes, getSettings, deleteOrders, updatePaymentStatus } from '@/lib/storage';
+import { getOrders, updateOrderStatus, updateOrderNotes, getSettings, deleteOrders, updatePaymentStatus, updateOrder } from '@/lib/storage';
 import { Order } from '@/types';
 import { DEFAULT_SETTINGS } from '@/data/mockData';
 import toast from 'react-hot-toast';
@@ -32,6 +32,15 @@ export default function OrderList() {
     useEffect(() => {
         if (storeId) loadData();
         else setLoading(false); // storeId not ready yet — show empty state immediately
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && storeId) {
+                loadData();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [storeId]);
 
     useEffect(() => {
@@ -76,8 +85,12 @@ export default function OrderList() {
     const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
         setUpdatingOrderId(orderId);
         try {
-            await updateOrderStatus(orderId, newStatus, storeId!);
-            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+            const updates: Partial<Order> = { status: newStatus };
+            if (newStatus === 'confirmed') {
+                updates.payment_status = 'paid';
+            }
+            await updateOrder(orderId, updates, storeId!);
+            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updates } : o));
             toast.success(`Order status updated to ${newStatus}`);
         } catch (error) {
             toast.error("Failed to update status");
@@ -594,9 +607,9 @@ export default function OrderList() {
                                                                         onClick={async (e) => {
                                                                             e.stopPropagation();
                                                                             try {
-                                                                                await updatePaymentStatus(order.id, 'paid', storeId!);
-                                                                                await updateOrderStatus(order.id, 'confirmed', storeId!);
-                                                                                setOrders(prev => prev.map(o => o.id === order.id ? { ...o, payment_status: 'paid', status: 'confirmed' } : o));
+                                                                                const updates: Partial<Order> = { payment_status: 'paid', status: 'confirmed' };
+                                                                                await updateOrder(order.id, updates, storeId!);
+                                                                                setOrders(prev => prev.map(o => o.id === order.id ? { ...o, ...updates } : o));
                                                                                 toast.success(`Payment verified and order confirmed!`);
                                                                             } catch (err) {
                                                                                 toast.error('Failed to verify payment');
@@ -612,9 +625,9 @@ export default function OrderList() {
                                                                             e.stopPropagation();
                                                                             if (window.confirm('Reject this payment? The order will return to Pending status.')) {
                                                                                 try {
-                                                                                    await updatePaymentStatus(order.id, 'unpaid', storeId!);
-                                                                                    await updateOrderStatus(order.id, 'pending', storeId!);
-                                                                                    setOrders(prev => prev.map(o => o.id === order.id ? { ...o, payment_status: 'unpaid', status: 'pending' } : o));
+                                                                                    const updates: Partial<Order> = { payment_status: 'unpaid', status: 'pending' };
+                                                                                    await updateOrder(order.id, updates, storeId!);
+                                                                                    setOrders(prev => prev.map(o => o.id === order.id ? { ...o, ...updates } : o));
                                                                                     toast.success(`Payment rejected`);
                                                                                 } catch (err) {
                                                                                     toast.error('Failed to reject payment');

@@ -39,7 +39,8 @@ export default function Sidebar({
         const fetchInquiriesCount = async () => {
             const { count } = await supabase
                 .from('inquiries')
-                .select('*', { count: 'exact', head: true });
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'new');
             if (count !== null) setNewInquiries(count);
         };
         fetchInquiriesCount();

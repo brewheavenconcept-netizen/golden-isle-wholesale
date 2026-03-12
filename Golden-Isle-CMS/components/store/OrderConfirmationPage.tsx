@@ -146,7 +146,7 @@ I have just placed an order:
 📍 Address: ${order.delivery_address}
 🛒 Items:
 ${order.items?.map((i: any) => `- ${i.product?.name || i.name} x${i.qty || i.quantity}`).join('\n') || ''}
-💰 Total: RM ${order.total_amount || (order.total ? Number(order.total).toFixed(2) : '0.00')}
+💰 Total: RM ${order.total ? Number(order.total).toFixed(2) : '0.00'}
 🔗 Track Order: https://goldenisle-wholesale.vercel.app/order-review/${order.id}
 
 Please confirm my order. Thank you!`;

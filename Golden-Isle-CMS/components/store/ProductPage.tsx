@@ -573,6 +573,7 @@ export default function ProductPage() {
       images: product.image_url ? [product.image_url] : [],
       description: product.description || '',
       stock: 999,
+      stock_quantity: (product as any).stock_quantity ?? 0,
       status: 'active',
       created_at: product.created_at || new Date().toISOString()
     };

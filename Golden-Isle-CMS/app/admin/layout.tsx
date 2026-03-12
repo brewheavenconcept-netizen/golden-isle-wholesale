@@ -8,6 +8,7 @@ import { StoreProvider } from '@/context/StoreContext';
 import { NotificationsProvider, useNotifications } from '@/hooks/useNotifications';
 import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/hooks/useAuth';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { usePathname, useRouter } from 'next/navigation';
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const notificationsData = useNotifications(); // ONE persistent subscription
     const pathname = usePathname();
     const router = useRouter();
+
+    // Setup native push notifications
+    usePushNotifications();
 
     const isAuthPage = pathname?.includes('/login') || pathname?.includes('/register');
 

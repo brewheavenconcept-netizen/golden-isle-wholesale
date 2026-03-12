@@ -11,8 +11,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
     const { addToCart } = useCart();
-    
-    // Determine which icon to show based on category
+
     const getCategoryPlaceholder = () => {
         const cat = product.category?.toLowerCase() || '';
         if (cat.includes('wine')) return (
@@ -42,19 +41,27 @@ export default function ProductCard({ product }: ProductCardProps) {
     };
 
     const imageUrl = product.images?.[0] || (product as any).image_url;
-    const isOutOfStock = product.stock_status === 'out_of_stock' || product.stock <= 0;
 
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!isOutOfStock) {
-            addToCart(product, 1);
-        }
+    // Always read directly from DB field — no fallback to mock/hardcoded values
+    const qty = product.stock_quantity;
+    const isOutOfStock = product.stock_status === 'out_of_stock' || qty <= 0;
+
+    const stockLabel = () => {
+        if (qty === 0) return (
+            <span className="text-[11px] font-semibold text-red-500">Out of Stock</span>
+        );
+        if (qty <= 10) return (
+            <span className="text-[11px] font-semibold text-orange-500">Only {qty} left!</span>
+        );
+        return (
+            <span className="text-[11px] font-medium text-gray-400">{qty} units available</span>
+        );
     };
 
     return (
         <div className={`group bg-white rounded-[12px] border border-[#e8e5dd] shadow-sm transition-all duration-300 flex flex-col h-full ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:shadow-md'}`}>
             <Link href={`/product/${product.id}`} className="block flex-1">
+                {/* Product Image */}
                 <div className="aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative rounded-t-[12px] max-h-[160px]">
                     {imageUrl ? (
                         <img
@@ -77,24 +84,27 @@ export default function ProductCard({ product }: ProductCardProps) {
                         {getCategoryPlaceholder()}
                     </div>
                 </div>
-                
-                <div className="p-3 flex flex-col gap-1">
+
+                {/* Product Info — outside image */}
+                <div className="p-3 flex flex-col gap-0.5">
                     <h3 className="font-semibold text-[#1a1a1a] text-[14px] leading-tight truncate w-full" title={product.name}>
                         {product.name}
                     </h3>
-                    <div className="flex items-center justify-between">
+                    {/* Stock quantity — always visible, reads from product.stock_quantity */}
+                    <div className="mt-0.5">{stockLabel()}</div>
+                    <div className="flex items-center justify-between mt-1.5">
                         <span className="text-[16px] font-bold text-[#1a1a0e]">RM {product.price.toFixed(2)}</span>
                     </div>
                 </div>
             </Link>
-            
+
             <div className="px-3 pb-3 mt-auto">
                 <Link href={`/product/${product.id}`} className="block w-full">
                     <button
                         disabled={isOutOfStock}
                         className={`w-full py-[8px] rounded-[8px] text-[12px] font-semibold transition-all duration-200 ${
-                            isOutOfStock 
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                            isOutOfStock
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-[#1a1a0e] text-white hover:bg-[#2a2a1e] active:scale-[0.98]'
                         }`}
                     >

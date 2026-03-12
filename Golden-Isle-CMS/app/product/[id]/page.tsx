@@ -43,6 +43,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     };
 }
 
+export async function generateStaticParams() {
+    return [{ id: "dummy" }];
+}
+
+export const dynamicParams = false;
+
 export default async function ProductRoute({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     return (

@@ -20,7 +20,7 @@ const steps = [
         num: "03",
         icon: Truck,
         title: "We deliver to your door",
-        description: "Receive your stock fast. Pay on delivery or via bank transfer, hassle-free.",
+        description: "Receive your stock fast. Pay via bank transfer or online banking, hassle-free.",
     },
 ];
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "693429651536",
+    "project_id": "golden-isle-wholesale",
+    "storage_bucket": "golden-isle-wholesale.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693429651536:android:20b7515ba61814c384a955",
+        "android_client_info": {
+          "package_name": "com.goldenisle.cms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0KQXZ4zPhlpdtgWJzhgJaRBz2Pl2AUmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

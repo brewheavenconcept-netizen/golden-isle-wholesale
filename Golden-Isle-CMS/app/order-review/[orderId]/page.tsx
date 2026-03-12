@@ -1,14 +1,11 @@
-'use client';
+import OrderReviewClient from './OrderReviewClient';
 
-import { Suspense, lazy } from 'react';
-import { Loader2 } from 'lucide-react';
+export async function generateStaticParams() {
+    return [{ orderId: "dummy" }];
+}
 
-const OrderReviewPage = lazy(() => import('@/components/store/OrderReviewPage'));
+export const dynamicParams = false;
 
-export default function OrderReviewRoute() {
-    return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-blue-600 w-8 h-8" /></div>}>
-            <OrderReviewPage />
-        </Suspense>
-    );
+export default function OrderReviewPage() {
+    return <OrderReviewClient />;
 }
