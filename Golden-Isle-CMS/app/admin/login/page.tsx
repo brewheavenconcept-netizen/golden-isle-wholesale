@@ -70,6 +70,7 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
@@ -84,6 +85,17 @@ export default function LoginPage() {
         try {
             const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
             if (authError) throw authError;
+
+            if (!rememberMe) {
+                await supabase.auth.signOut();
+                const { error: reAuthError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                    options: { persistSession: false } as any
+                });
+                if (reAuthError) throw reAuthError;
+            }
+
             toast.success('Welcome back! 🥃', { duration: 3000 });
             router.push('/admin/dashboard');
         } catch (err: any) {
@@ -162,6 +174,21 @@ export default function LoginPage() {
                                     </button>
                                 </div>
                             </div>
+
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="rememberMe"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    className="w-4 h-4 rounded border-[#e8e4dd] text-[#c8a84b] focus:ring-[#c8a84b] cursor-pointer"
+                                    style={{ accentColor: '#c8a84b' }}
+                                />
+                                <label htmlFor="rememberMe" className="text-sm font-medium text-[#1a1a1a] cursor-pointer select-none">
+                                    Remember Me
+                                </label>
+                            </div>
+
                             <button type="submit" disabled={loading || googleLoading}
                                 className="w-full h-12 flex items-center justify-center gap-2 bg-[#b8960c] hover:bg-[#d4af37] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-[0_4px_14px_rgba(184,150,12,0.3)] mt-2">
                                 {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Signing in...</> : 'Sign In'}
