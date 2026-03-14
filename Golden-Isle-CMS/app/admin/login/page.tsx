@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { AlertCircle, Loader2, Eye, EyeOff, X, Mail, Send, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -68,6 +68,11 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function LoginPage() {
+    const searchParams = useSearchParams();
+    if (!searchParams.get('ref') || searchParams.get('ref') !== 'giv') {
+        redirect('/');
+    }
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);

@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 export default function SecretAccess() {
   const router = useRouter()
   useEffect(() => {
-    router.replace('/admin/login')
+    router.replace('/admin/login?ref=giv')
   }, [router])
   return null
 }
