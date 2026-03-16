@@ -80,7 +80,7 @@ export function useNotifications() {
 
         const setupChannel = () => {
             channel = supabase
-                .channel('orders-changes')
+                .channel(`orders-changes-${Date.now()}`)
                 .on(
                     'postgres_changes',
                     {
@@ -118,6 +118,7 @@ export function useNotifications() {
                     }
                 )
                 .subscribe((status) => {
+                    console.log('[Realtime] Status:', status);
                     if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
                         setTimeout(setupChannel, 3000);
                     }
@@ -125,6 +126,7 @@ export function useNotifications() {
         };
 
         setupChannel();
+        fetchNotifications(); // catch any missed orders
 
         return () => {
             if (channel) {

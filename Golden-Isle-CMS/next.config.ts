@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
+const isStatic = process.env.IS_STATIC === 'true';
+
 const nextConfig: NextConfig = {
-  output: "export",
+  output: isStatic ? "export" : undefined,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -22,3 +24,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

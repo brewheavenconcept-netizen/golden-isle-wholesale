@@ -28,7 +28,6 @@ export const usePushNotifications = () => {
 
         const setupPushNotifications = async () => {
             try {
-                // Small delay to allow Capacitor native bridge to be ready
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 console.log('[FCM] Starting setup...');
@@ -73,31 +72,30 @@ export const usePushNotifications = () => {
                                     token: token.value,
                                     user_id: user?.id ?? null,
                                     platform: 'android',
-                                    created_at: new Date().toISOString(),
                                 },
                                 { onConflict: 'token' }
                             )
                             .select();
                         
-                        console.log('[FCM] Upsert result — data:', upsertData);
-                        console.log('[FCM] Upsert result — error:', upsertError);
+                        console.log('[FCM] Upsert result — data:', JSON.stringify(upsertData));
+                        console.log('[FCM] Upsert result — error:', JSON.stringify(upsertError));
 
                         if (upsertError) {
-                            console.error('[FCM] ❌ Error saving FCM token to Supabase:', upsertError);
+                            console.error('[FCM] ❌ Error saving FCM token to Supabase:', JSON.stringify(upsertError));
                         } else {
                             console.log('[FCM] ✅ FCM token saved successfully. user_id:', user?.id);
                         }
                     } catch (err) {
-                        console.error('[FCM] Exception while saving token:', err);
+                        console.error('[FCM] Exception while saving token:', JSON.stringify(err));
                     }
                 });
 
                 await PushNotifications.addListener('registrationError', (err) => {
-                    console.error('[FCM] ❌ Registration error from FCM:', err.error);
+                    console.error('[FCM] ❌ Registration error from FCM:', JSON.stringify(err));
                 });
 
                 await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-                    console.log('[FCM] Push notification received:', notification);
+                    console.log('[FCM] Push notification received:', JSON.stringify(notification));
                     toast.success(`${notification.title || 'New Notification'}\n${notification.body || ''}`, {
                         duration: 5000,
                         position: 'top-center',
@@ -106,7 +104,7 @@ export const usePushNotifications = () => {
                 });
 
                 await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-                    console.log('[FCM] Action performed:', notification.actionId, notification.notification);
+                    console.log('[FCM] Action performed:', notification.actionId, JSON.stringify(notification.notification));
                 });
 
                 console.log('[FCM] Calling PushNotifications.register()...');
@@ -114,7 +112,7 @@ export const usePushNotifications = () => {
                 console.log('[FCM] register() called — waiting for registration event...');
 
             } catch (error) {
-                console.error('[FCM] ❌ Setup error:', error);
+                console.error('[FCM] ❌ Setup error:', JSON.stringify(error));
             }
         };
 
@@ -127,4 +125,3 @@ export const usePushNotifications = () => {
         };
     }, [user, loading]);
 };
-

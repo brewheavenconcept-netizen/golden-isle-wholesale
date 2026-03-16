@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Golden Isle CMS',
   webDir: 'out',
   server: {
-    url: 'https://goldenisle-wholesale.vercel.app/admin/login',
+    url: 'https://goldenisle-wholesale.vercel.app/admin/login?ref=giv',
     cleartext: false
   },
   android: {

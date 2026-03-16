@@ -1,15 +1,11 @@
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { Metadata } from 'next';
 import ProductPage from '@/components/store/ProductPage';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-    );
 
     const { data } = await supabase
         .from('products')
@@ -47,7 +43,7 @@ export async function generateStaticParams() {
     return [{ id: "dummy" }];
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export default async function ProductRoute({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

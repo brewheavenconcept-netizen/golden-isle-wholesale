@@ -59,3 +59,58 @@
 .chart-bar {
   transition: height 1s ease-out;
 }
+.jelly-btn {
+  position: relative;
+  width: 160px;
+  height: 55px;
+  border-radius: 45px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+.jelly-btn::before {
+  width: 70%; height: 2px;
+  position: absolute;
+  background-color: rgba(250,250,250,0.68);
+  content: ''; filter: blur(1px);
+  top: 7px; border-radius: 50%;
+}
+.jelly-btn::after {
+  width: 70%; height: 2px;
+  position: absolute;
+  background-color: rgba(250,250,250,0.14);
+  content: ''; filter: blur(1px);
+  bottom: 7px; border-radius: 50%;
+}
+.jelly-btn:hover {
+  animation: jello 0.9s both;
+}
+@keyframes jello {
+  0%   { transform: scale3d(1,1,1); }
+  30%  { transform: scale3d(1.25,0.75,1); }
+  40%  { transform: scale3d(0.75,1.25,1); }
+  50%  { transform: scale3d(1.15,0.85,1); }
+  65%  { transform: scale3d(0.95,1.05,1); }
+  75%  { transform: scale3d(1.05,0.95,1); }
+  100% { transform: scale3d(1,1,1); }
+}
+
+.btn-transfer {
+  background-color: #1a1a1a;
+  box-shadow: 0px 10px 10px rgba(80,80,80,0.35) inset,
+              0px 5px 10px rgba(5,5,5,0.25),
+              0px -10px 10px rgba(0,0,0,0.5) inset;
+}
+.btn-whatsapp {
+  width: 180px;
+  gap: 8px;
+  background-color: #25D366;
+  box-shadow: 0px 10px 10px rgba(100,230,160,0.35) inset,
+              0px 5px 10px rgba(5,5,5,0.2),
+              0px -10px 10px rgba(10,160,70,0.5) inset;
+}

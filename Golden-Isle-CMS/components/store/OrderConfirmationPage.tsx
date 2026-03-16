@@ -19,6 +19,7 @@ import { toast } from 'react-hot-toast';
 import { getOrder, uploadPaymentProof, updatePaymentProof } from '@/lib/storage';
 import { usePublicStore } from '@/hooks/usePublicStore';
 import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 
 export default function OrderConfirmationPage() {
     const router = useRouter();
@@ -268,13 +269,12 @@ Please confirm my order. Thank you!`;
                                                 </div>
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => router.push(`/payment/transfer/${orderId}`)} 
-                                            className="w-full sm:w-auto py-3 px-8 rounded-xl font-medium text-sm bg-gray-900 text-white transition-all text-center"
+                                        <button
+                                            onClick={() => router.push(`/payment/transfer/${orderId}`)}
+                                            className="jelly-btn btn-transfer"
                                         >
                                             Transfer Now
-                                        </button>
-                                    </div>
+                                        </button>                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -293,7 +293,8 @@ Please confirm my order. Thank you!`;
                                                 </div>
                                                 <h3 className="font-semibold text-gray-900 text-base">Order via WhatsApp</h3>
                                             </div>
-                                            <div className="w-full py-2.5 px-4 bg-[#25D366] text-white rounded-xl font-medium text-sm flex items-center justify-center transition-colors">
+                                            <div className="jelly-btn btn-whatsapp mx-auto">
+                                                <WhatsappIcon className="w-5 h-5" />
                                                 Chat Now
                                             </div>
                                         </a>
@@ -312,7 +313,7 @@ Please confirm my order. Thank you!`;
                                     {/* CARD 3: PAY VIA FPX */}
                                     <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-4 opacity-60">
                                         <div className="flex items-center gap-3">
-                                            <img src="/fpx_logo.svg" width={40} height={16} alt="FPX" className="shrink-0" />
+                                            <Image src="/fpx-logo.png" alt="FPX" width={48} height={24} />
                                             <h3 className="font-semibold text-gray-900 text-base">FPX online banking</h3>
                                         </div>
                                         <button disabled onClick={handleFPXCheckout} className="w-full py-2.5 px-4 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm text-center transition-colors">

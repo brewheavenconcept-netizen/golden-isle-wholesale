@@ -4,7 +4,7 @@ export async function generateStaticParams() {
     return [{ orderId: "dummy" }];
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export default function OrderReviewPage() {
     return <OrderReviewClient />;
