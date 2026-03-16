@@ -87,7 +87,8 @@
   content: ''; filter: blur(1px);
   bottom: 7px; border-radius: 50%;
 }
-.jelly-btn:hover {
+.jelly-btn:hover,
+.jelly-btn:active {
   animation: jello 0.9s both;
 }
 @keyframes jello {

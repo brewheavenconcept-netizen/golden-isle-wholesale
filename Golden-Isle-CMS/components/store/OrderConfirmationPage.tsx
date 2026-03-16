@@ -269,12 +269,15 @@ Please confirm my order. Thank you!`;
                                                 </div>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => router.push(`/payment/transfer/${orderId}`)}
-                                            className="jelly-btn btn-transfer"
-                                        >
-                                            Transfer Now
-                                        </button>                                    </div>
+                                        <div className="w-full flex justify-center sm:justify-end">
+                                            <button
+                                                onClick={() => router.push(`/payment/transfer/${orderId}`)}
+                                                className="jelly-btn btn-transfer transition-transform active:scale-95"
+                                            >
+                                                Transfer Now
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,7 +319,11 @@ Please confirm my order. Thank you!`;
                                             <Image src="/fpx-logo.png" alt="FPX" width={48} height={24} />
                                             <h3 className="font-semibold text-gray-900 text-base">FPX online banking</h3>
                                         </div>
-                                        <button disabled onClick={handleFPXCheckout} className="w-full py-2.5 px-4 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm text-center transition-colors">
+                                        <button 
+                                            disabled 
+                                            onClick={handleFPXCheckout} 
+                                            className="w-full max-w-[180px] mx-auto py-2.5 px-4 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm text-center transition-colors"
+                                        >
                                             Coming Soon
                                         </button>
                                     </div>
