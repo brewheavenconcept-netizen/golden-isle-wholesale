@@ -57,6 +57,7 @@ export default function SpotlightSection() {
 
                         <Link href="#products">
                             <motion.button
+                                suppressHydrationWarning
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="bg-white hover:bg-[#d4af37] text-black font-bold px-8 py-4 rounded-full text-base transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(184,150,12,0.4)] flex items-center justify-center gap-2 cursor-pointer"

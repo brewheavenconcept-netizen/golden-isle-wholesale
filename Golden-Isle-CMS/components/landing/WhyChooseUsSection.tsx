@@ -128,6 +128,7 @@ export function WhyChooseUsSection() {
                     {features.map((f) => (
                         <button
                             key={f.title}
+                            suppressHydrationWarning
                             onClick={() => scrollToSection(f.targetId)}
                             className="group text-left bg-[#111827] border border-[#d4a853]/20 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:scale-[1.02] hover:border-[#d4a853]/60 hover:shadow-[0_8px_32px_rgba(212,168,83,0.18)] active:scale-[0.98] cursor-pointer"
                         >

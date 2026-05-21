@@ -175,6 +175,7 @@ export function CollectionCarousel() {
 
                 {/* Arrow buttons */}
                 <button
+                    suppressHydrationWarning
                     onClick={prevSlide}
                     aria-label="Previous slide"
                     className="absolute z-20 left-4 md:left-12 lg:left-24 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#1a1a1a] shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-[#e8e4dd] hover:border-[#b8960c] hover:text-[#b8960c] hover:scale-110 transition-all focus:outline-none"
@@ -182,6 +183,7 @@ export function CollectionCarousel() {
                     <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
+                    suppressHydrationWarning
                     onClick={nextSlide}
                     aria-label="Next slide"
                     className="absolute z-20 right-4 md:right-12 lg:right-24 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#1a1a1a] shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-[#e8e4dd] hover:border-[#b8960c] hover:text-[#b8960c] hover:scale-110 transition-all focus:outline-none"
@@ -195,6 +197,7 @@ export function CollectionCarousel() {
                 {slides.map((_, i) => (
                     <button
                         key={i}
+                        suppressHydrationWarning
                         onClick={() => setCurrentIndex(i)}
                         className={`h-2 rounded-full transition-all duration-500 ease-out ${i === currentIndex ? "w-8 bg-[#b8960c]" : "w-2 bg-[#d4af37]/30 hover:bg-[#d4af37]/60"}`}
                         aria-label={`Go to slide ${i + 1}`}

@@ -77,6 +77,7 @@ export function CTASection() {
                             <h3 className="text-xl font-bold text-white mb-2">Thank you!</h3>
                             <p className="text-[#9a9a9a]">We'll get back to you with our catalog within 24 hours.</p>
                             <button
+                                suppressHydrationWarning
                                 onClick={() => setSubmitted(false)}
                                 className="mt-6 text-[#d4af37] text-sm hover:underline"
                             >
@@ -89,6 +90,7 @@ export function CTASection() {
                                 <div>
                                     <label className="block text-xs font-semibold text-[#8a8a8a] uppercase tracking-widest mb-1.5 ml-1">Business Name *</label>
                                     <input
+                                        suppressHydrationWarning
                                         required
                                         type="text"
                                         placeholder="Your Company Ltd."
@@ -100,6 +102,7 @@ export function CTASection() {
                                 <div>
                                     <label className="block text-xs font-semibold text-[#8a8a8a] uppercase tracking-widest mb-1.5 ml-1">Email *</label>
                                     <input
+                                        suppressHydrationWarning
                                         required
                                         type="email"
                                         placeholder="sales@yourcompany.com"
@@ -111,6 +114,7 @@ export function CTASection() {
                                 <div>
                                     <label className="block text-xs font-semibold text-[#8a8a8a] uppercase tracking-widest mb-1.5 ml-1">Contact Person</label>
                                     <input
+                                        suppressHydrationWarning
                                         type="text"
                                         placeholder="John Doe"
                                         value={formData.contact_person}
@@ -121,6 +125,7 @@ export function CTASection() {
                                 <div>
                                     <label className="block text-xs font-semibold text-[#8a8a8a] uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
                                     <input
+                                        suppressHydrationWarning
                                         type="tel"
                                         placeholder="+60 12 345 6789"
                                         value={formData.phone}
@@ -133,6 +138,7 @@ export function CTASection() {
                             <div>
                                 <label className="block text-xs font-semibold text-[#8a8a8a] uppercase tracking-widest mb-1.5 ml-1">Message</label>
                                 <textarea
+                                    suppressHydrationWarning
                                     rows={3}
                                     placeholder="Tell us about your business needs..."
                                     value={formData.message}
@@ -143,6 +149,7 @@ export function CTASection() {
 
                             <div className="pt-2">
                                 <motion.button
+                                    suppressHydrationWarning
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     disabled={submitting}
