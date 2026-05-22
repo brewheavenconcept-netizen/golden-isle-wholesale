@@ -179,7 +179,12 @@ export function Navbar() {
                         </div>
 
                         {/* Mobile Actions & Hamburger */}
-                        <div className="md:hidden flex items-center gap-3">
+                        <div className="md:hidden flex items-center gap-2">
+                            <Link href="/chatbot">
+                                <button className="relative p-2 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full">
+                                    <Bot className="w-6 h-6" />
+                                </button>
+                            </Link>
                             <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full">
                                 <ShoppingCart className="w-6 h-6" />
                                 {totalItems > 0 && (

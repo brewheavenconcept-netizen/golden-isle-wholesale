@@ -83,7 +83,7 @@ export default function ChatbotPage() {
             <div className="pointer-events-none absolute bottom-1/4 right-10 w-[300px] h-[300px] bg-[#d4af37]/5 blur-[100px] rounded-full -z-10" />
 
             {/* Content Container */}
-            <div className="w-full max-w-2xl flex flex-col h-[calc(100vh-4rem)] my-auto relative z-10">
+            <div className="w-full max-w-2xl flex flex-col h-[calc(100dvh-4rem)] my-auto relative z-10">
                 
                 {/* Back to Home Link */}
                 <div className="mb-4 shrink-0">
