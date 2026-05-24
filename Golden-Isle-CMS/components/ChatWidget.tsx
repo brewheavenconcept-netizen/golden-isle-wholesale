@@ -175,26 +175,50 @@ function AvatarUser() {
 
 function OnboardingPointer() {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="rgba(255, 255, 255, 0.85)" 
-      stroke="rgba(17, 24, 39, 0.15)" 
-      strokeWidth="1.2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className="w-11 h-11 drop-shadow-[0_8px_20px_rgba(0,0,0,0.06)] backdrop-blur-[2px]"
-      style={{ backdropFilter: "blur(2px)" }}
-    >
-      <path 
-        d="M10 11V3.5a1.5 1.5 0 0 1 3 0V11h1V5.5a1.5 1.5 0 0 1 3 0V11h1V7.5a1.5 1.5 0 0 1 3 0V14c0 4.4-3.6 8-8 8h-2c-3.3 0-6.1-2-7.3-4.9l-1.9-4.8a1.5 1.5 0 0 1 2.3-1.8l2.9 2.2V11a1.5 1.5 0 0 1 3 0Z" 
-      />
-      <path 
-        d="M12 5.5v4M15 7.5v3M18 9.5v1.5" 
-        stroke="rgba(255, 255, 255, 0.6)" 
-        strokeWidth="1" 
-      />
-    </svg>
+    <div className="relative flex flex-col items-center justify-center h-20 w-full mt-2">
+      {/* Premium glowing tap/click target ripple */}
+      <div className="absolute top-0 w-8 h-8 rounded-full border border-[#D4AF37] bg-[#D4AF37]/10 animate-ping" />
+      <div className="absolute top-1.5 w-5 h-5 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/25 flex items-center justify-center shadow-[0_0_12px_rgba(212,175,55,0.45)]">
+        <div className="w-2 h-2 rounded-full bg-[#D4AF37]" />
+      </div>
+
+      {/* Realistic modern 3D sleeve-cuff cursor hand SVG */}
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 28" 
+        className="w-12 h-14 drop-shadow-[0_6px_16px_rgba(0,0,0,0.12)] relative z-10 mt-5"
+      >
+        {/* Blue Sleeve / Cuff */}
+        <path 
+          d="M7 21h10v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5Z" 
+          fill="#3B82F6" 
+          stroke="#2563EB" 
+          strokeWidth="1.2"
+        />
+        <path 
+          d="M7 21h10v2.5H7V21Z" 
+          fill="#EFF6FF"
+        />
+
+        {/* Hand Body & Skin Fingers */}
+        <path 
+          d="M10 16.5V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18c0 3.31-2.69 6-6 6h-2c-2.48 0-4.58-1.51-5.48-3.68l-1.42-3.55a1.5 1.5 0 0 1 2.3-1.8l2.18 1.63V16.5Z" 
+          fill="#FCD34D" 
+          stroke="#D97706" 
+          strokeWidth="1.2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        />
+        
+        {/* Subtle highlights */}
+        <path 
+          d="M11 4.5v5M14 6.5v4M17 8.5v3" 
+          stroke="#F59E0B" 
+          strokeWidth="1" 
+          strokeLinecap="round"
+        />
+      </svg>
+    </div>
   );
 }
 
@@ -1598,6 +1622,25 @@ export default function ChatWidget() {
                           >
                             <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
 
+                            {/* Animated Guidance Pointer */}
+                            {!onboardingSeen && (
+                              <motion.div 
+                                className="flex justify-center items-center py-1"
+                                animate={{
+                                  x: [0, 4, 0],
+                                  y: [0, -8, 0],
+                                  rotate: [0, -5, 4, 0]
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 1.8,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                <OnboardingPointer />
+                              </motion.div>
+                            )}
+
                             {/* Premium Onboarding Helper Message */}
                             {!onboardingSeen && (
                               <motion.div 
@@ -1626,25 +1669,6 @@ export default function ChatWidget() {
                                     Please select your business type above to continue.
                                   </p>
                                 </div>
-                              </motion.div>
-                            )}
-
-                            {/* Animated Guidance Pointer */}
-                            {!onboardingSeen && (
-                              <motion.div 
-                                className="flex justify-center items-center py-2"
-                                animate={{
-                                  x: [0, 4, 0],
-                                  y: [0, -8, 0],
-                                  rotate: [0, -5, 4, 0]
-                                }}
-                                transition={{
-                                  repeat: Infinity,
-                                  duration: 1.8,
-                                  ease: "easeInOut"
-                                }}
-                              >
-                                <OnboardingPointer />
                               </motion.div>
                             )}
                           </motion.div>
