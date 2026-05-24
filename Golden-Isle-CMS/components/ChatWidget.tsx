@@ -344,6 +344,51 @@ function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddTo
   );
 }
 
+// ─── Payment Options Card ──────────────────────────────────────────────────────
+
+function PaymentOptionsCard({ text, onSelect, lang }: { text: string; onSelect: (option: string) => void; lang: Language }) {
+  const t = TRANSLATIONS[lang];
+  
+  // Clean the tag from the text
+  const cleanText = text.replace("SHOW_PAYMENT_OPTIONS", "").trim();
+
+  const options = [
+    { id: "qr", label: t.payQr, query: lang === "zh" ? "我想使用二维码扫码支付" : lang === "en" ? "I want to pay via QR Payment" : "Saya mahu bayar guna QR Payment" },
+    { id: "bank", label: t.payBank, query: lang === "zh" ? "我想使用银行转账" : lang === "en" ? "I want to pay via Bank Transfer" : "Saya mahu bayar guna Bank Transfer" },
+    { id: "fpx", label: t.payFpx, query: lang === "zh" ? "我想使用网上银行闪付" : lang === "en" ? "I want to pay via FPX Online Payment" : "Saya mahu bayar guna FPX Online Payment" },
+    { id: "custom", label: t.payCustom, query: lang === "zh" ? "我想使用其他付款方式" : lang === "en" ? "I would like to use another payment method" : "Saya mahu guna kaedah pembayaran lain" },
+  ];
+
+  return (
+    <div className="space-y-3 w-full">
+      {cleanText && (
+        <div className="bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl rounded-tl-[6px] px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap">
+          {cleanText}
+        </div>
+      )}
+      <div className="bg-[#0F172A] rounded-2xl overflow-hidden shadow-xl p-4 space-y-4 border border-white/5">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <span className="text-[10px] font-bold text-amber-400 tracking-widest uppercase">{t.payTitle}</span>
+          <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">{t.brandTitle}</span>
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          {options.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => onSelect(opt.query)}
+              className="w-full text-left p-3.5 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-amber-400/50 hover:text-amber-400 text-slate-300 text-[12.5px] font-bold transition-all flex items-center justify-between cursor-pointer"
+            >
+              <span>{opt.label}</span>
+              <span className="text-[10.5px] text-amber-400 font-extrabold">➔</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export default function ChatWidget() {
@@ -554,7 +599,47 @@ export default function ChatWidget() {
 
   const handleSuggestionClick = (query: string) => {
     setMessage(query);
-    inputRef.current?.focus();
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const handleSuggestionClickAndSubmit = async (query: string) => {
+    const trimmedMessage = query.trim();
+    if (!trimmedMessage) return;
+
+    const newMsg: Message = { role: "user", text: trimmedMessage };
+    const updatedMessages = [...messages, newMsg];
+    setMessages(updatedMessages);
+    setMessage("");
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: updatedMessages, cart, language: lang }),
+      });
+      const data: ChatResponse = await response.json();
+      if (!response.ok) throw new Error(data.error || `Error ${response.status}`);
+      if (data.reply) {
+        setMessages((prev) => [...prev, { role: "model", text: data.reply! }]);
+        if (data.reply.startsWith("TOOL_RESULT:")) {
+          try {
+            const parsed = JSON.parse(data.reply.substring(12));
+            if (parsed && (parsed.action === "cart_updated" || parsed.action === "cart_viewed") && Array.isArray(parsed.products)) {
+              setCart(parsed.products);
+            }
+          } catch (e) {}
+        }
+      } else {
+        throw new Error("Empty reply from AI.");
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Something went wrong.";
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleProceedToWhatsApp = () => {
@@ -827,6 +912,8 @@ export default function ChatWidget() {
                               ) : (
                                 <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} lang={lang} />
                               )
+                            ) : msg.role === "model" && msg.text.includes("SHOW_PAYMENT_OPTIONS") ? (
+                              <PaymentOptionsCard text={msg.text} onSelect={(option) => handleSuggestionClickAndSubmit(option)} lang={lang} />
                             ) : (
                               <div className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap ${
                                 msg.role === "user"

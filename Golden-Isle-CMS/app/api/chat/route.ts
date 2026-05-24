@@ -145,6 +145,16 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
 5. Tell the user you are preparing their Quote Draft.
 6. If the user asks to see their quote or cart, use 'view_cart'.
 
+## INTERACTIVE PAYMENT RECOMMENDATION CARD
+- Whenever the client asks about payment methods, payment options, how to pay, bank details, QR payments, or payment terms, you must ALWAYS append the exact tag 'SHOW_PAYMENT_OPTIONS' at the very end of your response. This triggers an interactive payment selection card in their chat UI.
+- IMPORTANT: The tag 'SHOW_PAYMENT_OPTIONS' must be at the very end of your output, with no text after it.
+- If they select 'QR Payment', explain that the company will provide the DuitNow QR upon finalize of their sebut harga (quote draft).
+- If they select 'Bank Transfer', display the company bank account details:
+  * Bank Name: Bank Malaysia Berhad
+  * Account Name: Golden Isle Wholesale
+  * Account No: 123-456-789
+- If they select 'FPX Online Payment', explain that they will receive a secure checkout link once they finalize their order.
+
 ## RESPONSE STRUCTURE
 - Keep responses clean and concise (max 3 short paragraphs unless listing products).
 - Use bullet points for product lists.`;
@@ -530,7 +540,7 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
             }
         }
 
-        const reply = choiceMessage?.content;
+        let reply = choiceMessage?.content;
 
         if (!reply) {
             console.error("Unexpected OpenAI API response structure:", JSON.stringify(data));
@@ -538,6 +548,28 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                 { error: "Failed to parse reply from OpenAI API response" },
                 { status: 502 }
             );
+        }
+
+        // Programmatic fail-safe for payment suggestion card
+        const userQuery = (message || "").toLowerCase();
+        const lastMsg = Array.isArray(messages) && messages.length > 0
+            ? (messages[messages.length - 1].text || messages[messages.length - 1].content || "").toLowerCase()
+            : "";
+        const combinedUserText = `${userQuery} ${lastMsg}`;
+        const lowercaseReply = reply.toLowerCase();
+
+        const paymentKeywords = [
+            "payment", "pay", "paying", "bank details", "bank acc", "duitnow", "fpx", "transfer", "how to pay", "kaedah pembayaran", "cara bayar", "pembayaran", "bayar", "duit now", "invoice", "receipt", "checkout",
+            "付款", "支付", "转账", "汇款", "二维码", "银行"
+        ];
+
+        const userAskedPayment = paymentKeywords.some(kw => combinedUserText.includes(kw));
+        const aiDiscussedPayment = paymentKeywords.some(kw => lowercaseReply.includes(kw)) &&
+            (lowercaseReply.includes("bank") || lowercaseReply.includes("qr") || lowercaseReply.includes("fpx") || lowercaseReply.includes("invoice") || lowercaseReply.includes("transfer") || lowercaseReply.includes("method") || lowercaseReply.includes("bayar") || lowercaseReply.includes("pembayaran") || lowercaseReply.includes("kaedah") || lowercaseReply.includes("转账") || lowercaseReply.includes("汇款"));
+
+        if ((userAskedPayment || aiDiscussedPayment) && !reply.includes("SHOW_PAYMENT_OPTIONS")) {
+            console.log("Fail-safe: Appending SHOW_PAYMENT_OPTIONS to response.");
+            reply = `${reply.trim()}\n\nSHOW_PAYMENT_OPTIONS`;
         }
 
         return NextResponse.json({ reply });
