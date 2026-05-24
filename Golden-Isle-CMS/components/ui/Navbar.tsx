@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, MessageCircle, GlassWater, X, ShoppingCart, Bot } from "lucide-react";
+import { Menu, GlassWater, X, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getWhatsAppLink } from '@/lib/config';
 import { useCart } from "@/context/CartContext";
+import ChatWidget from "@/components/ChatWidget";
 
 export function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -142,16 +143,6 @@ export function Navbar() {
 
                         {/* Desktop Actions */}
                         <div className="hidden md:flex items-center space-x-4">
-                            <Link href="/chatbot">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="relative p-2.5 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full transition-all group"
-                                    title="Try our AI Chatbot"
-                                >
-                                    <Bot className="w-6 h-6 group-hover:text-[#b8960c]" />
-                                </motion.button>
-                            </Link>
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -180,11 +171,6 @@ export function Navbar() {
 
                         {/* Mobile Actions & Hamburger */}
                         <div className="md:hidden flex items-center gap-2">
-                            <Link href="/chatbot">
-                                <button className="relative p-2 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full">
-                                    <Bot className="w-6 h-6" />
-                                </button>
-                            </Link>
                             <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-[#1a1a1a] hover:bg-[#fafaf7] rounded-full">
                                 <ShoppingCart className="w-6 h-6" />
                                 {totalItems > 0 && (
@@ -220,11 +206,6 @@ export function Navbar() {
                                         {item.name}
                                     </Link>
                                 ))}
-                                <Link href="/chatbot" onClick={() => setIsMobileMenuOpen(false)}
-                                    className="block px-3 py-4 text-base font-bold text-[#b8960c] hover:bg-[#fafaf7] rounded-lg border-b border-transparent hover:border-[#d4af37]/20 transition-all flex items-center gap-2">
-                                    <Bot className="w-5 h-5" />
-                                    AI Chatbot
-                                </Link>
                                 <div className="pt-4 flex flex-col gap-3">
                                     <Link href={getWhatsAppLink("Hi, I'm interested in Golden Isle Wholesale products. Can you share your catalog?")} target="_blank" rel="noopener noreferrer" className="w-full">
                                         <button className="w-full bg-[#b8960c] text-white font-bold py-4 rounded-full flex items-center justify-center gap-2 shadow-lg">
@@ -359,6 +340,9 @@ export function Navbar() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* ── Floating Chat Widget ── */}
+            <ChatWidget />
         </>
     );
 }

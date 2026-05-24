@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientToaster } from "@/components/providers/ClientToaster";
@@ -8,6 +8,12 @@ import CartDrawer from "@/components/store/CartDrawer";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -57,7 +63,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${dmSans.variable} font-body antialiased overflow-x-hidden`}
+        className={`${dmSans.variable} ${inter.variable} font-body antialiased overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"
