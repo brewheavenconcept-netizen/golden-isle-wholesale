@@ -175,49 +175,88 @@ function AvatarUser() {
 
 function OnboardingPointer() {
   return (
-    <div className="relative flex flex-col items-center justify-center h-20 w-full mt-2">
-      {/* Premium glowing tap/click target ripple */}
-      <div className="absolute top-0 w-8 h-8 rounded-full border border-[#D4AF37] bg-[#D4AF37]/10 animate-ping" />
-      <div className="absolute top-1.5 w-5 h-5 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/25 flex items-center justify-center shadow-[0_0_12px_rgba(212,175,55,0.45)]">
-        <div className="w-2 h-2 rounded-full bg-[#D4AF37]" />
-      </div>
-
-      {/* Realistic modern 3D sleeve-cuff cursor hand SVG */}
+    <div className="relative flex flex-col items-center justify-center pointer-events-none">
+      {/* Curved dotted line with arrowhead guiding attention from bottom-right up to the touch target */}
       <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 28" 
-        className="w-12 h-14 drop-shadow-[0_6px_16px_rgba(0,0,0,0.12)] relative z-10 mt-5"
+        className="absolute -right-8 top-10 w-16 h-20 overflow-visible pointer-events-none opacity-90" 
+        viewBox="0 0 60 80" 
+        fill="none"
       >
-        {/* Blue Sleeve / Cuff */}
         <path 
-          d="M7 21h10v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5Z" 
-          fill="#3B82F6" 
-          stroke="#2563EB" 
-          strokeWidth="1.2"
-        />
-        <path 
-          d="M7 21h10v2.5H7V21Z" 
-          fill="#EFF6FF"
-        />
-
-        {/* Hand Body & Skin Fingers */}
-        <path 
-          d="M10 16.5V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18c0 3.31-2.69 6-6 6h-2c-2.48 0-4.58-1.51-5.48-3.68l-1.42-3.55a1.5 1.5 0 0 1 2.3-1.8l2.18 1.63V16.5Z" 
-          fill="#FCD34D" 
-          stroke="#D97706" 
-          strokeWidth="1.2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-        
-        {/* Subtle highlights */}
-        <path 
-          d="M11 4.5v5M14 6.5v4M17 8.5v3" 
-          stroke="#F59E0B" 
-          strokeWidth="1" 
+          d="M45,75 Q60,45 28,10" 
+          stroke="#D4AF37" 
+          strokeWidth="1.5" 
+          strokeDasharray="4,4" 
           strokeLinecap="round"
         />
+        {/* Elegant golden arrowhead */}
+        <path 
+          d="M23,16 L28,8 L35,13" 
+          fill="none" 
+          stroke="#D4AF37" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+        />
       </svg>
+
+      {/* Floating Animated Hand Cursor */}
+      <motion.div
+        animate={{
+          x: [0, 2, 0],
+          y: [0, -6, 0],
+          rotate: [0, -4, 2, 0]
+        }}
+        transition={{
+          repeat: Infinity,
+          duration: 1.6,
+          ease: "easeInOut"
+        }}
+        className="relative flex flex-col items-center justify-center h-20 w-full"
+      >
+        {/* Premium glowing tap/click target ripple */}
+        <div className="absolute -top-1.5 w-8 h-8 rounded-full border border-[#D4AF37] bg-[#D4AF37]/15 animate-ping" />
+        <div className="absolute top-0 w-5 h-5 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/35 flex items-center justify-center shadow-[0_0_10px_rgba(212,175,55,0.45)]">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+        </div>
+
+        {/* Realistic modern 3D sleeve-cuff cursor hand SVG */}
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 24 28" 
+          className="w-11 h-13 drop-shadow-[0_6px_14px_rgba(0,0,0,0.12)] relative z-10 mt-4"
+        >
+          {/* Blue Sleeve / Cuff */}
+          <path 
+            d="M7 21h10v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5Z" 
+            fill="#3B82F6" 
+            stroke="#2563EB" 
+            strokeWidth="1"
+          />
+          <path 
+            d="M7 21h10v2.5H7V21Z" 
+            fill="#EFF6FF"
+          />
+
+          {/* Hand Body & Skin Fingers */}
+          <path 
+            d="M10 16.5V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18c0 3.31-2.69 6-6 6h-2c-2.48 0-4.58-1.51-5.48-3.68l-1.42-3.55a1.5 1.5 0 0 1 2.3-1.8l2.18 1.63V16.5Z" 
+            fill="#FCD34D" 
+            stroke="#D97706" 
+            strokeWidth="1.2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+          
+          {/* Subtle highlights */}
+          <path 
+            d="M11 4.5v5M14 6.5v4M17 8.5v3" 
+            stroke="#F59E0B" 
+            strokeWidth="1" 
+            strokeLinecap="round"
+          />
+        </svg>
+      </motion.div>
     </div>
   );
 }
@@ -637,11 +676,16 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
                 duration: 2.2,
                 ease: "easeInOut"
               } : undefined}
-              className="flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-100 hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer"
+              className={`flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-100 hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer relative ${isHighlighted ? "overflow-visible" : "overflow-hidden"}`}
             >
               <span className="text-2xl mb-2 group-hover:scale-105 transition-transform">{t.icon}</span>
               <span className="text-[13px] font-semibold text-slate-800 leading-tight">{t.name}</span>
               <span className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">{t.desc}</span>
+              {isHighlighted && (
+                <div className="absolute -bottom-14 right-2 z-50 pointer-events-none">
+                  <OnboardingPointer />
+                </div>
+              )}
             </motion.button>
           );
         })}
@@ -1621,25 +1665,6 @@ export default function ChatWidget() {
                             className="py-4 px-4 space-y-4"
                           >
                             <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
-
-                            {/* Animated Guidance Pointer */}
-                            {!onboardingSeen && (
-                              <motion.div 
-                                className="flex justify-center items-center py-1"
-                                animate={{
-                                  x: [0, 4, 0],
-                                  y: [0, -8, 0],
-                                  rotate: [0, -5, 4, 0]
-                                }}
-                                transition={{
-                                  repeat: Infinity,
-                                  duration: 1.8,
-                                  ease: "easeInOut"
-                                }}
-                              >
-                                <OnboardingPointer />
-                              </motion.div>
-                            )}
 
                             {/* Premium Onboarding Helper Message */}
                             {!onboardingSeen && (
