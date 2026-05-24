@@ -199,7 +199,83 @@ function ReceiptRenderer({ text }: { text: string }) {
 
 // ─── Tool Result Renderer ───────────────────────────────────────────────────
 
-function ToolResultRenderer({ text }: { text: string }) {
+function ProductCard({ p, onAddToCart }: { p: any; onAddToCart: (product: any) => void }) {
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = () => {
+    onAddToCart(p);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
+
+  return (
+    <div className="bg-white border border-slate-100 rounded-[16px] overflow-hidden shadow-sm hover:shadow transition-shadow duration-200 flex flex-col gap-2 p-2.5">
+      {p.image_url && (
+        <div className="w-full h-[110px] rounded-[10px] overflow-hidden bg-slate-50 shrink-0 border border-slate-100/60 flex items-center justify-center">
+          <img
+            src={p.image_url}
+            alt={p.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      
+      <div className="flex-1 flex flex-col justify-between min-w-0">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[8.5px] uppercase tracking-wider font-extrabold text-slate-400 truncate">
+              {p.category}
+            </span>
+            <span
+              className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full select-none ${
+                p.badge === "TERHAD"
+                  ? "bg-amber-50 text-amber-600 border border-amber-100"
+                  : "bg-emerald-50 text-emerald-600 border border-emerald-100"
+              }`}
+            >
+              {p.badge}
+            </span>
+          </div>
+          
+          <h4 className="text-[12.5px] font-bold text-[#0F172A] tracking-tight mt-0.5 truncate">
+            {p.name}
+          </h4>
+          
+          <p className="text-[10.5px] text-[#64748B] line-clamp-2 leading-normal mt-0.5">
+            {p.description}
+          </p>
+        </div>
+        
+        <div className="flex flex-col gap-2 mt-2.5 shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-[12.5px] font-extrabold text-indigo-600">
+              {p.price}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-1.5 w-full">
+            <button
+              onClick={handleAdd}
+              className="flex-1 inline-flex items-center justify-center gap-1 text-[10.5px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-2 py-1.5 rounded-[9px] transition-all duration-200"
+            >
+              {added ? "Added!" : "Add to Order"}
+            </button>
+            <a
+              href={`https://wa.me/601164073143?text=${encodeURIComponent(p.whatsapp_message)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1 text-[10.5px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] px-2 py-1.5 rounded-[9px] transition-all duration-200 shadow-sm hover:shadow"
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ToolResultRenderer({ text, onAddToCart }: { text: string; onAddToCart: (product: any) => void }) {
   let data: {
     summary: string;
     products: Array<{
@@ -236,69 +312,7 @@ function ToolResultRenderer({ text }: { text: string }) {
       {data.products && data.products.length > 0 ? (
         <div className="space-y-2.5">
           {data.products.map((p, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-slate-100 rounded-[16px] overflow-hidden shadow-sm hover:shadow transition-shadow duration-200 flex flex-col gap-2 p-2.5"
-            >
-              {p.image_url && (
-                <div className="w-full h-[110px] rounded-[10px] overflow-hidden bg-slate-50 shrink-0 border border-slate-100/60 flex items-center justify-center">
-                  <img
-                    src={p.image_url}
-                    alt={p.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              
-              <div className="flex-1 flex flex-col justify-between min-w-0">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[8.5px] uppercase tracking-wider font-extrabold text-slate-400 truncate">
-                      {p.category}
-                    </span>
-                    <span
-                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full select-none ${
-                        p.badge === "TERHAD"
-                          ? "bg-amber-50 text-amber-600 border border-amber-100"
-                          : "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                      }`}
-                    >
-                      {p.badge}
-                    </span>
-                  </div>
-                  
-                  <h4 className="text-[12.5px] font-bold text-[#0F172A] tracking-tight mt-0.5 truncate">
-                    {p.name}
-                  </h4>
-                  
-                  <p className="text-[10.5px] text-[#64748B] line-clamp-2 leading-normal mt-0.5">
-                    {p.description}
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between gap-2 mt-2.5 shrink-0">
-                  <span className="text-[12.5px] font-extrabold text-indigo-600">
-                    {p.price}
-                  </span>
-                  
-                  <a
-                    href={`https://wa.me/601164073143?text=${encodeURIComponent(p.whatsapp_message)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] px-2.5 py-1.5 rounded-[9px] transition-all duration-200 shadow-sm hover:shadow"
-                  >
-                    <span>WhatsApp</span>
-                    <svg
-                      className="w-3 h-3 fill-current"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.644 1.97 14.178.948 11.55.948c-5.443 0-9.87 4.372-9.874 9.799-.001 1.768.479 3.494 1.39 5.048L2.08 21.628l6.195-1.62c.366.19.742.366 1.127.48.243.072.483.102.725.102.13 0 .26-.008.39-.024.116-.014.23-.035.346-.062z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
+            <ProductCard key={idx} p={p} onAddToCart={onAddToCart} />
           ))}
         </div>
       ) : (
@@ -322,6 +336,35 @@ export default function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Load state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedMessages = localStorage.getItem("golden_ai_messages");
+      const savedCart = localStorage.getItem("golden_ai_cart");
+      if (savedMessages) setMessages(JSON.parse(savedMessages));
+      if (savedCart) setCart(JSON.parse(savedCart));
+    } catch (e) {
+      console.error("Failed to load state from localStorage", e);
+    }
+  }, []);
+
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("golden_ai_messages", JSON.stringify(messages));
+    } catch (e) {
+      console.error("Failed to save messages to localStorage", e);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("golden_ai_cart", JSON.stringify(cart));
+    } catch (e) {
+      console.error("Failed to save cart to localStorage", e);
+    }
+  }, [cart]);
+
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -342,6 +385,33 @@ export default function ChatWidget() {
   }, [isOpen]);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
+
+  const handleAddToCart = (product: any) => {
+    setCart((prev) => {
+      const updated = [...prev];
+      const existingIdx = updated.findIndex((c) => c.name.toLowerCase() === product.name.toLowerCase());
+      
+      const priceString = product.price || "RM 0";
+      const priceNum = parseFloat(priceString.replace(/[^0-9.]/g, '')) || 0;
+
+      if (existingIdx > -1) {
+        updated[existingIdx].quantity += 1;
+        updated[existingIdx].total = `RM ${(updated[existingIdx].quantity * updated[existingIdx].priceNum).toFixed(2)}`;
+      } else {
+        updated.push({
+          name: product.name,
+          category: product.category || "Beverage",
+          price: product.price,
+          priceNum: priceNum,
+          quantity: 1,
+          total: `RM ${priceNum.toFixed(2)}`,
+          image_url: product.image_url,
+          whatsapp_message: `Saya berminat dengan ${product.name} (1 unit, jumlah RM ${priceNum.toFixed(2)}). Boleh proceed pesanan?`
+        });
+      }
+      return updated;
+    });
+  };
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -401,6 +471,12 @@ export default function ChatWidget() {
     setMessages([]);
     setCart([]);
     setError(null);
+    try {
+      localStorage.removeItem("golden_ai_messages");
+      localStorage.removeItem("golden_ai_cart");
+    } catch (e) {
+      console.error("Failed to clear localStorage", e);
+    }
   };
 
   const handleSuggestionClick = (query: string) => {
@@ -412,43 +488,25 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* ── Floating Trigger Bubble — always visible ── */}
-      <motion.button
-        onClick={() => setIsOpen((prev) => !prev)}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.93 }}
-        aria-label="Open Golden AI chat"
-        style={{ zIndex: 9999 }}
-        className="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.28)] cursor-pointer"
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          {isOpen ? (
-            <motion.span
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.18 }}
-            >
-              <X className="w-5 h-5" />
-            </motion.span>
-          ) : (
-            <motion.span
-              key="open"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              transition={{ duration: 0.18 }}
-            >
-              <MessageCircle className="w-5 h-5" />
-            </motion.span>
-          )}
-        </AnimatePresence>
-        {/* Unread pulse dot — only when closed */}
+      {/* ── Floating Trigger Bubble — Hidden when open to prevent overlap ── */}
+      <AnimatePresence>
         {!isOpen && (
-          <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-[#b8960c] border-2 border-white animate-pulse" />
+          <motion.button
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            onClick={() => setIsOpen(true)}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.93 }}
+            aria-label="Open Golden AI chat"
+            style={{ zIndex: 9999 }}
+            className="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.28)] cursor-pointer border border-white/10"
+          >
+            <Bot className="w-6 h-6 text-[#EAB308]" />
+            <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-[#EAB308] border-2 border-[#1a1a1a] animate-pulse" />
+          </motion.button>
         )}
-      </motion.button>
+      </AnimatePresence>
 
       {/* ── Chat Panel — slides up above the bubble ── */}
       <AnimatePresence>
@@ -609,7 +667,7 @@ export default function ChatWidget() {
                             msg.text.includes('"action":"cart_') ? (
                               <ReceiptRenderer text={msg.text} />
                             ) : (
-                              <ToolResultRenderer text={msg.text} />
+                              <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} />
                             )
                           ) : (
                             <div
