@@ -388,6 +388,40 @@ function PaymentOptionsCard({ text, onSelect, lang }: { text: string; onSelect: 
     </div>
   );
 }
+// ─── Suggestion Chips ─────────────────────────────────────────────────────────
+
+function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (option: string) => void; lang: Language }) {
+  const match = text.match(/SHOW_SUGGESTIONS:(.*)/);
+  if (!match) return null;
+  
+  const rawTags = match[1].split(",").map(s => s.trim());
+  const suggestionsList = TRANSLATIONS[lang].suggestions;
+  
+  const chipsToRender = rawTags.map(tag => {
+    if (tag === "whisky") return suggestionsList[0];
+    if (tag === "quote") return suggestionsList[1];
+    if (tag === "cart" || tag === "view_cart") return suggestionsList[2];
+    if (tag === "contact" || tag === "sales") return suggestionsList[3];
+    return { label: tag, icon: "💡", query: tag };
+  }).filter(Boolean);
+
+  if (chipsToRender.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3 w-full">
+      {chipsToRender.map((chip, idx) => (
+        <button
+          key={idx}
+          onClick={() => onSelect(chip.query)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-slate-200 shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 transition-all text-[11.5px] font-bold text-slate-600"
+        >
+          <span>{chip.icon}</span>
+          <span>{chip.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
@@ -575,11 +609,11 @@ export default function ChatWidget() {
 
     let greetingText = "";
     if (selectedLang === "en") {
-      greetingText = "Excellent choice! I'm Jenny, and I'll be your B2B Sales Assistant today. How can I help you? You can ask me to recommend premium whiskies, draft wholesale quotes (sebut harga), or query current stock levels.";
+      greetingText = "Welcome! I'm Jenny, your dedicated B2B Sales Consultant at Golden Isle Wholesale — Labuan's premier duty-free liquor distributor. How may I assist you today?\n\nSHOW_SUGGESTIONS:whisky,quote,payment,contact";
     } else if (selectedLang === "zh") {
-      greetingText = "太棒了！我是珍妮 (Jenny)，接下来我将使用中文为您服务。请问今天有什么我可以帮您的？您可以让我推荐高端威士忌、制作大宗批发报价单或查询库存。";
+      greetingText = "您好！我是珍妮，Golden Isle Wholesale 的专属 B2B 销售顾问。我们是马来西亚纳闽最大的免税酒类批发商。请问今天有什么我可以为您效劳？\n\nSHOW_SUGGESTIONS:whisky,quote,payment,contact";
     } else {
-      greetingText = "Mantap bosku! Saya Jenny. Saya akan bantu ko dalam Bahasa Melayu Sabah. Apa yang saya boleh tolong harini? Mau cari wiski premium kah, or mau draf sebut harga borong?";
+      greetingText = "Selamat datang! Saya Jenny, Sales Consultant Golden Isle Wholesale. Kami ada koleksi terbesar arak premium duty-free di Labuan. Apa yang boleh saya bantu hari ini?\n\nSHOW_SUGGESTIONS:whisky,quote,payment,contact";
     }
 
     setMessages([
@@ -915,12 +949,17 @@ export default function ChatWidget() {
                             ) : msg.role === "model" && msg.text.includes("SHOW_PAYMENT_OPTIONS") ? (
                               <PaymentOptionsCard text={msg.text} onSelect={(option) => handleSuggestionClickAndSubmit(option)} lang={lang} />
                             ) : (
-                              <div className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap ${
-                                msg.role === "user"
-                                  ? "bg-indigo-600 text-white rounded-tr-[6px] shadow-md shadow-indigo-500/15"
-                                  : "bg-slate-50 border border-slate-100 text-slate-800 rounded-tl-[6px]"
-                              }`}>
-                                {msg.text}
+                              <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
+                                <div className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${
+                                  msg.role === "user"
+                                    ? "bg-indigo-600 text-white rounded-tr-[6px] shadow-md shadow-indigo-500/15"
+                                    : "bg-slate-50 border border-slate-100 text-slate-800 rounded-tl-[6px]"
+                                }`}>
+                                  {msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()}
+                                </div>
+                                {msg.role === "model" && msg.text.includes("SHOW_SUGGESTIONS:") && (
+                                  <SuggestionChips text={msg.text} onSelect={handleSuggestionClickAndSubmit} lang={lang} />
+                                )}
                               </div>
                             )}
                           </div>
