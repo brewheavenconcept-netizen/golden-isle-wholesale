@@ -173,6 +173,27 @@ function AvatarUser() {
   );
 }
 
+function OnboardingPointer() {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className="w-5 h-5 text-[#D4AF37]"
+    >
+      <path d="M12 11V3a1 1 0 0 0-2 0v8a1 1 0 0 0 2 0Z" />
+      <path d="M12 7a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0V7Z" />
+      <path d="M14 8.5a1 1 0 0 1 2 0v2.5a1 1 0 0 1-2 0V8.5Z" />
+      <path d="M16 10a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0v-2Z" />
+      <path d="M10 11H8a3 3 0 0 0-3 3v2.58a7 7 0 0 0 1.52 4.35l1.62 1.95a2 2 0 0 0 3.08 0l4.33-5.2A3 3 0 0 0 16 12.6V11" />
+    </svg>
+  );
+}
+
 // ─── Quote Renderer ────────────────────────────────────────────────────────────
 
 function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text: string; onModifyQuote: () => void; onWhatsAppCheckout: (products: CartItem[], total: number) => void; lang: Language }) {
@@ -553,7 +574,7 @@ function CategorySelector({ onSelect }: { onSelect: (category: string) => void }
   );
 }
 
-function BusinessTypeSelector({ onSelect }: { onSelect: (type: string) => void }) {
+function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: string) => void; highlightFirst?: boolean }) {
   const types = [
     { name: "Restaurant / Bar", desc: "Horeca selection, premium wholesale margins", icon: "🍷" },
     { name: "Event / Party", desc: "Volume-friendly crowd favorites & quick delivery", icon: "🎉" },
@@ -565,17 +586,37 @@ function BusinessTypeSelector({ onSelect }: { onSelect: (type: string) => void }
     <div className="space-y-4 w-full p-5 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
       <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest text-center">Tujuan Pesanan / Usage Intent</div>
       <div className="grid grid-cols-2 gap-3">
-        {types.map((t, idx) => (
-          <button
-            key={`type-sel-${t.name}-${idx}`}
-            onClick={() => onSelect(t.name)}
-            className="flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-100 hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer"
-          >
-            <span className="text-2xl mb-2 group-hover:scale-105 transition-transform">{t.icon}</span>
-            <span className="text-[13px] font-semibold text-slate-800 leading-tight">{t.name}</span>
-            <span className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">{t.desc}</span>
-          </button>
-        ))}
+        {types.map((t, idx) => {
+          const isHighlighted = idx === 0 && highlightFirst;
+          return (
+            <motion.button
+              key={`type-sel-${t.name}-${idx}`}
+              onClick={() => onSelect(t.name)}
+              animate={isHighlighted ? {
+                boxShadow: [
+                  "0 0 0 rgba(212, 175, 55, 0)",
+                  "0 0 15px rgba(212, 175, 55, 0.25)",
+                  "0 0 0 rgba(212, 175, 55, 0)"
+                ],
+                borderColor: [
+                  "rgba(241, 245, 249, 1)",
+                  "rgba(212, 175, 55, 0.4)",
+                  "rgba(241, 245, 249, 1)"
+                ]
+              } : undefined}
+              transition={isHighlighted ? {
+                repeat: Infinity,
+                duration: 2.2,
+                ease: "easeInOut"
+              } : undefined}
+              className="flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-100 hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer"
+            >
+              <span className="text-2xl mb-2 group-hover:scale-105 transition-transform">{t.icon}</span>
+              <span className="text-[13px] font-semibold text-slate-800 leading-tight">{t.name}</span>
+              <span className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">{t.desc}</span>
+            </motion.button>
+          );
+        })}
       </div>
     </div>
   );
@@ -839,6 +880,7 @@ export default function ChatWidget() {
   const router = useRouter();
   const { storeId } = usePublicStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [onboardingSeen, setOnboardingSeen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [leadContext, setLeadContext] = useState({ budget: "", preference: "", quantity: "" });
   const [messages, setMessages] = useState<Message[]>([]);
@@ -882,6 +924,7 @@ export default function ChatWidget() {
       const savedStep = localStorage.getItem("golden_ai_step") as ChatStep;
       const savedName = localStorage.getItem("golden_ai_name");
       const savedPhone = localStorage.getItem("golden_ai_phone");
+      const seenOnboarding = localStorage.getItem("golden_onboarding_seen");
 
       if (savedMessages) setMessages(JSON.parse(savedMessages));
       if (savedCart) setCart(JSON.parse(savedCart));
@@ -889,6 +932,7 @@ export default function ChatWidget() {
       if (savedStep) setCurrentStep(savedStep);
       if (savedName) setCustomerName(savedName);
       if (savedPhone) setCustomerPhone(savedPhone);
+      setOnboardingSeen(seenOnboarding === "true");
     } catch (e) {}
   }, []);
 
@@ -1156,6 +1200,12 @@ export default function ChatWidget() {
 
   const handleBusinessTypeSelect = async (businessType: string) => {
     setLeadContext(prev => ({ ...prev, quantity: businessType }));
+    
+    // Mark onboarding seen
+    try {
+      localStorage.setItem("golden_onboarding_seen", "true");
+      setOnboardingSeen(true);
+    } catch (e) {}
     
     // Add messages to chat
     const userMsg: Message = { role: "user", text: `Selected Use Case: ${businessType}` };
@@ -1540,9 +1590,49 @@ export default function ChatWidget() {
                             initial={{ opacity: 0, y: 12 }} 
                             animate={{ opacity: 1, y: 0 }} 
                             exit={{ opacity: 0, y: -12 }}
-                            className="py-4 px-4"
+                            className="py-4 px-4 space-y-4"
                           >
-                            <BusinessTypeSelector onSelect={handleBusinessTypeSelect} />
+                            {/* Premium Onboarding Helper Message */}
+                            {!onboardingSeen && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-white/80 backdrop-blur-md border border-slate-150 rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex items-start gap-3.5 relative overflow-hidden text-left"
+                              >
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-150 shrink-0 mt-0.5 shadow-sm">
+                                  <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                                </div>
+                                <div className="space-y-1">
+                                  <h4 className="text-[13px] font-semibold text-slate-850">Hi 👋 Welcome to Golden AI Concierge.</h4>
+                                  <p className="text-[12px] text-slate-400 font-normal leading-relaxed">
+                                    This quick setup helps me recommend the best wholesale solution for your needs. Please select your business type below to continue.
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+
+                            {/* Animated Guidance Pointer */}
+                            {!onboardingSeen && (
+                              <motion.div 
+                                className="flex justify-center items-center gap-1.5 py-1 text-[11px] font-semibold text-[#D4AF37]"
+                                animate={{
+                                  x: [0, 6, 0],
+                                  y: [0, -8, 0],
+                                  rotate: [0, -6, 4, 0]
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 1.8,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                <OnboardingPointer />
+                                <span className="uppercase tracking-wider">Select usage intent</span>
+                              </motion.div>
+                            )}
+
+                            <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
                           </motion.div>
                         )}
 
