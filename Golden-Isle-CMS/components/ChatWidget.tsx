@@ -524,6 +524,24 @@ export default function ChatWidget() {
     }
   };
 
+  const handleLanguageSelect = (selectedLang: Language) => {
+    setLang(selectedLang);
+    try { localStorage.setItem("golden_ai_language", selectedLang); } catch (e) {}
+
+    let greetingText = "";
+    if (selectedLang === "en") {
+      greetingText = "Excellent choice! I'm Jenny, and I'll be your B2B Sales Assistant today. How can I help you? You can ask me to recommend premium whiskies, draft wholesale quotes (sebut harga), or query current stock levels.";
+    } else if (selectedLang === "zh") {
+      greetingText = "太棒了！我是珍妮 (Jenny)，接下来我将使用中文为您服务。请问今天有什么我可以帮您的？您可以让我推荐高端威士忌、制作大宗批发报价单或查询库存。";
+    } else {
+      greetingText = "Mantap bosku! Saya Jenny. Saya akan bantu ko dalam Bahasa Melayu Sabah. Apa yang saya boleh tolong harini? Mau cari wiski premium kah, or mau draf sebut harga borong?";
+    }
+
+    setMessages([
+      { role: "model", text: greetingText }
+    ]);
+  };
+
   const handleClearChat = () => {
     setMessages([]);
     setCart([]);
@@ -715,33 +733,64 @@ export default function ChatWidget() {
               <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-5 space-y-5 min-h-0 overscroll-contain">
                 <AnimatePresence initial={false}>
 
-                  {/* Empty state */}
+                  {/* Empty state onboarding selector */}
                   {messages.length === 0 && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="h-full flex flex-col items-center justify-center text-center py-6"
+                      className="h-full flex flex-col items-center justify-center text-center px-4 py-6 space-y-6"
                     >
-                      <div className="relative mb-5">
-                        <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-500/25">
-                          <Bot className="w-8 h-8 text-white" />
+                      {/* Premium circular avatar */}
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20 border-2 border-white/20">
+                          <Sparkles className="w-10 h-10 text-white" />
                         </div>
-                        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 border-2 border-white animate-pulse" />
+                        <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white animate-pulse" />
                       </div>
-                      <h3 className="text-[17px] font-bold text-slate-900 tracking-tight">{t.welcomeTitle}</h3>
-                      <p className="text-[12.5px] text-slate-500 mt-2 max-w-[260px] leading-relaxed">
-                        {t.welcomeDesc}
-                      </p>
-                      <div className="mt-7 w-full">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center mb-3.5">{t.quickActionsTitle}</p>
-                        <div className="flex flex-wrap justify-center gap-2">
-                          {t.suggestions.map((s, i) => (
-                            <button key={i} type="button" onClick={() => handleSuggestionClick(s.query)}
-                              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-slate-700 bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-full transition-all shadow-sm hover:shadow cursor-pointer">
-                              <span className="text-[14px]">{s.icon}</span>
-                              <span>{s.label}</span>
-                            </button>
-                          ))}
+
+                      {/* Catchy welcome text */}
+                      <div className="space-y-3 max-w-[320px]">
+                        <h3 className="text-[20px] font-black text-slate-900 tracking-tight leading-none">
+                          Hello! I'm Jenny ✨
+                        </h3>
+                        <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest leading-none">
+                          Golden AI B2B Sales Assistant
+                        </p>
+                        <p className="text-[13px] text-slate-600 leading-relaxed font-medium">
+                          I'm here to help you secure elite wholesale rates, source premium stocks, and build custom quote drafts instantly.
+                        </p>
+                      </div>
+
+                      {/* Language Card buttons */}
+                      <div className="w-full max-w-[280px] bg-slate-50 border border-slate-100 rounded-3xl p-4 shadow-sm space-y-3">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                          Choose Your Language / Pilih Bahasa
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleLanguageSelect("en")}
+                            className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 text-[13px] font-extrabold text-slate-700 transition-all cursor-pointer flex items-center justify-between"
+                          >
+                            <span>🇬🇧 English</span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-extrabold">Start</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleLanguageSelect("ms")}
+                            className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 text-[13px] font-extrabold text-slate-700 transition-all cursor-pointer flex items-center justify-between"
+                          >
+                            <span>🇲🇾 Bahasa Melayu</span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-extrabold">Mula</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleLanguageSelect("zh")}
+                            className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 text-[13px] font-extrabold text-slate-700 transition-all cursor-pointer flex items-center justify-between"
+                          >
+                            <span>🇨🇳 中文 / 华语</span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-extrabold">开始</span>
+                          </button>
                         </div>
                       </div>
                     </motion.div>
@@ -831,31 +880,33 @@ export default function ChatWidget() {
               </div>
 
               {/* ── Input Bar ── */}
-              <div className={`shrink-0 border-t border-slate-100 ${isMobile ? "px-4 py-4 pb-8" : "px-5 py-4"}`}>
-                <form onSubmit={handleChatSubmit} className="flex gap-2.5 items-center">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    required
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    disabled={loading}
-                    placeholder={t.placeholder}
-                    className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 px-4 py-3 rounded-[14px] outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/8 transition-all disabled:opacity-50 text-[13.5px] font-medium"
-                  />
-                  <motion.button
-                    whileTap={{ scale: loading ? 1 : 0.95 }}
-                    type="submit"
-                    disabled={loading || !message.trim()}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white px-4 py-3 rounded-[14px] transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  </motion.button>
-                </form>
-                <p className="text-center text-[9.5px] text-slate-300 mt-2.5 select-none">
-                  Golden AI · Powered by OpenAI · Golden Isle Wholesale
-                </p>
-              </div>
+              {messages.length > 0 && (
+                <div className={`shrink-0 border-t border-slate-100 ${isMobile ? "px-4 py-4 pb-8" : "px-5 py-4"}`}>
+                  <form onSubmit={handleChatSubmit} className="flex gap-2.5 items-center">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      required
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      disabled={loading}
+                      placeholder={t.placeholder}
+                      className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 px-4 py-3 rounded-[14px] outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/8 transition-all disabled:opacity-50 text-[13.5px] font-medium"
+                    />
+                    <motion.button
+                      whileTap={{ scale: loading ? 1 : 0.95 }}
+                      type="submit"
+                      disabled={loading || !message.trim()}
+                      className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white px-4 py-3 rounded-[14px] transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                    >
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    </motion.button>
+                  </form>
+                  <p className="text-center text-[9.5px] text-slate-300 mt-2.5 select-none">
+                    Golden AI · Powered by OpenAI · Golden Isle Wholesale
+                  </p>
+                </div>
+              )}
 
             </motion.div>
           </>
