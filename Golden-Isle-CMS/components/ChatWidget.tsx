@@ -419,7 +419,7 @@ export default function ChatWidget() {
         whileTap={{ scale: 0.93 }}
         aria-label="Open Golden AI chat"
         style={{ zIndex: 9999 }}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.28)] cursor-pointer"
+        className="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.28)] cursor-pointer"
       >
         <AnimatePresence mode="wait" initial={false}>
           {isOpen ? (

@@ -137,13 +137,13 @@ export function HeroSection() {
                     {/* CTAs */}
                     <motion.div
                         variants={fadeInUp}
-                        className="flex flex-col sm:flex-row gap-3 pt-2"
+                        className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-2 w-full sm:w-auto"
                     >
                         <MotionLink
                             href="#products"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="inline-flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#333] text-white font-bold px-9 py-4 rounded-full text-[0.95rem] transition-all shadow-xl"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#333] text-white font-bold px-9 py-4 rounded-full text-[0.95rem] transition-all shadow-xl"
                         >
                             Browse Products <ArrowDown className="w-4 h-4" />
                         </MotionLink>
@@ -152,7 +152,7 @@ export function HeroSection() {
                             target="_blank"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="inline-flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm border border-[#e8e4dd] text-[#1a1a1a] px-8 py-4 rounded-full text-[0.95rem] font-bold hover:border-[#b8960c] hover:text-[#b8960c] transition-all"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm border border-[#e8e4dd] text-[#1a1a1a] px-8 py-4 rounded-full text-[0.95rem] font-bold hover:border-[#b8960c] hover:text-[#b8960c] transition-all"
                         >
                             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -184,83 +184,102 @@ export function HeroSection() {
             {/* ── Live Inventory Card — anchored bottom-right inside the scene ── */}
             <AnimatePresence>
                 {!isChatOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 32, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.96 }}
-                        transition={{ duration: 0.5, ease: "easeInOut" }}
-                        className="absolute bottom-10 right-4 sm:right-8 lg:right-14 xl:right-20 z-20 w-[320px] sm:w-[360px]"
-                        style={{
-                            background: "rgba(255,255,255,0.82)",
-                            backdropFilter: "blur(20px)",
-                            WebkitBackdropFilter: "blur(20px)",
-                            border: "1px solid rgba(255,255,255,0.55)",
-                            borderRadius: "2rem",
-                            boxShadow: "0 24px 56px -12px rgba(0,0,0,0.10), 0 0 0 1px rgba(232,228,221,0.5)",
-                        }}
-                    >
-                        {/* Card inner */}
-                        <div className="p-5">
-                            {/* Header */}
-                            <div className="flex justify-between items-center mb-4 pb-3.5 border-b border-[#f3f0ea]">
-                                <h3 className="text-[10px] font-black text-[#1a1a1a] tracking-[0.18em] flex items-center gap-2.5 uppercase">
-                                    <span className="flex h-1.5 w-1.5 rounded-full bg-[#b8960c]" />
-                                    Live Inventory
-                                </h3>
-                                <span className="text-[9px] font-bold text-[#6b6b6b] bg-[#fafaf7] border border-[#e8e4dd] px-2.5 py-1 rounded-full uppercase tracking-widest">
-                                    Updated just now
-                                </span>
-                            </div>
+                    <>
+                        {/* Desktop version (Full Card) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 32, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.96 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                            className="hidden lg:block absolute bottom-10 right-14 xl:right-20 z-20 w-[360px]"
+                            style={{
+                                background: "rgba(255,255,255,0.82)",
+                                backdropFilter: "blur(20px)",
+                                WebkitBackdropFilter: "blur(20px)",
+                                border: "1px solid rgba(255,255,255,0.55)",
+                                borderRadius: "2rem",
+                                boxShadow: "0 24px 56px -12px rgba(0,0,0,0.10), 0 0 0 1px rgba(232,228,221,0.5)",
+                            }}
+                        >
+                            {/* Card inner */}
+                            <div className="p-5">
+                                {/* Header */}
+                                <div className="flex justify-between items-center mb-4 pb-3.5 border-b border-[#f3f0ea]">
+                                    <h3 className="text-[10px] font-black text-[#1a1a1a] tracking-[0.18em] flex items-center gap-2.5 uppercase">
+                                        <span className="flex h-1.5 w-1.5 rounded-full bg-[#b8960c]" />
+                                        Live Inventory
+                                    </h3>
+                                    <span className="text-[9px] font-bold text-[#6b6b6b] bg-[#fafaf7] border border-[#e8e4dd] px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                        Updated just now
+                                    </span>
+                                </div>
 
-                            {/* Items */}
-                            <div className="space-y-3">
-                                <div className="group flex items-center justify-between bg-white hover:bg-[#faf9f6]/70 border border-[#eeebe4] p-3 rounded-2xl transition-all duration-300">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-[#faf9f6] border border-[#e8e4dd] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <GlassWater className="w-5 h-5 text-[#b8960c]" />
+                                {/* Items */}
+                                <div className="space-y-3">
+                                    <div className="group flex items-center justify-between bg-white hover:bg-[#faf9f6]/70 border border-[#eeebe4] p-3 rounded-2xl transition-all duration-300">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-[#faf9f6] border border-[#e8e4dd] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <GlassWater className="w-5 h-5 text-[#b8960c]" />
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-[#1a1a1a] text-[13px] leading-tight">Macallan 18yr</div>
+                                                <div className="text-[10px] text-[#6b6b6b] mt-0.5">Single Malt Whisky</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="font-bold text-[#1a1a1a] text-[13px] leading-tight">Macallan 18yr</div>
-                                            <div className="text-[10px] text-[#6b6b6b] mt-0.5">Single Malt Whisky</div>
+                                        <div className="text-right">
+                                            <div className="font-black text-[#b8960c] text-[13px]">RM 850.00</div>
+                                            <div className="text-[9px] font-black mt-1 bg-[#b8960c] text-white px-2 py-0.5 rounded uppercase tracking-tighter">Exclusive</div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="font-black text-[#b8960c] text-[13px]">RM 850.00</div>
-                                        <div className="text-[9px] font-black mt-1 bg-[#b8960c] text-white px-2 py-0.5 rounded uppercase tracking-tighter">Exclusive</div>
+
+                                    <div className="group flex items-center justify-between bg-white hover:bg-[#faf9f6]/70 border border-[#eeebe4] p-3 rounded-2xl transition-all duration-300">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-[#faf9f6] border border-[#e8e4dd] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <Wine className="w-5 h-5 text-[#b8960c]" />
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-[#1a1a1a] text-[13px] leading-tight">Penfolds Bin 389</div>
+                                                <div className="text-[10px] text-[#6b6b6b] mt-0.5">Cabernet Shiraz</div>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="font-black text-[#1a1a1a] text-[13px]">RM 320.00</div>
+                                            <div className="text-[9px] font-black mt-1 bg-[#6b6b6b] text-white px-2 py-0.5 rounded uppercase tracking-tighter">Fast Moving</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="group flex items-center justify-between bg-white hover:bg-[#faf9f6]/70 border border-[#eeebe4] p-3 rounded-2xl transition-all duration-300">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-[#faf9f6] border border-[#e8e4dd] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <Wine className="w-5 h-5 text-[#b8960c]" />
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-[#1a1a1a] text-[13px] leading-tight">Penfolds Bin 389</div>
-                                            <div className="text-[10px] text-[#6b6b6b] mt-0.5">Cabernet Shiraz</div>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="font-black text-[#1a1a1a] text-[13px]">RM 320.00</div>
-                                        <div className="text-[9px] font-black mt-1 bg-[#6b6b6b] text-white px-2 py-0.5 rounded uppercase tracking-tighter">Fast Moving</div>
-                                    </div>
+                                {/* Footer */}
+                                <div className="mt-4 pt-3.5 border-t border-[#f3f0ea] text-center">
+                                    <span className="text-[9px] font-bold text-[#6b6b6b] uppercase tracking-widest flex items-center justify-center gap-2">
+                                        More arrivals coming soon!
+                                        <motion.span
+                                            animate={{ x: [0, 5, 0] }}
+                                            transition={{ repeat: Infinity, duration: 2 }}
+                                        >
+                                            <ArrowDown className="w-3 h-3 rotate-[-90deg]" />
+                                        </motion.span>
+                                    </span>
                                 </div>
                             </div>
+                        </motion.div>
 
-                            {/* Footer */}
-                            <div className="mt-4 pt-3.5 border-t border-[#f3f0ea] text-center">
-                                <span className="text-[9px] font-bold text-[#6b6b6b] uppercase tracking-widest flex items-center justify-center gap-2">
-                                    More arrivals coming soon!
-                                    <motion.span
-                                        animate={{ x: [0, 5, 0] }}
-                                        transition={{ repeat: Infinity, duration: 2 }}
-                                    >
-                                        <ArrowDown className="w-3 h-3 rotate-[-90deg]" />
-                                    </motion.span>
+                        {/* Mobile version (Compact Badge) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                            className="lg:hidden absolute bottom-8 left-4 right-4 sm:left-auto sm:right-8 z-20 flex justify-center sm:block"
+                        >
+                            <div className="bg-white/90 backdrop-blur-md border border-[#e8e4dd] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2.5">
+                                <span className="flex h-2 w-2 rounded-full bg-[#b8960c] animate-pulse" />
+                                <span className="text-[11px] font-bold text-[#1a1a1a] tracking-widest uppercase">
+                                    120+ Premium Bottles In Stock
                                 </span>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
