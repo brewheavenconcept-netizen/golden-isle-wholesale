@@ -92,7 +92,7 @@ interface CartItem {
 
 // ─── Receipt Renderer ────────────────────────────────────────────────────────
 
-function ReceiptRenderer({ text }: { text: string }) {
+function QuoteRenderer({ text, onModifyQuote }: { text: string; onModifyQuote: () => void }) {
   let data: {
     action: string;
     summary: string;
@@ -134,65 +134,67 @@ function ReceiptRenderer({ text }: { text: string }) {
       </div>
       
       {data.products && data.products.length > 0 ? (
-        <div className="bg-white border border-slate-100 rounded-[16px] overflow-hidden shadow-sm p-3.5 space-y-3">
-          <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
-                  <span className="flex h-1.5 w-1.5 rounded-full bg-[#b8960c] animate-pulse" />
-                  <span className="text-[9px] font-extrabold text-[#1a1a1a] tracking-wider uppercase">
-                      DRAF RESIT
+        <div className="bg-[#0F172A] border border-[#1e293b] rounded-[16px] overflow-hidden shadow-xl p-4 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                  <span className="flex h-2 w-2 rounded-full bg-[#EAB308] animate-pulse" />
+                  <span className="text-[10px] font-extrabold text-[#EAB308] tracking-widest uppercase">
+                      QUOTE DRAFT
                   </span>
               </div>
-              <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                   Golden Isle Wholesale
               </span>
           </div>
 
-          <div className="divide-y divide-slate-50 space-y-2">
+          <div className="divide-y divide-white/5 space-y-2.5">
             {data.products.map((p, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3 pt-2 first:pt-0">
+              <div key={idx} className="flex items-center justify-between gap-3 pt-2.5 first:pt-0">
                 <div className="min-w-0">
-                  <h4 className="text-[11.5px] font-bold text-[#0F172A] truncate">
+                  <h4 className="text-[12px] font-bold text-white truncate">
                     {p.name}
                   </h4>
-                  <p className="text-[9.5px] text-[#64748B] mt-0.5 font-medium">
-                    {p.quantity} x {p.price}
+                  <p className="text-[10px] text-slate-400 mt-0.5 font-medium">
+                    {p.quantity} unit × {p.price}
                   </p>
                 </div>
-                <span className="text-[11.5px] font-extrabold text-[#0F172A] shrink-0">
+                <span className="text-[12px] font-extrabold text-white shrink-0">
                   {p.total}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Jumlah Keseluruhan
+          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              Grand Total
             </span>
-            <span className="text-[13px] font-black text-indigo-600">
+            <span className="text-[14px] font-black text-[#EAB308]">
               RM {grandTotal.toFixed(2)}
             </span>
           </div>
 
-          <a
-            href={checkoutLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 text-[10.5px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] py-2.5 rounded-[11px] transition-all duration-200 shadow-md hover:shadow-lg mt-1"
-          >
-            <span>WhatsApp Checkout</span>
-            <svg
-              className="w-3 h-3 fill-current"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          <div className="pt-1 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onModifyQuote}
+              className="flex-1 inline-flex items-center justify-center gap-2 text-[10.5px] font-bold text-white bg-white/10 hover:bg-white/20 py-2.5 rounded-[11px] transition-all duration-200"
             >
-              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.644 1.97 14.178.948 11.55.948c-5.443 0-9.87 4.372-9.874 9.799-.001 1.768.479 3.494 1.39 5.048L2.08 21.628l6.195-1.62c.366.19.742.366 1.127.48.243.072.483.102.725.102.13 0 .26-.008.39-.024.116-.014.23-.035.346-.062z" />
-            </svg>
-          </a>
+              Modify Quote
+            </button>
+            <a
+              href={checkoutLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-2 text-[10.5px] font-bold text-[#0F172A] bg-[#EAB308] hover:bg-[#FACC15] py-2.5 rounded-[11px] transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              <span>WhatsApp Sales</span>
+            </a>
+          </div>
         </div>
       ) : (
         <div className="text-[11px] text-slate-400 bg-white border border-slate-100 rounded-[14px] p-3.5 text-center shadow-sm">
-          Troli draf ko kosong, bossku.
+          Tiada draf quote buat masa ini.
         </div>
       )}
     </div>
@@ -665,7 +667,7 @@ export default function ChatWidget() {
 
                           {msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
                             msg.text.includes('"action":"cart_') ? (
-                              <ReceiptRenderer text={msg.text} />
+                              <QuoteRenderer text={msg.text} onModifyQuote={() => handleSuggestionClick("Tolong ubah quote ni bosku: ")} />
                             ) : (
                               <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} />
                             )

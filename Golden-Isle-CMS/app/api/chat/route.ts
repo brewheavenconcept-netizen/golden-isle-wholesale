@@ -106,7 +106,7 @@ export async function POST(req: Request) {
         const { message, messages, cart: incomingCart } = body;
         const cart = Array.isArray(incomingCart) ? incomingCart : [];
         
-        const systemInstructionText = `You are Golden AI, a premium, professional, yet witty and highly persuasive wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia). Your primary goal is to provide excellent service, charm clients, and confidently close sales, while remaining strictly grounded in real product data.
+        const systemInstructionText = `You are Golden AI, a premium B2B wholesale sales concierge for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia). Your primary goal is to provide excellent service, charm clients, and confidently close sales, while remaining strictly grounded in real product data.
 
 ## LANGUAGE & TONE
 - Speak in casual but professional Malay (casual business).
@@ -119,21 +119,15 @@ export async function POST(req: Request) {
 1. FACTUAL INTEGRITY: You must ONLY recommend products that actually exist in the provided product catalog via tool calls. Never fabricate stock levels, pricing, or product names (no hallucinations!).
 2. NO HALLUCINATIONS: If a product description is missing, vague, or contains placeholder nonsense (e.g., 'asdasd'), DO NOT invent flavor notes, tasting details, or fake features. 
 3. MISSING DATA FALLBACK: If details are missing, respond honestly but cleverly. Example: "Item ini available bos, tapi tasting notes detail dia tengah main sorok-sorok dalam sistem kita. Nak secure stok ni dulu?"
-4. CLARIFY, DON'T GUESS: If uncertain about what the customer wants, ask engaging, clarifying questions.
 
-## TOOL CALL MANDATE
+## QUOTE BUILDER CONCIERGE FLOW (B2B)
+As a premium concierge, you build Custom Quotes (Drafts) for clients.
 1. ALWAYS use the 'search_products' tool when asked for product recommendations, prices, or availability.
-2. NEVER guess products without using the tool data.
-
-## HYBRID WHOLESALE LOGIC
-1. NORMAL BROWSING USERS: When recommending products, clearly encourage them to use the [ Add to Order ] button on the product card to draft an order, or chat with sales via WhatsApp.
-2. BULK PROCUREMENT LOGIC (B2B): If the user shows bulk buying intent (e.g., hotel, restaurant, monthly supply, large quantities), DO NOT just tell them to use the cart. You MUST ask qualifying questions:
-   - Business type
-   - Estimated quantity
-   - Budget
-   - Contact name
-   - WhatsApp number
-   After asking, recommend they seamlessly transition to WhatsApp for a custom quote discussion.
+2. RECOMMEND & CLARIFY: When recommending products, ask clarifying questions before adding to the quote. Ask about quantity needed, budget, or timeline if not provided.
+3. CART AS A QUOTE DRAFT: Treat the "cart" as a "Quote Draft" (Sebut Harga Draf). 
+4. Use 'add_to_cart' to add items to the quote, 'update_quantity' to change amounts, and 'remove_from_cart' to remove items. 
+5. Tell the user you are preparing their Quote Draft.
+6. If the user asks to see their quote or cart, use 'view_cart'.
 
 ## RESPONSE STRUCTURE
 - Keep responses clean and concise (max 3 short paragraphs unless listing products).
@@ -266,6 +260,37 @@ export async function POST(req: Request) {
                         {
                             type: "function",
                             function: {
+                                name: "update_quantity",
+                                description: "Kemaskini (update) kuantiti untuk produk yang sudah ada dalam troli draf (cart/quote). Gunakan apabila pelanggan meminta untuk menukar jumlah pesanan bagi barangan tertentu.",
+                                parameters: {
+                                    type: "object",
+                                    properties: {
+                                        items: {
+                                            type: "array",
+                                            description: "Senarai barangan yang mahu ditukar kuantitinya.",
+                                            items: {
+                                                type: "object",
+                                                properties: {
+                                                    name: {
+                                                        type: "string",
+                                                        description: "Nama produk yang ada dalam troli."
+                                                    },
+                                                    quantity: {
+                                                        type: "integer",
+                                                        description: "Kuantiti baru."
+                                                    }
+                                                },
+                                                required: ["name", "quantity"]
+                                            }
+                                        }
+                                    },
+                                    required: ["items"]
+                                }
+                            }
+                        },
+                        {
+                            type: "function",
+                            function: {
                                 name: "view_cart",
                                 description: "Paparkan senarai troli draf / resit draf (cart) pelanggan yang terkini. Gunakan apabila pelanggan meminta untuk menyemak pesanan mereka, bertanya 'berapa jumlah bil saya?', 'tunjuk cart saya', atau mahu proceed checkout.",
                                 parameters: {
@@ -386,6 +411,32 @@ export async function POST(req: Request) {
                 const summaryText = removedList.length > 0 
                     ? `Beres bossku, saya sudah padam ${removedList.join(", ")} dari troli draf ko. Ini resit draf terkini:`
                     : `Ehh, saya tak jumpa produk "${itemsToRemove.map((i: any)=>i.name).join(", ")}" di dalam troli draf ko sekarang.`;
+
+                return NextResponse.json({
+                    reply: formatCartResult("cart_updated", updatedCart, summaryText)
+                });
+            }
+
+            // update_quantity — stateless cart update
+            if (functionName === "update_quantity") {
+                const itemsToUpdate = args.items ?? [];
+                
+                let updatedCart = [...cart];
+                let updatedList = [];
+
+                for (const item of itemsToUpdate) {
+                    const idx = updatedCart.findIndex((c: any) => c.name.toLowerCase().includes(item.name.toLowerCase()));
+                    if (idx > -1) {
+                        const quantity = Number(item.quantity) || 1;
+                        updatedCart[idx].quantity = quantity;
+                        updatedCart[idx].total = `RM ${(updatedCart[idx].quantity * updatedCart[idx].priceNum).toFixed(2)}`;
+                        updatedList.push(`${quantity}x ${updatedCart[idx].name}`);
+                    }
+                }
+
+                const summaryText = updatedList.length > 0 
+                    ? `Cantik bosku, saya dah update kuantiti jadi ${updatedList.join(", ")}. Ini draf quote terkini:`
+                    : `Sori bos, saya tak jumpa produk "${itemsToUpdate.map((i: any)=>i.name).join(", ")}" dalam draf quote.`;
 
                 return NextResponse.json({
                     reply: formatCartResult("cart_updated", updatedCart, summaryText)
