@@ -206,7 +206,9 @@ function QuoteRenderer({ text, onModifyQuote }: { text: string; onModifyQuote: (
 function ProductCard({ p, onAddToCart }: { p: any; onAddToCart: (product: any) => void }) {
   const [added, setAdded] = useState(false);
 
-  const handleAdd = () => {
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     onAddToCart(p);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -415,6 +417,47 @@ export default function ChatWidget() {
       }
       return updated;
     });
+
+    // Fix Issue 1: auto-submit view cart dengan cart terkini
+    setTimeout(() => {
+      autoViewCart();
+    }, 100);
+  };
+
+  const autoViewCart = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Ambil cart terkini dari localStorage sebab state mungkin belum settle
+      const savedCart = JSON.parse(localStorage.getItem("golden_ai_cart") || "[]");
+      
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          messages: [{ role: "user", text: "Tunjuk cart saya." }], 
+          cart: savedCart 
+        }),
+      });
+
+      const data: ChatResponse = await response.json();
+      if (data.reply) {
+        setMessages((prev) => [...prev, 
+          { role: "user", text: "✅ Ditambah ke draf quote" },
+          { role: "model", text: data.reply! }
+        ]);
+        if (data.reply.startsWith("TOOL_RESULT:")) {
+          const parsed = JSON.parse(data.reply.substring(12));
+          if (parsed?.action && Array.isArray(parsed.products)) {
+            setCart(parsed.products);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("autoViewCart error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChatSubmit = async (e: React.FormEvent) => {
