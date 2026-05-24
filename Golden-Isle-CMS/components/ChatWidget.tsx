@@ -178,18 +178,22 @@ function OnboardingPointer() {
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
+      fill="rgba(255, 255, 255, 0.85)" 
+      stroke="rgba(17, 24, 39, 0.15)" 
+      strokeWidth="1.2" 
       strokeLinecap="round" 
       strokeLinejoin="round" 
-      className="w-5 h-5 text-[#D4AF37]"
+      className="w-11 h-11 drop-shadow-[0_8px_20px_rgba(0,0,0,0.06)] backdrop-blur-[2px]"
+      style={{ backdropFilter: "blur(2px)" }}
     >
-      <path d="M12 11V3a1 1 0 0 0-2 0v8a1 1 0 0 0 2 0Z" />
-      <path d="M12 7a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0V7Z" />
-      <path d="M14 8.5a1 1 0 0 1 2 0v2.5a1 1 0 0 1-2 0V8.5Z" />
-      <path d="M16 10a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0v-2Z" />
-      <path d="M10 11H8a3 3 0 0 0-3 3v2.58a7 7 0 0 0 1.52 4.35l1.62 1.95a2 2 0 0 0 3.08 0l4.33-5.2A3 3 0 0 0 16 12.6V11" />
+      <path 
+        d="M10 11V3.5a1.5 1.5 0 0 1 3 0V11h1V5.5a1.5 1.5 0 0 1 3 0V11h1V7.5a1.5 1.5 0 0 1 3 0V14c0 4.4-3.6 8-8 8h-2c-3.3 0-6.1-2-7.3-4.9l-1.9-4.8a1.5 1.5 0 0 1 2.3-1.8l2.9 2.2V11a1.5 1.5 0 0 1 3 0Z" 
+      />
+      <path 
+        d="M12 5.5v4M15 7.5v3M18 9.5v1.5" 
+        stroke="rgba(255, 255, 255, 0.6)" 
+        strokeWidth="1" 
+      />
     </svg>
   );
 }
@@ -1592,21 +1596,34 @@ export default function ChatWidget() {
                             exit={{ opacity: 0, y: -12 }}
                             className="py-4 px-4 space-y-4"
                           >
+                            <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
+
                             {/* Premium Onboarding Helper Message */}
                             {!onboardingSeen && (
                               <motion.div 
-                                initial={{ opacity: 0, y: -8 }}
+                                initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3 }}
-                                className="bg-white/80 backdrop-blur-md border border-slate-150 rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex items-start gap-3.5 relative overflow-hidden text-left"
+                                style={{
+                                  background: "rgba(255, 255, 255, 0.78)",
+                                  backdropFilter: "blur(24px)",
+                                  border: "1px solid rgba(255, 255, 255, 0.55)",
+                                  boxShadow: "0 8px 30px rgba(0, 0, 0, 0.03)"
+                                }}
+                                className="rounded-2xl p-5 flex items-start gap-4 relative overflow-hidden text-left"
                               >
-                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-150 shrink-0 mt-0.5 shadow-sm">
-                                  <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                                <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100 shrink-0 shadow-sm">
+                                  <Sparkles className="w-4.5 h-4.5 text-[#D4AF37]" />
                                 </div>
-                                <div className="space-y-1">
-                                  <h4 className="text-[13px] font-semibold text-slate-850">Hi 👋 Welcome to Golden AI Concierge.</h4>
-                                  <p className="text-[12px] text-slate-400 font-normal leading-relaxed">
-                                    This quick setup helps me recommend the best wholesale solution for your needs. Please select your business type below to continue.
+                                <div className="space-y-1.5 flex-1">
+                                  <h4 className="text-[14px] font-semibold text-[#111827] leading-snug">
+                                    Hi 👋 Welcome to Golden AI Concierge.
+                                  </h4>
+                                  <p className="text-[13px] text-[#374151] font-semibold leading-relaxed">
+                                    Need help choosing the right wholesale solution?
+                                  </p>
+                                  <p className="text-[12px] text-[#374151] font-normal leading-relaxed">
+                                    Please select your business type above to continue.
                                   </p>
                                 </div>
                               </motion.div>
@@ -1615,11 +1632,11 @@ export default function ChatWidget() {
                             {/* Animated Guidance Pointer */}
                             {!onboardingSeen && (
                               <motion.div 
-                                className="flex justify-center items-center gap-1.5 py-1 text-[11px] font-semibold text-[#D4AF37]"
+                                className="flex justify-center items-center py-2"
                                 animate={{
-                                  x: [0, 6, 0],
+                                  x: [0, 4, 0],
                                   y: [0, -8, 0],
-                                  rotate: [0, -6, 4, 0]
+                                  rotate: [0, -5, 4, 0]
                                 }}
                                 transition={{
                                   repeat: Infinity,
@@ -1628,11 +1645,8 @@ export default function ChatWidget() {
                                 }}
                               >
                                 <OnboardingPointer />
-                                <span className="uppercase tracking-wider">Select usage intent</span>
                               </motion.div>
                             )}
-
-                            <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
                           </motion.div>
                         )}
 
