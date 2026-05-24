@@ -1,0 +1,59 @@
+{
+  "name": "ORB AI Simple Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "orb-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook (Pintu Masuk)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ],
+      "webhookId": "orb-ai-test-12345"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Mesej",
+              "value": "Fuhh mantap bro! Ini respons dari ORB AI n8n Automasi!"
+            },
+            {
+              "name": "Status",
+              "value": "Berjaya"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Mesej (Respons)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook (Pintu Masuk)": {
+      "main": [
+        [
+          {
+            "node": "Set Mesej (Respons)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {}
+}

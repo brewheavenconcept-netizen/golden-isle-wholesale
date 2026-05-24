@@ -360,16 +360,19 @@ function PaymentOptionsCard({ text, onSelect, lang }: { text: string; onSelect: 
   ];
 
   return (
-    <div className="space-y-3 w-full">
+    <div className="space-y-3 w-full mt-2">
       {cleanText && (
         <div className="bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl rounded-tl-[6px] px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap">
           {cleanText}
         </div>
       )}
-      <div className="bg-[#0F172A] rounded-2xl overflow-hidden shadow-xl p-4 space-y-4 border border-white/5">
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
-          <span className="text-[10px] font-bold text-amber-400 tracking-widest uppercase">{t.payTitle}</span>
-          <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">{t.brandTitle}</span>
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(79,70,229,0.06)] border border-slate-200/60 p-4 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+            <span className="text-[10px] font-extrabold text-slate-800 tracking-widest uppercase">{t.payTitle || "Kaedah Pembayaran"}</span>
+          </div>
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t.brandTitle || "Golden Isle Wholesale"}</span>
         </div>
         <div className="grid grid-cols-1 gap-2">
           {options.map((opt) => (
@@ -377,10 +380,16 @@ function PaymentOptionsCard({ text, onSelect, lang }: { text: string; onSelect: 
               key={opt.id}
               type="button"
               onClick={() => onSelect(opt.query)}
-              className="w-full text-left p-3.5 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-amber-400/50 hover:text-amber-400 text-slate-300 text-[12.5px] font-bold transition-all flex items-center justify-between cursor-pointer"
+              className="w-full text-left p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50/50 hover:border-indigo-300 hover:text-indigo-700 text-slate-600 text-[12.5px] font-extrabold transition-all flex items-center justify-between cursor-pointer shadow-sm group"
             >
-              <span>{opt.label}</span>
-              <span className="text-[10.5px] text-amber-400 font-extrabold">➔</span>
+              <div className="flex items-center gap-2.5">
+                {opt.id === "qr" && <span className="text-[14px] grayscale group-hover:grayscale-0">📱</span>}
+                {opt.id === "bank" && <span className="text-[14px] grayscale group-hover:grayscale-0">🏦</span>}
+                {opt.id === "fpx" && <span className="text-[14px] grayscale group-hover:grayscale-0">💳</span>}
+                {opt.id === "custom" && <span className="text-[14px] grayscale group-hover:grayscale-0">✏️</span>}
+                <span>{opt.label}</span>
+              </div>
+              <span className="text-[10.5px] text-slate-300 group-hover:text-indigo-400 font-extrabold transition-colors">➔</span>
             </button>
           ))}
         </div>
@@ -1007,8 +1016,8 @@ export default function ChatWidget() {
 
               {/* ── Input Bar ── */}
               {messages.length > 0 && (
-                <div className={`shrink-0 border-t border-slate-100 ${isMobile ? "px-4 py-4 pb-8" : "px-5 py-4"}`}>
-                  <form onSubmit={handleChatSubmit} className="flex gap-2.5 items-center">
+                <div className={`shrink-0 border-t border-slate-100 bg-white/80 backdrop-blur-md ${isMobile ? "px-4 py-4 pb-8" : "px-5 py-4"}`}>
+                  <form onSubmit={handleChatSubmit} className="relative flex items-center">
                     <input
                       ref={inputRef}
                       type="text"
@@ -1017,18 +1026,18 @@ export default function ChatWidget() {
                       onChange={(e) => setMessage(e.target.value)}
                       disabled={loading}
                       placeholder={t.placeholder}
-                      className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 px-4 py-3 rounded-[14px] outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/8 transition-all disabled:opacity-50 text-[13.5px] font-medium"
+                      className="w-full bg-slate-50 border border-slate-200/80 text-slate-900 placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all disabled:opacity-50 text-[13.5px] font-medium shadow-inner shadow-slate-100/50"
                     />
                     <motion.button
-                      whileTap={{ scale: loading ? 1 : 0.95 }}
+                      whileTap={{ scale: loading ? 1 : 0.9 }}
                       type="submit"
                       disabled={loading || !message.trim()}
-                      className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white px-4 py-3 rounded-[14px] transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                      className="absolute right-1.5 w-10 h-10 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white rounded-full transition-all shadow-md shadow-indigo-500/20 flex items-center justify-center cursor-pointer"
                     >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 ml-0.5" />}
                     </motion.button>
                   </form>
-                  <p className="text-center text-[9.5px] text-slate-300 mt-2.5 select-none">
+                  <p className="text-center text-[9.5px] text-slate-300 mt-3 select-none tracking-wide">
                     Golden AI · Powered by OpenAI · Golden Isle Wholesale
                   </p>
                 </div>

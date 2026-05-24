@@ -212,23 +212,7 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                                 }
                             }
                         },
-                        {
-                            type: "function",
-                            function: {
-                                name: "trigger_n8n",
-                                description: "Gunakan tool ini apabila pengguna meminta untuk mencetuskan (trigger) automasi n8n, buat ujian webhook, atau jalankan task automasi.",
-                                parameters: {
-                                    type: "object",
-                                    properties: {
-                                        pesanan: {
-                                            type: "string",
-                                            description: "Mesej atau arahan yang pengguna mahu sampaikan ke sistem n8n."
-                                        }
-                                    },
-                                    required: ["pesanan"]
-                                }
-                            }
-                        },
+
                         {
                             type: "function",
                             function: {
@@ -526,21 +510,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                 return NextResponse.json({
                     reply: formatCartResult("cart_viewed", cart, summaryText)
                 });
-            }
-
-            // trigger_n8n — webhook call (unchanged)
-            if (functionName === "trigger_n8n") {
-                try {
-                    // Call the n8n test webhook
-                    const n8nRes = await fetch("http://127.0.0.1:5678/webhook-test/orb-test");
-                    if (n8nRes.ok) {
-                        return NextResponse.json({ reply: "🚀 **Beres bos!** Saya dah hantar isyarat ke otak n8n! Cuba check skrin n8n sekarang, mesti warna hijau!" });
-                    } else {
-                        return NextResponse.json({ reply: "Hmm, isyarat dihantar tapi n8n tak sedia. Pastikan dah tekan 'Execute workflow' dekat n8n tu!" });
-                    }
-                } catch (err) {
-                    return NextResponse.json({ reply: "⚠️ **Ralat!** Tak dapat connect dengan n8n. Pastikan bro test chatbot ni di *localhost* (npm run dev), sebab Vercel tak boleh hantar data ke Localhost komputer bro." });
-                }
             }
         }
 
