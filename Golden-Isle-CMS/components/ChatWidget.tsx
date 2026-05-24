@@ -30,22 +30,24 @@ interface Message {
 
 const SUGGESTIONS = [
   {
-    label: "Wiski premium terlaris 🥃",
-    query: "Boleh senaraikan wiski premium terlaris dan paling popular?",
+    label: "Recommend Whisky",
+    icon: "🥃",
+    query: "Tolong recommend whisky premium yang best bosku.",
   },
   {
-    label: "Harga beer borong 🍻",
-    query: "Apakah perbandingan harga borong untuk pelbagai jenis craft beer?",
+    label: "Request Bulk Quote",
+    icon: "📦",
+    query: "Saya nak request sebut harga (bulk quote) untuk stok hotel/restoran.",
   },
   {
-    label: "Cara tempahan & hantaran 📦",
-    query:
-      "Bagaimana cara membuat tempahan borong dan berapa lama masa penghantaran?",
+    label: "View Cart",
+    icon: "🛒",
+    query: "Tunjuk cart saya.",
   },
   {
-    label: "Kelebihan duty-free 💰",
-    query:
-      "Apakah kelebihan membeli secara pukal/duty-free dengan Golden Isle?",
+    label: "Talk to Sales",
+    icon: "💬",
+    query: "Macam mana nak bercakap terus dengan sales / WhatsApp?",
   },
 ];
 
@@ -617,21 +619,19 @@ export default function ChatWidget() {
 
                     {/* Suggestions */}
                     <div className="mt-6 w-full">
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-left mb-2">
-                        Cuba tanya
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center mb-3">
+                        Quick Actions
                       </p>
-                      <div className="grid grid-cols-1 gap-1.5">
+                      <div className="flex flex-wrap justify-center gap-2">
                         {SUGGESTIONS.map((s, i) => (
                           <button
                             key={i}
                             type="button"
                             onClick={() => handleSuggestionClick(s.query)}
-                            className="group flex items-center justify-between gap-2 px-3 py-2.5 text-left text-[11.5px] font-medium text-[#0F172A] bg-white hover:bg-indigo-50 border border-slate-200/80 hover:border-indigo-200 rounded-[12px] transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[11.5px] font-bold text-[#0F172A] bg-white hover:bg-indigo-50 border border-slate-200/80 hover:border-indigo-300 rounded-full transition-all duration-200 shadow-sm hover:shadow cursor-pointer"
                           >
+                            <span className="text-[13px]">{s.icon}</span>
                             <span>{s.label}</span>
-                            <span className="text-indigo-400 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200 text-xs">
-                              ›
-                            </span>
                           </button>
                         ))}
                       </div>
