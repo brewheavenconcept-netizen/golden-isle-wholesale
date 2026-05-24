@@ -21,28 +21,74 @@ async function searchProducts(query: string) {
     try {
         const supabase = createClient(url, serviceKey);
 
+        const q = query.toLowerCase();
+        let baseSearch = query;
+        if (q.includes("whisky") || q.includes("whiskey")) baseSearch = "whisky";
+        else if (q.includes("wine")) baseSearch = "wine";
+        else if (q.includes("vodka")) baseSearch = "vodka";
+        else if (q.includes("cognac")) baseSearch = "cognac";
+        else if (q.includes("brandy")) baseSearch = "brandy";
+        else if (q.includes("beer")) baseSearch = "beer";
+        else baseSearch = query.split(' ')[0] || query;
+
         const { data, error } = await supabase
             .from('products')
             .select('name, description, price, category, image_url, stock_quantity')
-            .or(`name.ilike.%${query}%,category.ilike.%${query}%,description.ilike.%${query}%`)
-            .gt('stock_quantity', 0)
-            .order('price', { ascending: false })
-            .limit(3);
+            .or(`name.ilike.%${baseSearch}%,category.ilike.%${baseSearch}%,description.ilike.%${baseSearch}%`)
+            .gt('stock_quantity', 0);
 
-        if (error || !data?.length) {
-            return { products: [], summary: "Tiada produk dijumpai." };
+        if (error || !data || data.length === 0) {
+            // Fallback: just return ANY top 3 available products to avoid empty states
+            const { data: fallbackData } = await supabase
+                .from('products')
+                .select('name, description, price, category, image_url, stock_quantity')
+                .gt('stock_quantity', 0)
+                .order('stock_quantity', { ascending: false })
+                .limit(3);
+            
+            if (!fallbackData || fallbackData.length === 0) {
+                return { products: [], summary: "Tiada produk dijumpai." };
+            }
+            
+            return {
+                summary: `Tiada hasil tepat untuk "${query}", tapi ini adalah produk popular kami:`,
+                products: fallbackData.slice(0, 3).map((p: any) => ({
+                    name: p.name,
+                    category: p.category,
+                    price: `RM ${p.price}`,
+                    description: p.description,
+                    image_url: p.image_url,
+                    badge: p.stock_quantity < 10 ? "TERHAD" : "TERSEDIA",
+                    whatsapp_message: `Saya berminat dengan ${p.name} (RM ${p.price}). Boleh info lanjut?`
+                }))
+            };
         }
 
+        let rankedData = [...data];
+
+        // Rank based on mapped intent
+        if (q.includes("restaurant") || q.includes("bar")) {
+            // Horeca suitable, fast movers -> Sort by price ascending (volume-friendly)
+            rankedData.sort((a, b) => a.price - b.price);
+        } else if (q.includes("event") || q.includes("party")) {
+            // Crowd favorites -> Sort by price ascending or mid-tier
+            rankedData.sort((a, b) => a.price - b.price);
+        } else if (q.includes("wholesale") || q.includes("resale") || q.includes("bulk")) {
+            // Best margin, reseller friendly -> Sort by stock quantity descending
+            rankedData.sort((a, b) => b.stock_quantity - a.stock_quantity);
+        } else if (q.includes("personal") || q.includes("gift") || q.includes("premium")) {
+            // Premium, gifting -> Sort by price descending
+            rankedData.sort((a, b) => b.price - a.price);
+        } else {
+            // Default -> sort by price descending
+            rankedData.sort((a, b) => b.price - a.price);
+        }
+
+        const top3 = rankedData.slice(0, 3);
+        
         return {
-            summary: `Jumpa ${data.length} produk untuk "${query}":`,
-            products: data.map((p: {
-                name: string;
-                category: string;
-                price: number;
-                description: string;
-                image_url?: string;
-                stock_quantity: number;
-            }) => ({
+            summary: `Jumpa ${top3.length} produk untuk "${query}":`,
+            products: top3.map((p: any) => ({
                 name: p.name,
                 category: p.category,
                 price: `RM ${p.price}`,
@@ -142,45 +188,35 @@ export async function POST(req: Request) {
 - Speak in professional, warm, and natural Malay (B2B).
 - Do NOT use exaggerated or fake Sabahan slang. Speak like a premium professional sales consultant who is polite and helpful.
 - Professional & Premium: Maintain a high-quality, B2B wholesale standard. Treat every customer like a VIP.
-- Persuasive Closer: Strategically nudge the client towards making a bulk purchase.`;
+- Persuasive Closer: Strategically nudge the customer to complete their order.`;
         }
+        
+        const systemInstructionText = `You are Golden AI, a premium B2B wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
 
-        const systemInstructionText = `You are Golden AI, a premium B2B wholesale sales concierge for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia). Your primary goal is to provide excellent service, charm clients, and confidently close sales, while remaining strictly grounded in real product data.
+MISSION:
+Convert visitors into qualified buyers and process their payments.
 
 ${languageInstruction}
 
-## CRITICAL RULES (DO NOT IGNORE)
-1. FACTUAL INTEGRITY: You must ONLY recommend products that actually exist in the provided product catalog via tool calls. Never fabricate stock levels, pricing, or product names (no hallucinations!).
-2. NO HALLUCINATIONS: If a product description is missing, vague, or contains placeholder nonsense (e.g., 'asdasd'), DO NOT invent flavor notes, tasting details, or fake features. 
-3. MISSING DATA FALLBACK: If details are missing, respond honestly but cleverly. Example (if user speaks Malay): "Item ini available, tapi butiran rincinya sedang dikemas kini dalam sistem kami. Anda mahu saya simpankan stok ini untuk anda?" (Adapt the fallback response naturally to the client's language: English/Chinese).
+STYLE:
+- premium, concise, proactive, sales-focused.
+- no long essays.
 
-## QUOTE BUILDER CONCIERGE FLOW (B2B)
-As a premium concierge, you build Custom Quotes (Drafts) for clients.
-1. ALWAYS use the 'search_products' tool when asked for product recommendations, prices, or availability.
-2. RECOMMEND & CLARIFY: When recommending products, ask clarifying questions before adding to the quote. Ask about quantity needed, budget, or timeline if not provided.
-3. CART AS A QUOTE DRAFT: Treat the "cart" as a "Quote Draft" (Sebut Harga Draf / 报价单草稿). 
-4. Use 'add_to_cart' to add items to the quote, 'update_quantity' to change amounts, and 'remove_from_cart' to remove items. 
-5. Tell the user you are preparing their Quote Draft.
-6. If the user asks to see their quote or cart, use 'view_cart'.
+FLOW RULES:
+1. Main Menu: When a user starts or says hello, offer these options: 'Browse Products', 'Recommend by Budget', 'Build Quote', 'Talk to Sales'.
+2. Browse Products: If they ask to browse, use the 'get_categories' tool to fetch and show category buttons.
+3. Category Click: Once a category is selected or mentioned, IMMEDIATELY use 'search_products' tool to show product cards. Do NOT ask any open-ended questions like "what is your budget?".
+4. Product Cards: When returning products via 'search_products', the UI will automatically show "Add to Quote", "More Like This", and "Checkout".
+5. Add to Quote: When they ask to add to quote/cart, use the 'add_to_cart' tool.
+6. Checkout: When they say checkout or pay, use the 'request_checkout' tool to ask for their name and phone number. If you already know their name and phone, pass it to the tool to display the Payment Options Card.
 
-1. NEVER ask the client for bank transfers or payment proof.
-2. When the client is ready to proceed or asks for a final quote, invoke the 'generate_quote_card' tool.
-3. If they ask about payment, tell them they can discuss it directly with the human sales concierge on WhatsApp.
+GLOBAL RULES:
+- Never hallucinate products, prices, stock, payment links, or shipping details. Only recommend products that actually exist in the catalog.
+- If they want to talk to a human, provide a WhatsApp link.
 
 ## INTERACTIVE SUGGESTIONS
 - To provide quick contextual actions for the user, you can append the tag 'SHOW_SUGGESTIONS:item1,item2,...' at the end of your response.
-- Available suggestion tags: 'whisky', 'quote', 'cart', 'sales'.
-- Example if recommending whisky: \n\nSHOW_SUGGESTIONS:whisky,quote,cart
-
-## KNOWN LEAD CONTEXT
-- Budget: ${leadContext.budget || "Not provided yet"}
-- Product Preference: ${leadContext.preference || "Not provided yet"}
-- Quantity: ${leadContext.quantity || "Not provided yet"}
-**IMPORTANT**: DO NOT ask the user for budget, preference, or quantity if it is already provided above! Only ask for what is missing. Use the 'update_lead_context' tool if you learn new information about their budget, preference, or quantity.
-
-## RESPONSE STRUCTURE
-- Keep responses clean and concise (max 3 short paragraphs unless listing products).
-- Use bullet points for product lists.`;
+- Example: SHOW_SUGGESTIONS:Browse Products,Recommend by Budget,Talk to Sales`;
 
         // Format history for OpenAI
         const openAiMessages = [
@@ -190,37 +226,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
             }
         ];
 
-        // -- Payment Interceptor (Task 1) --
-        const paymentKeywords = ["payment", "bayar", "pay", "付款"];
-        let paymentMentionCount = 0;
-        if (Array.isArray(messages)) {
-            for (const m of messages) {
-                if (m.role === "user" || m.role === "assistant" === false) {
-                    const text = (m.text || m.content || "").toLowerCase();
-                    if (paymentKeywords.some(kw => text.includes(kw))) {
-                        paymentMentionCount++;
-                    }
-                }
-            }
-        }
-        
-        if (paymentMentionCount > 1) {
-            const total = cart.reduce((acc: number, item: any) => acc + (item.priceNum * item.quantity), 0);
-            let productList = "";
-            cart.forEach((item: any) => {
-                productList += `• ${item.quantity}x ${item.name} (RM ${item.priceNum}/unit) — Jumlah: RM ${(item.quantity * item.priceNum).toFixed(2)}\n`;
-            });
-            
-            const waText = `🛒 *New Lead - Golden AI*\n---------------------------\n${productList}---------------------------\n💰 *TOTAL: RM ${total.toFixed(2)}*\n🌐 Language: ${language.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
-            const waLink = `https://wa.me/601164073143?text=${encodeURIComponent(waText)}`;
-            
-            let redirectMsg = "";
-            if (language === "en") redirectMsg = `It looks like you're ready to proceed! Please click the button below to finalize your order with our sales team via WhatsApp:\n\n[WhatsApp Sales](${waLink})`;
-            else if (language === "zh") redirectMsg = `看来您准备好付款了！请点击下方按钮通过 WhatsApp 与我们的销售团队完成订单：\n\n[联系 WhatsApp 销售](${waLink})`;
-            else redirectMsg = `Nampaknya bosku sudah bersedia untuk pembayaran! Sila klik pautan di bawah untuk terus ke WhatsApp Sales kami:\n\n[WhatsApp Sales](${waLink})`;
-
-            return NextResponse.json({ reply: redirectMsg });
-        }
 
         if (Array.isArray(messages)) {
             openAiMessages.push(...messages.map((m: any) => ({
@@ -382,26 +387,25 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                         {
                             type: "function",
                             function: {
-                                name: "generate_quote_card",
-                                description: "Generate a wholesale quote card for the client displaying itemized breakdown and a WhatsApp sales button.",
+                                name: "get_categories",
+                                description: "Dapatkan senarai kategori produk yang ada dalam kedai.",
+                                parameters: {
+                                    type: "object",
+                                    properties: {}
+                                }
+                            }
+                        },
+                        {
+                            type: "function",
+                            function: {
+                                name: "request_checkout",
+                                description: "Panggil ini apabila pengguna sedia untuk checkout / membayar. Ia akan meminta butiran pelanggan atau terus membuka Payment Options Card jika details sudah ada.",
                                 parameters: {
                                     type: "object",
                                     properties: {
-                                        items: {
-                                            type: "array",
-                                            items: {
-                                                type: "object",
-                                                properties: {
-                                                    name: { type: "string" },
-                                                    quantity: { type: "number" },
-                                                    price: { type: "number" }
-                                                },
-                                                required: ["name", "quantity", "price"]
-                                            }
-                                        },
-                                        total_amount: { type: "number" }
-                                    },
-                                    required: ["items", "total_amount"]
+                                        customer_name: { type: "string", description: "Nama pelanggan (jika ada)" },
+                                        customer_phone: { type: "string", description: "Nombor telefon pelanggan (jika ada)" }
+                                    }
                                 }
                             }
                         }
@@ -436,12 +440,35 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                 console.error("Failed to parse tool call arguments:", e);
             }
 
+            // get_categories — fetch available categories
+            if (functionName === "get_categories") {
+                // To keep it simple and dynamic, we just return the predefined categories or fetch from Supabase.
+                // In this case, we'll return a static list that maps to what we expect in the DB.
+                const categories = [
+                    { label: "Whisky", value: "whisky" },
+                    { label: "Wine", value: "wine" },
+                    { label: "Vodka", value: "vodka" },
+                    { label: "Cognac", value: "cognac" },
+                    { label: "Craft Beer", value: "craft beer" }
+                ];
+                return NextResponse.json({
+                    reply: "TOOL_RESULT_CATEGORIES:" + JSON.stringify(categories)
+                });
+            }
+
             // search_products — live Supabase product lookup
             if (functionName === "search_products") {
                 const query = args.query ?? "";
                 const result = await searchProducts(query);
                 return NextResponse.json({
-                    reply: "TOOL_RESULT:" + JSON.stringify(result)
+                    reply: "TOOL_RESULT_PRODUCT_CARDS:" + JSON.stringify(result)
+                });
+            }
+
+            // request_checkout — switch to payment options
+            if (functionName === "request_checkout") {
+                return NextResponse.json({
+                    reply: "TOOL_RESULT_CHECKOUT_CARD:" + JSON.stringify(args)
                 });
             }
             if (functionName === "generate_quote_card") {

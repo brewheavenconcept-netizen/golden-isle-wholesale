@@ -14,6 +14,11 @@ import {
   ArrowLeft,
   ShoppingCart,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { usePublicStore } from "@/hooks/usePublicStore";
+import { getProducts, createOrderWithStockCheck, clearCart } from "@/lib/storage";
+import { Order, OrderItem } from "@/types";
+import toast from "react-hot-toast";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -221,9 +226,7 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
   );
 }
 
-// ─── Product Card ─────────────────────────────────────────────────────────────
-
-function ProductCard({ p, onAddToCart, lang }: { p: any; onAddToCart: (product: any) => void; lang: Language }) {
+function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart: (product: any) => void; onSendText: (text: string) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
   const [added, setAdded] = useState(false);
 
@@ -233,16 +236,6 @@ function ProductCard({ p, onAddToCart, lang }: { p: any; onAddToCart: (product: 
     onAddToCart(p);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
-  };
-
-  const getWaMessage = () => {
-    if (lang === "en") {
-      return `Hi, I am interested in ${p.name} (${p.price}). Could you provide more details?`;
-    }
-    if (lang === "zh") {
-      return `您好，我对 ${p.name} (${p.price}) 很感兴趣。请问可以提供更多详细信息吗？`;
-    }
-    return p.whatsapp_message || `Saya berminat dengan ${p.name} (${p.price}). Boleh info lanjut?`;
   };
 
   return (
@@ -264,28 +257,33 @@ function ProductCard({ p, onAddToCart, lang }: { p: any; onAddToCart: (product: 
         <div className="flex items-center justify-between mt-1">
           <span className="text-[14px] font-extrabold text-indigo-600">{p.price}</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 mt-2">
           <button onClick={handleAdd}
-            className="flex-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 py-2.5 rounded-xl transition-all">
-            {added ? t.addedBtn : t.addBtn}
+            className="w-full text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 py-2.5 rounded-xl transition-all">
+            {added ? t.addedBtn : "Add to Quote"}
           </button>
-          <a href={`https://wa.me/601164073143?text=${encodeURIComponent(getWaMessage())}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-[11px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] py-2.5 rounded-xl text-center transition-all">
-            {t.waBtn}
-          </a>
+          <div className="flex gap-2">
+            <button onClick={() => onSendText(`More like ${p.name}`)}
+              className="flex-1 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 py-2 rounded-xl transition-all">
+              More Like This
+            </button>
+            <button onClick={() => onSendText(`Checkout`)}
+              className="flex-1 text-[11px] font-bold text-slate-900 bg-amber-400 hover:bg-amber-500 py-2 rounded-xl transition-all">
+              Checkout
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Tool Result Renderer ─────────────────────────────────────────────────────
+// ─── Tool Result Renderers ──────────────────────────────────────────────────
 
-function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddToCart: (product: any) => void; lang: Language }) {
+function ToolResultProductCards({ text, onAddToCart, onSendText, lang }: { text: string; onAddToCart: (product: any) => void; onSendText: (text: string) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
-  try { data = JSON.parse(text.substring(12)); } catch (e) {}
+  try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
 
   if (!data) return (
     <div className="text-slate-500 text-[13px] p-3.5 bg-white border border-slate-200/60 rounded-2xl rounded-tl-[5px] shadow-sm">
@@ -299,12 +297,105 @@ function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddTo
       {data.products?.length > 0 ? (
         <div className="space-y-3">
           {data.products.map((p, idx) => (
-            <ProductCard key={idx} p={p} onAddToCart={onAddToCart} lang={lang} />
+            <ProductCard key={idx} p={p} onAddToCart={onAddToCart} onSendText={onSendText} lang={lang} />
           ))}
         </div>
       ) : (
         <div className="text-[12px] text-slate-400 bg-slate-50 border border-slate-100 rounded-xl p-4 text-center">
           {t.noProduct}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolResultCategories({ text, onSendText, lang }: { text: string; onSendText: (text: string) => void; lang: Language }) {
+  let categories: { label: string, value: string }[] = [];
+  try { categories = JSON.parse(text.substring("TOOL_RESULT_CATEGORIES:".length)); } catch (e) {}
+
+  if (!categories || categories.length === 0) return null;
+
+  return (
+    <div className="space-y-3 w-full">
+      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">Here are our product categories:</div>
+      <div className="grid grid-cols-2 gap-2">
+        {categories.map((cat, idx) => (
+          <button
+            key={idx}
+            onClick={() => onSendText(cat.label)}
+            className="flex items-center justify-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 transition-all text-[12px] font-bold text-slate-600"
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text: string; cart: CartItem[]; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string) => void; lang: Language }) {
+  let data: { customer_name?: string; customer_phone?: string } | null = null;
+  try { data = JSON.parse(text.substring("TOOL_RESULT_CHECKOUT_CARD:".length)); } catch (e) {}
+
+  if (!data || !data.customer_name || !data.customer_phone) {
+    return (
+      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">
+        Please provide your name and phone number to proceed with checkout.
+      </div>
+    );
+  }
+
+  const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col p-4 w-full">
+      <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+        <ShoppingCart className="w-4 h-4 text-indigo-600" />
+        <span className="text-[12px] font-extrabold text-slate-800 uppercase">Checkout</span>
+      </div>
+      
+      <div className="py-3 text-[12px] text-slate-600 space-y-1">
+        <p><strong>Name:</strong> {data.customer_name}</p>
+        <p><strong>Phone:</strong> {data.customer_phone}</p>
+        <p><strong>Total:</strong> RM {grandTotal.toFixed(2)}</p>
+      </div>
+
+      <div className="pt-2 space-y-2">
+        <button onClick={() => onProcessCheckout('qr', data?.customer_name || '', data?.customer_phone || '')}
+          className="w-full text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl transition-all shadow-sm">
+          QR Payment
+        </button>
+        <button onClick={() => onProcessCheckout('bank_transfer', data?.customer_name || '', data?.customer_phone || '')}
+          className="w-full text-[12px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 py-3 rounded-xl transition-all shadow-sm">
+          Bank Transfer
+        </button>
+        <button onClick={() => onProcessCheckout('whatsapp', data?.customer_name || '', data?.customer_phone || '')}
+          className="w-full text-[12px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] py-3 rounded-xl transition-all shadow-sm">
+          Talk to Human Agent
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddToCart: (product: any) => void; lang: Language }) {
+  const t = TRANSLATIONS[lang];
+  let data: { summary: string; products: any[] } | null = null;
+  try { data = JSON.parse(text.substring("TOOL_RESULT:".length)); } catch (e) {}
+
+  if (!data) return null;
+
+  return (
+    <div className="space-y-3 w-full">
+      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">{data.summary}</div>
+      {data.products?.length > 0 && (
+        <div className="space-y-3">
+          {data.products.map((p, idx) => (
+            <div key={idx} className="bg-slate-50 border border-slate-100 rounded-xl p-3">
+              <p className="font-bold text-[12px]">{p.name}</p>
+              <p className="text-[11px] text-slate-500">{p.price}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -372,13 +463,8 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
   if (!match) return null;
   
   const rawTags = match[1].split(",").map(s => s.trim());
-  const suggestionsList = TRANSLATIONS[lang].suggestions;
   
   const chipsToRender = rawTags.map(tag => {
-    if (tag === "whisky") return suggestionsList[0];
-    if (tag === "quote") return suggestionsList[1];
-    if (tag === "cart" || tag === "view_cart") return suggestionsList[2];
-    if (tag === "contact" || tag === "sales") return suggestionsList[3];
     return { label: tag, icon: "💡", query: tag };
   }).filter(Boolean);
 
@@ -403,6 +489,8 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export default function ChatWidget() {
+  const router = useRouter();
+  const { storeId } = usePublicStore();
   const [isOpen, setIsOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [leadContext, setLeadContext] = useState({ budget: "", preference: "", quantity: "" });
@@ -468,6 +556,100 @@ export default function ChatWidget() {
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("golden-chat-toggle", { detail: { isOpen } }));
   }, [isOpen]);
+
+  // ── handleProcessCheckout ───────────────────────────────────────────────────
+
+  const handleProcessCheckout = async (method: 'qr' | 'bank_transfer' | 'whatsapp', customerName: string, customerPhone: string) => {
+    if (method === 'whatsapp') {
+      let waMsg = `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
+      cart.forEach((item) => {
+        waMsg += `• ${item.quantity}x ${item.name} (RM ${(item.priceNum || parseFloat(item.price.replace(/[^0-9.]/g, ""))).toFixed(2)})\n`;
+      });
+      const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
+      waMsg += `\n*Jumlah Keseluruhan: RM ${grandTotal.toFixed(2)}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!`;
+      window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const orderId = `ORD-${Date.now()}`;
+      const subtotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
+      const deliveryFee = 0;
+      const total = subtotal + deliveryFee;
+
+      // 1. Fetch store products to match name with ID
+      const targetStoreId = storeId || '00000000-0000-0000-0000-000000000000';
+      const storeProducts = await getProducts(targetStoreId);
+
+      // 2. Map cart items to the strict OrderItem structure
+      const orderItems: OrderItem[] = cart.map(item => {
+        const dbProduct = storeProducts.find(p => p.name.toLowerCase() === item.name.toLowerCase());
+        return {
+          product: {
+            id: dbProduct?.id || `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: item.name,
+            price: item.priceNum,
+            images: item.image_url ? [item.image_url] : []
+          },
+          qty: item.quantity
+        };
+      });
+
+      const newOrder: Order = {
+        id: orderId,
+        store_id: targetStoreId,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        items: orderItems,
+        subtotal,
+        delivery_fee: deliveryFee,
+        total: total,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        payment_method: method,
+        payment_status: 'unpaid'
+      };
+
+      const result = await createOrderWithStockCheck(newOrder, targetStoreId);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      // Clear standard cart and local storage chatbot cart
+      clearCart();
+      setCart([]);
+      try {
+        localStorage.removeItem("golden_ai_cart");
+      } catch (e) {}
+
+      // Add a success message to the chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "model",
+          text: lang === "zh"
+            ? `🎉 订单创建成功！正在为您跳转至支付页面...`
+            : lang === "en"
+            ? `🎉 Order created successfully! Redirecting you to the payment page...`
+            : `🎉 Pesanan berjaya dicipta! Melencongkan anda ke laman pembayaran...`
+        }
+      ]);
+
+      // Redirect to payment transfer page
+      setTimeout(() => {
+        router.push(`/payment/transfer/${orderId}`);
+      }, 1500);
+
+    } catch (err: any) {
+      console.error("handleProcessCheckout error:", err);
+      setError(err.message || "Failed to process checkout. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ── autoViewCart ─────────────────────────────────────────────────────────────
 
@@ -781,7 +963,7 @@ export default function ChatWidget() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Online
                   </div>
@@ -891,6 +1073,12 @@ export default function ChatWidget() {
                             </span>
                             {msg.role === "model" && msg.text.startsWith("TOOL_RESULT_QUOTE_CARD:") ? (
                               <QuoteCardUI text={msg.text} lang={lang} />
+                            ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_PRODUCT_CARDS:") ? (
+                              <ToolResultProductCards text={msg.text} onAddToCart={handleAddToCart} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
+                            ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CATEGORIES:") ? (
+                              <ToolResultCategories text={msg.text} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
+                            ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CHECKOUT_CARD:") ? (
+                              <ToolResultCheckoutCard text={msg.text} cart={cart} onProcessCheckout={handleProcessCheckout} lang={lang} />
                             ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
                               msg.text.includes('"action":"cart_') ? (
                                 <QuoteRenderer
