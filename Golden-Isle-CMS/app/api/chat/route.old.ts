@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-async function saveLead(data: any) {
-    // TODO: replace with Google Sheets webhook URL
-    console.log("Saving lead to Google Sheets:", data);
-}
-
 // ─── Supabase Product Search (server-only, service role) ─────────────────────
 
 async function searchProducts(query: string) {
@@ -108,22 +103,8 @@ export async function POST(req: Request) {
             );
         }
 
-        const { message, messages, cart: incomingCart, language = "ms", action, leadContext = {} } = body;
+        const { message, messages, cart: incomingCart, language = "ms" } = body;
         const cart = Array.isArray(incomingCart) ? incomingCart : [];
-
-        // Task 3: Lead Capture for WhatsApp click
-        if (action === "whatsapp_click") {
-            await saveLead({
-                action: "whatsapp_click",
-                language,
-                cart,
-                budget: leadContext.budget || "",
-                quantity: leadContext.quantity || "",
-                preference: leadContext.preference || "",
-                timestamp: new Date().toISOString()
-            });
-            return NextResponse.json({ success: true });
-        }
         
         let languageInstruction = "";
         if (language === "en") {
@@ -163,20 +144,20 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
 5. Tell the user you are preparing their Quote Draft.
 6. If the user asks to see their quote or cart, use 'view_cart'.
 
-1. NEVER ask the client for bank transfers or payment proof.
-2. When the client is ready to proceed or asks for a final quote, invoke the 'generate_quote_card' tool.
-3. If they ask about payment, tell them they can discuss it directly with the human sales concierge on WhatsApp.
+## INTERACTIVE PAYMENT RECOMMENDATION CARD
+- Whenever the client asks about payment methods, payment options, how to pay, bank details, QR payments, or payment terms, you must ALWAYS append the exact tag 'SHOW_PAYMENT_OPTIONS' at the very end of your response. This triggers an interactive payment selection card in their chat UI.
+- IMPORTANT: The tag 'SHOW_PAYMENT_OPTIONS' must be at the very end of your output, with no text after it.
+- If they select 'QR Payment', explain that the company will provide the DuitNow QR upon finalize of their sebut harga (quote draft).
+- If they select 'Bank Transfer', display the company bank account details:
+  * Bank Name: Bank Malaysia Berhad
+  * Account Name: Golden Isle Wholesale
+  * Account No: 123-456-789
+- If they select 'FPX Online Payment', explain that they will receive a secure checkout link once they finalize their order.
 
 ## INTERACTIVE SUGGESTIONS
 - To provide quick contextual actions for the user, you can append the tag 'SHOW_SUGGESTIONS:item1,item2,...' at the end of your response.
 - Available suggestion tags: 'whisky', 'quote', 'cart', 'sales'.
 - Example if recommending whisky: \n\nSHOW_SUGGESTIONS:whisky,quote,cart
-
-## KNOWN LEAD CONTEXT
-- Budget: ${leadContext.budget || "Not provided yet"}
-- Product Preference: ${leadContext.preference || "Not provided yet"}
-- Quantity: ${leadContext.quantity || "Not provided yet"}
-**IMPORTANT**: DO NOT ask the user for budget, preference, or quantity if it is already provided above! Only ask for what is missing. Use the 'update_lead_context' tool if you learn new information about their budget, preference, or quantity.
 
 ## RESPONSE STRUCTURE
 - Keep responses clean and concise (max 3 short paragraphs unless listing products).
@@ -189,38 +170,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                 content: systemInstructionText
             }
         ];
-
-        // -- Payment Interceptor (Task 1) --
-        const paymentKeywords = ["payment", "bayar", "pay", "付款"];
-        let paymentMentionCount = 0;
-        if (Array.isArray(messages)) {
-            for (const m of messages) {
-                if (m.role === "user" || m.role === "assistant" === false) {
-                    const text = (m.text || m.content || "").toLowerCase();
-                    if (paymentKeywords.some(kw => text.includes(kw))) {
-                        paymentMentionCount++;
-                    }
-                }
-            }
-        }
-        
-        if (paymentMentionCount > 1) {
-            const total = cart.reduce((acc: number, item: any) => acc + (item.priceNum * item.quantity), 0);
-            let productList = "";
-            cart.forEach((item: any) => {
-                productList += `• ${item.quantity}x ${item.name} (RM ${item.priceNum}/unit) — Jumlah: RM ${(item.quantity * item.priceNum).toFixed(2)}\n`;
-            });
-            
-            const waText = `🛒 *New Lead - Golden AI*\n---------------------------\n${productList}---------------------------\n💰 *TOTAL: RM ${total.toFixed(2)}*\n🌐 Language: ${language.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
-            const waLink = `https://wa.me/601164073143?text=${encodeURIComponent(waText)}`;
-            
-            let redirectMsg = "";
-            if (language === "en") redirectMsg = `It looks like you're ready to proceed! Please click the button below to finalize your order with our sales team via WhatsApp:\n\n[WhatsApp Sales](${waLink})`;
-            else if (language === "zh") redirectMsg = `看来您准备好付款了！请点击下方按钮通过 WhatsApp 与我们的销售团队完成订单：\n\n[联系 WhatsApp 销售](${waLink})`;
-            else redirectMsg = `Nampaknya bosku sudah bersedia untuk pembayaran! Sila klik pautan di bawah untuk terus ke WhatsApp Sales kami:\n\n[WhatsApp Sales](${waLink})`;
-
-            return NextResponse.json({ reply: redirectMsg });
-        }
 
         if (Array.isArray(messages)) {
             openAiMessages.push(...messages.map((m: any) => ({
@@ -260,21 +209,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                                         }
                                     },
                                     required: ["query"]
-                                }
-                            }
-                        },
-                        {
-                            type: "function",
-                            function: {
-                                name: "update_lead_context",
-                                description: "Save or update user's budget, product preference, and quantity requirements to memory.",
-                                parameters: {
-                                    type: "object",
-                                    properties: {
-                                        budget: { type: "string", description: "User's stated budget (e.g. 'RM500', 'under 1k')" },
-                                        preference: { type: "string", description: "User's stated product preference (e.g. 'whisky', 'red wine')" },
-                                        quantity: { type: "string", description: "User's stated quantity requirements (e.g. '10 bottles', '2 cartons')" }
-                                    }
                                 }
                             }
                         },
@@ -378,32 +312,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                                     properties: {}
                                 }
                             }
-                        },
-                        {
-                            type: "function",
-                            function: {
-                                name: "generate_quote_card",
-                                description: "Generate a wholesale quote card for the client displaying itemized breakdown and a WhatsApp sales button.",
-                                parameters: {
-                                    type: "object",
-                                    properties: {
-                                        items: {
-                                            type: "array",
-                                            items: {
-                                                type: "object",
-                                                properties: {
-                                                    name: { type: "string" },
-                                                    quantity: { type: "number" },
-                                                    price: { type: "number" }
-                                                },
-                                                required: ["name", "quantity", "price"]
-                                            }
-                                        },
-                                        total_amount: { type: "number" }
-                                    },
-                                    required: ["items", "total_amount"]
-                                }
-                            }
                         }
                     ],
                     tool_choice: "auto"
@@ -442,11 +350,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                 const result = await searchProducts(query);
                 return NextResponse.json({
                     reply: "TOOL_RESULT:" + JSON.stringify(result)
-                });
-            }
-            if (functionName === "generate_quote_card") {
-                return NextResponse.json({
-                    reply: "TOOL_RESULT_QUOTE_CARD:" + JSON.stringify(args)
                 });
             }
 
@@ -509,17 +412,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                         ? `Saya sudah masukkan ${summaryList.join(", ")} ke dalam troli draf bosku. Berikut adalah resit draf ko yang terkini:`
                         : `Minta maaf bossku, saya tak jumpa produk "${itemsToAdd.map((i: any)=>i.name).join(", ")}" yang ada stok dalam inventori kita.`;
                 }
-
-                // Lead Capture
-                await saveLead({
-                    action: "add_to_cart",
-                    language,
-                    cart: updatedCart,
-                    budget: leadContext.budget || "",
-                    quantity: leadContext.quantity || "",
-                    preference: leadContext.preference || "",
-                    timestamp: new Date().toISOString()
-                });
 
                 return NextResponse.json({
                     reply: formatCartResult("cart_updated", updatedCart, summaryText)
@@ -619,17 +511,6 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                     reply: formatCartResult("cart_viewed", cart, summaryText)
                 });
             }
-
-            if (functionName === "update_lead_context") {
-                let summaryText = "";
-                if (language === "en") summaryText = "I have noted your preferences. How else can I assist you?";
-                else if (language === "zh") summaryText = "我已经记录了您的需求。还有什么可以帮您的吗？";
-                else summaryText = "Noted bosku! Ada apa-apa lagi yang saya boleh tolong?";
-
-                return NextResponse.json({
-                    reply: `TOOL_RESULT:{"action":"context_updated","data":${JSON.stringify(args)},"summary":"${summaryText}"}`
-                });
-            }
         }
 
         let reply = choiceMessage?.content;
@@ -642,6 +523,27 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
             );
         }
 
+        // Programmatic fail-safe for payment suggestion card
+        const userQuery = (message || "").toLowerCase();
+        const lastMsg = Array.isArray(messages) && messages.length > 0
+            ? (messages[messages.length - 1].text || messages[messages.length - 1].content || "").toLowerCase()
+            : "";
+        const combinedUserText = `${userQuery} ${lastMsg}`;
+        const lowercaseReply = reply.toLowerCase();
+
+        const paymentKeywords = [
+            "payment", "pay", "paying", "bank details", "bank acc", "duitnow", "fpx", "transfer", "how to pay", "kaedah pembayaran", "cara bayar", "pembayaran", "bayar", "duit now", "invoice", "receipt", "checkout",
+            "付款", "支付", "转账", "汇款", "二维码", "银行"
+        ];
+
+        const userAskedPayment = paymentKeywords.some(kw => combinedUserText.includes(kw));
+        const aiDiscussedPayment = paymentKeywords.some(kw => lowercaseReply.includes(kw)) &&
+            (lowercaseReply.includes("bank") || lowercaseReply.includes("qr") || lowercaseReply.includes("fpx") || lowercaseReply.includes("invoice") || lowercaseReply.includes("transfer") || lowercaseReply.includes("method") || lowercaseReply.includes("bayar") || lowercaseReply.includes("pembayaran") || lowercaseReply.includes("kaedah") || lowercaseReply.includes("转账") || lowercaseReply.includes("汇款"));
+
+        if ((userAskedPayment || aiDiscussedPayment) && !reply.includes("SHOW_PAYMENT_OPTIONS")) {
+            console.log("Fail-safe: Appending SHOW_PAYMENT_OPTIONS to response.");
+            reply = `${reply.trim()}\n\nSHOW_PAYMENT_OPTIONS`;
+        }
 
         return NextResponse.json({ reply });
 

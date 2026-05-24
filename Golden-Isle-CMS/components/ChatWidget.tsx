@@ -69,21 +69,10 @@ const TRANSLATIONS = {
     noProduct: "Tiada produk tersenarai dijumpai.",
     waProceedMsg: "Hi, saya mahu proceed pesanan borong untuk:\n\n",
     waTotalMsg: "\n*Jumlah Keseluruhan: RM {total}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!",
-    payTitle: "Kaedah Pembayaran",
-    payDesc: "Sila pilih kaedah pembayaran pilihan ko untuk pesanan borong ini:",
-    payQr: "📱 QR Payment (DuitNow)",
-    payBank: "🏦 Bank Transfer (Instant)",
-    payFpx: "💳 FPX Online Payment",
-    payCustom: "✏️ Tulis kaedah pilihan ko...",
-    payPlaceholder: "Tulis kaedah pembayaran (e.g. Kad Kredit, Term 30 Hari)...",
-    payCancel: "Batal",
-    payConfirm: "Sahkan & WhatsApp",
-    payMethodLabel: "Kaedah Pembayaran",
     suggestions: [
-      { label: "Recommend Whisky", icon: "🥃", query: "Tolong recommend whisky premium yang best bosku." },
-      { label: "Request Bulk Quote", icon: "📦", query: "Saya nak request sebut harga (bulk quote) untuk stok hotel/restoran." },
-      { label: "View Cart", icon: "🛒", query: "Tunjuk cart saya." },
-      { label: "Talk to Sales", icon: "💬", query: "Macam mana nak bercakap terus dengan sales / WhatsApp?" },
+      { label: "Recommend by Budget", icon: "🥃", query: "Tolong recommend produk borong ikut budget saya." },
+      { label: "Build Wholesale Quote", icon: "📦", query: "Saya nak minta sebut harga (wholesale quote)." },
+      { label: "Talk to Human Sales", icon: "💬", query: "Boleh saya bercakap terus dengan sales / WhatsApp?" },
     ]
   },
   en: {
@@ -112,21 +101,10 @@ const TRANSLATIONS = {
     noProduct: "No listed products found.",
     waProceedMsg: "Hi, I would like to proceed with this wholesale order for:\n\n",
     waTotalMsg: "\n*Grand Total: RM {total}*\n\nPlease prepare the invoice & QR payment link. Thank you!",
-    payTitle: "Payment Method",
-    payDesc: "Please select your preferred payment method for this wholesale order:",
-    payQr: "📱 QR Payment (DuitNow)",
-    payBank: "🏦 Bank Transfer (Instant)",
-    payFpx: "💳 FPX Online Payment",
-    payCustom: "✏️ Custom payment method...",
-    payPlaceholder: "Write payment method (e.g. Credit Card, Net 30)...",
-    payCancel: "Cancel",
-    payConfirm: "Confirm & WhatsApp",
-    payMethodLabel: "Payment Method",
     suggestions: [
-      { label: "Recommend Whisky", icon: "🥃", query: "Please recommend some premium whisky." },
-      { label: "Request Bulk Quote", icon: "📦", query: "I would like to request a wholesale bulk quote for hotel/restaurant stock." },
-      { label: "View Cart", icon: "🛒", query: "Show my cart." },
-      { label: "Talk to Sales", icon: "💬", query: "How do I talk directly to sales or WhatsApp?" },
+      { label: "Recommend by Budget", icon: "🥃", query: "Please recommend wholesale products based on my budget." },
+      { label: "Build Wholesale Quote", icon: "📦", query: "I would like to build a wholesale quote." },
+      { label: "Talk to Human Sales", icon: "💬", query: "I want to talk directly to human sales / WhatsApp." },
     ]
   },
   zh: {
@@ -155,21 +133,10 @@ const TRANSLATIONS = {
     noProduct: "未找到相关产品。",
     waProceedMsg: "您好，我想为以下货品办理大宗批发订单：\n\n",
     waTotalMsg: "\n*总计金额: RM {total}*\n\n请准备发票和付款二维码。谢谢！",
-    payTitle: "付款方式选择",
-    payDesc: "请选择您此大宗批发订单的首选付款方式：",
-    payQr: "📱 二维码扫码支付 (DuitNow QR)",
-    payBank: "🏦 银行转账 (Bank Transfer)",
-    payFpx: "💳 网上银行闪付 (FPX Online)",
-    payCustom: "✏️ 自定义其他付款方式...",
-    payPlaceholder: "输入您的付款方式（如：信用卡，30天结账期等）...",
-    payCancel: "取消",
-    payConfirm: "确认并联系 WhatsApp",
-    payMethodLabel: "付款方式",
     suggestions: [
-      { label: "推荐威士忌", icon: "🥃", query: "请推荐一些高端威士忌。" },
-      { label: "申请大宗报价", icon: "📦", query: "我想为酒店/餐厅库存申请大宗批发报价单。" },
-      { label: "查看购物车", icon: "🛒", query: "显示我的购物车。" },
-      { label: "联系销售", icon: "💬", query: "如何直接联系销售人员或通过 WhatsApp 沟通？" },
+      { label: "Recommend by Budget", icon: "🥃", query: "请根据我的预算推荐批发产品。" },
+      { label: "Build Wholesale Quote", icon: "📦", query: "我想获取批发报价单。" },
+      { label: "Talk to Human Sales", icon: "💬", query: "我想直接联系销售代表/WhatsApp。" },
     ]
   }
 };
@@ -344,59 +311,60 @@ function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddTo
   );
 }
 
-// ─── Payment Options Card ──────────────────────────────────────────────────────
+// ─── Quote Card UI (Generative) ───────────────────────────────────────────────
 
-function PaymentOptionsCard({ text, onSelect, lang }: { text: string; onSelect: (option: string) => void; lang: Language }) {
+function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
   const t = TRANSLATIONS[lang];
-  
-  // Clean the tag from the text
-  const cleanText = text.replace("SHOW_PAYMENT_OPTIONS", "").trim();
+  let data: { items: any[]; total_amount: number } | null = null;
+  try { data = JSON.parse(text.substring("TOOL_RESULT_QUOTE_CARD:".length)); } catch (e) {}
 
-  const options = [
-    { id: "qr", label: t.payQr, query: lang === "zh" ? "我想使用二维码扫码支付" : lang === "en" ? "I want to pay via QR Payment" : "Saya mahu bayar guna QR Payment" },
-    { id: "bank", label: t.payBank, query: lang === "zh" ? "我想使用银行转账" : lang === "en" ? "I want to pay via Bank Transfer" : "Saya mahu bayar guna Bank Transfer" },
-    { id: "fpx", label: t.payFpx, query: lang === "zh" ? "我想使用网上银行闪付" : lang === "en" ? "I want to pay via FPX Online Payment" : "Saya mahu bayar guna FPX Online Payment" },
-    { id: "custom", label: t.payCustom, query: lang === "zh" ? "我想使用其他付款方式" : lang === "en" ? "I would like to use another payment method" : "Saya mahu guna kaedah pembayaran lain" },
-  ];
+  if (!data) return null;
+
+  const handleWaClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "whatsapp_click", language: lang, cart: data?.items || [] })
+    }).catch(() => {});
+    
+    let msg = `🛒 *New Lead - Golden AI*\n---------------------------\n`;
+    data!.items.forEach((item) => {
+      msg += `• ${item.quantity}x ${item.name} (RM ${item.price})\n`;
+    });
+    msg += `---------------------------\n💰 *TOTAL: RM ${data!.total_amount.toFixed(2)}*\n🌐 Language: ${lang.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
+    
+    window.open(`https://wa.me/601164073143?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+  };
 
   return (
-    <div className="space-y-3 w-full mt-2">
-      {cleanText && (
-        <div className="bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl rounded-tl-[6px] px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap">
-          {cleanText}
-        </div>
-      )}
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(79,70,229,0.06)] border border-slate-200/60 p-4 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span className="text-[10px] font-extrabold text-slate-800 tracking-widest uppercase">{t.payTitle || "Kaedah Pembayaran"}</span>
+    <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col p-4 w-full">
+      <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+        <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="text-[10px] font-extrabold text-slate-800 tracking-widest uppercase">Wholesale Quote</span>
+      </div>
+      <div className="space-y-2 py-3">
+        {data.items.map((item, idx) => (
+          <div key={idx} className="flex justify-between items-center text-[12.5px] text-slate-600">
+            <span>{item.quantity}x {item.name}</span>
+            <span className="font-bold text-slate-800">RM {item.price.toFixed(2)}</span>
           </div>
-          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t.brandTitle || "Golden Isle Wholesale"}</span>
-        </div>
-        <div className="grid grid-cols-1 gap-2">
-          {options.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => onSelect(opt.query)}
-              className="w-full text-left p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50/50 hover:border-indigo-300 hover:text-indigo-700 text-slate-600 text-[12.5px] font-extrabold transition-all flex items-center justify-between cursor-pointer shadow-sm group"
-            >
-              <div className="flex items-center gap-2.5">
-                {opt.id === "qr" && <span className="text-[14px] grayscale group-hover:grayscale-0">📱</span>}
-                {opt.id === "bank" && <span className="text-[14px] grayscale group-hover:grayscale-0">🏦</span>}
-                {opt.id === "fpx" && <span className="text-[14px] grayscale group-hover:grayscale-0">💳</span>}
-                {opt.id === "custom" && <span className="text-[14px] grayscale group-hover:grayscale-0">✏️</span>}
-                <span>{opt.label}</span>
-              </div>
-              <span className="text-[10.5px] text-slate-300 group-hover:text-indigo-400 font-extrabold transition-colors">➔</span>
-            </button>
-          ))}
-        </div>
+        ))}
+      </div>
+      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t.grandTotal}</span>
+        <span className="text-[16px] font-black text-indigo-600">RM {data.total_amount.toFixed(2)}</span>
+      </div>
+      <div className="pt-4">
+        <button onClick={handleWaClick}
+          className="block w-full text-[12px] font-bold text-white bg-[#25D366] hover:bg-[#20ba56] py-3 rounded-xl text-center transition-all shadow-md">
+          {t.whatsappBtn}
+        </button>
       </div>
     </div>
   );
 }
+
 // ─── Suggestion Chips ─────────────────────────────────────────────────────────
 
 function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (option: string) => void; lang: Language }) {
@@ -437,17 +405,13 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [leadContext, setLeadContext] = useState({ budget: "", preference: "", quantity: "" });
+  const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [lang, setLang] = useState<Language>("ms");
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"qr" | "bank" | "fpx" | "custom">("qr");
-  const [customPaymentText, setCustomPaymentText] = useState("");
-  const [activeCheckoutCart, setActiveCheckoutCart] = useState<CartItem[]>([]);
-  const [activeCheckoutTotal, setActiveCheckoutTotal] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -587,7 +551,7 @@ export default function ChatWidget() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages, cart, language: lang }),
+        body: JSON.stringify({ messages: updatedMessages, cart, language: lang, leadContext }),
       });
       const data: ChatResponse = await response.json();
       if (!response.ok) throw new Error(data.error || `Error ${response.status}`);
@@ -598,6 +562,13 @@ export default function ChatWidget() {
             const parsed = JSON.parse(data.reply.substring(12));
             if (parsed && (parsed.action === "cart_updated" || parsed.action === "cart_viewed") && Array.isArray(parsed.products)) {
               setCart(parsed.products);
+            }
+            if (parsed && parsed.action === "context_updated" && parsed.data) {
+              setLeadContext((prev) => ({
+                budget: parsed.data.budget || prev.budget,
+                preference: parsed.data.preference || prev.preference,
+                quantity: parsed.data.quantity || prev.quantity
+              }));
             }
           } catch (e) {}
         }
@@ -683,28 +654,6 @@ export default function ChatWidget() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleProceedToWhatsApp = () => {
-    if (!activeCheckoutCart.length) return;
-
-    let paymentMethodName = "";
-    if (selectedPaymentMethod === "qr") paymentMethodName = t.payQr;
-    else if (selectedPaymentMethod === "bank") paymentMethodName = t.payBank;
-    else if (selectedPaymentMethod === "fpx") paymentMethodName = t.payFpx;
-    else paymentMethodName = customPaymentText.trim() || (lang === "zh" ? "其他方式" : lang === "en" ? "Other Method" : "Kaedah Lain");
-
-    let msg = t.waProceedMsg;
-    activeCheckoutCart.forEach(item => {
-      msg += `• ${item.quantity}x ${item.name} (${item.price}/unit) — Jumlah: ${item.total}\n`;
-    });
-    
-    msg += `\n*${t.payMethodLabel}:* ${paymentMethodName}\n`;
-    msg += t.waTotalMsg.replace("{total}", activeCheckoutTotal.toFixed(2));
-
-    const checkoutLink = `https://wa.me/601164073143?text=${encodeURIComponent(msg)}`;
-    window.open(checkoutLink, "_blank", "noopener,noreferrer");
-    setShowPaymentModal(false);
   };
 
   // ── Panel animation variants ──────────────────────────────────────────────────
@@ -940,24 +889,34 @@ export default function ChatWidget() {
                             <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-0.5">
                               {msg.role === "user" ? t.userLabel : t.botLabel}
                             </span>
-                            {msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
+                            {msg.role === "model" && msg.text.startsWith("TOOL_RESULT_QUOTE_CARD:") ? (
+                              <QuoteCardUI text={msg.text} lang={lang} />
+                            ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
                               msg.text.includes('"action":"cart_') ? (
                                 <QuoteRenderer
                                   text={msg.text}
                                   onModifyQuote={() => handleSuggestionClick(lang === "zh" ? "请修改此报价单：" : lang === "en" ? "Please modify this quote: " : "Tolong ubah quote ni bosku: ")}
                                   onWhatsAppCheckout={(products, total) => {
-                                    setActiveCheckoutCart(products);
-                                    setActiveCheckoutTotal(total);
-                                    setShowPaymentModal(true);
+                                    fetch("/api/chat", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ action: "whatsapp_click", language: lang, cart: products, leadContext })
+                                    }).catch(() => {});
+                                    
+                                    let waMsg = `🛒 *New Lead - Golden AI*\n---------------------------\n`;
+                                    products.forEach((item) => {
+                                      waMsg += `• ${item.quantity}x ${item.name} (RM ${item.priceNum || item.price})\n`;
+                                    });
+                                    waMsg += `---------------------------\n💰 *TOTAL: RM ${total.toFixed(2)}*\n🌐 Language: ${lang.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
+                                    
+                                    window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
                                   }}
                                   lang={lang}
                                 />
                               ) : (
                                 <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} lang={lang} />
                               )
-                            ) : msg.role === "model" && msg.text.includes("SHOW_PAYMENT_OPTIONS") ? (
-                              <PaymentOptionsCard text={msg.text} onSelect={(option) => handleSuggestionClickAndSubmit(option)} lang={lang} />
-                            ) : (
+                              ) : (
                               <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
                                 <div className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${
                                   msg.role === "user"
@@ -1048,116 +1007,6 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
       {/* ── Payment Method Selector Modal ── */}
-      <AnimatePresence>
-        {showPaymentModal && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowPaymentModal(false)}
-              style={{ zIndex: 10000 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  fontFamily: "var(--font-inter), var(--font-dm-sans), sans-serif",
-                }}
-                className="w-full max-w-[400px] bg-[#0F172A] border border-white/10 rounded-[28px] p-6 shadow-2xl space-y-5 text-white"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[17px] font-extrabold text-amber-400 tracking-tight">{t.payTitle}</h3>
-                  <button
-                    onClick={() => setShowPaymentModal(false)}
-                    className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-[12.5px] text-slate-300 leading-relaxed font-medium">
-                  {t.payDesc}
-                </p>
-
-                {/* Option Cards */}
-                <div className="space-y-2.5">
-                  {[
-                    { id: "qr", label: t.payQr },
-                    { id: "bank", label: t.payBank },
-                    { id: "fpx", label: t.payFpx },
-                    { id: "custom", label: t.payCustom },
-                  ].map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setSelectedPaymentMethod(opt.id as any)}
-                      className={`w-full text-left p-3.5 rounded-xl border text-[13px] font-bold transition-all flex items-center justify-between cursor-pointer ${
-                        selectedPaymentMethod === opt.id
-                          ? "border-amber-400 bg-amber-400/10 text-amber-400 shadow-md shadow-amber-400/5"
-                          : "border-white/5 bg-white/5 text-slate-300 hover:bg-white/10 hover:border-white/10"
-                      }`}
-                    >
-                      <span>{opt.label}</span>
-                      <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        selectedPaymentMethod === opt.id
-                          ? "border-amber-400 bg-amber-400"
-                          : "border-slate-500"
-                      }`}>
-                        {selectedPaymentMethod === opt.id && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#0F172A]" />
-                        )}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Custom input box */}
-                <AnimatePresence>
-                  {selectedPaymentMethod === "custom" && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <input
-                        type="text"
-                        value={customPaymentText}
-                        onChange={(e) => setCustomPaymentText(e.target.value)}
-                        placeholder={t.payPlaceholder}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[12.5px] outline-none text-white focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/10 transition-all font-medium placeholder:text-slate-500"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Actions */}
-                <div className="flex gap-2.5 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowPaymentModal(false)}
-                    className="flex-1 py-3 text-[12px] font-extrabold text-slate-300 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 cursor-pointer"
-                  >
-                    {t.payCancel}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleProceedToWhatsApp}
-                    className="flex-1 py-3 text-[12px] font-extrabold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all text-center shadow-lg shadow-amber-400/25 cursor-pointer"
-                  >
-                    {t.payConfirm}
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }
