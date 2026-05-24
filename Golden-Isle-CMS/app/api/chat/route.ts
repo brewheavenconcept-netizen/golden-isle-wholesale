@@ -400,9 +400,20 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                     }
                 }
 
-                const summaryText = addedCount > 0 
-                    ? `Saya sudah masukkan ${summaryList.join(", ")} ke dalam troli draf bosku. Berikut adalah resit draf ko yang terkini:`
-                    : `Minta maaf bossku, saya tak jumpa produk "${itemsToAdd.map((i: any)=>i.name).join(", ")}" yang ada stok dalam inventori kita.`;
+                let summaryText = "";
+                if (language === "en") {
+                    summaryText = addedCount > 0 
+                        ? `I have successfully added ${summaryList.join(", ")} to your quote draft. Here is your current quote receipt:`
+                        : `I'm sorry, I couldn't find "${itemsToAdd.map((i: any)=>i.name).join(", ")}" with available stock in our inventory.`;
+                } else if (language === "zh") {
+                    summaryText = addedCount > 0 
+                        ? `我已成功将 ${summaryList.join(", ")} 添加到您的报价单草稿中。以下是您当前的报价单明细：`
+                        : `非常抱歉，在我们的库存中未找到有货的 "${itemsToAdd.map((i: any)=>i.name).join(", ")}"。`;
+                } else {
+                    summaryText = addedCount > 0 
+                        ? `Saya sudah masukkan ${summaryList.join(", ")} ke dalam troli draf bosku. Berikut adalah resit draf ko yang terkini:`
+                        : `Minta maaf bossku, saya tak jumpa produk "${itemsToAdd.map((i: any)=>i.name).join(", ")}" yang ada stok dalam inventori kita.`;
+                }
 
                 return NextResponse.json({
                     reply: formatCartResult("cart_updated", updatedCart, summaryText)
@@ -424,9 +435,20 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                     }
                 }
 
-                const summaryText = removedList.length > 0 
-                    ? `Beres bossku, saya sudah padam ${removedList.join(", ")} dari troli draf ko. Ini resit draf terkini:`
-                    : `Ehh, saya tak jumpa produk "${itemsToRemove.map((i: any)=>i.name).join(", ")}" di dalam troli draf ko sekarang.`;
+                let summaryText = "";
+                if (language === "en") {
+                    summaryText = removedList.length > 0 
+                        ? `Perfect, I've removed ${removedList.join(", ")} from your quote draft. Here is your updated receipt:`
+                        : `I couldn't find "${itemsToRemove.map((i: any)=>i.name).join(", ")}" in your quote draft.`;
+                } else if (language === "zh") {
+                    summaryText = removedList.length > 0 
+                        ? `好的，我已从您的报价草稿中删除了 ${removedList.join(", ")}。这是您更新后的明细：`
+                        : `在您的报价单草稿中未找到产品 "${itemsToRemove.map((i: any)=>i.name).join(", ")}"。`;
+                } else {
+                    summaryText = removedList.length > 0 
+                        ? `Beres bossku, saya sudah padam ${removedList.join(", ")} dari troli draf ko. Ini resit draf terkini:`
+                        : `Ehh, saya tak jumpa produk "${itemsToRemove.map((i: any)=>i.name).join(", ")}" di dalam troli draf ko sekarang.`;
+                }
 
                 return NextResponse.json({
                     reply: formatCartResult("cart_updated", updatedCart, summaryText)
@@ -450,9 +472,20 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
                     }
                 }
 
-                const summaryText = updatedList.length > 0 
-                    ? `Cantik bosku, saya dah update kuantiti jadi ${updatedList.join(", ")}. Ini draf quote terkini:`
-                    : `Sori bos, saya tak jumpa produk "${itemsToUpdate.map((i: any)=>i.name).join(", ")}" dalam draf quote.`;
+                let summaryText = "";
+                if (language === "en") {
+                    summaryText = updatedList.length > 0 
+                        ? `Great, I've updated the quantities to ${updatedList.join(", ")}. Here is your updated quote draft:`
+                        : `I couldn't find "${itemsToUpdate.map((i: any)=>i.name).join(", ")}" in your quote draft.`;
+                } else if (language === "zh") {
+                    summaryText = updatedList.length > 0 
+                        ? `好的，我已将数量更新为 ${updatedList.join(", ")}。这是您更新后的报价单草稿：`
+                        : `在您的报价单草稿中未找到产品 "${itemsToUpdate.map((i: any)=>i.name).join(", ")}"。`;
+                } else {
+                    summaryText = updatedList.length > 0 
+                        ? `Cantik bosku, saya dah update kuantiti jadi ${updatedList.join(", ")}. Ini draf quote terkini:`
+                        : `Sori bos, saya tak jumpa produk "${itemsToUpdate.map((i: any)=>i.name).join(", ")}" dalam draf quote.`;
+                }
 
                 return NextResponse.json({
                     reply: formatCartResult("cart_updated", updatedCart, summaryText)
@@ -461,9 +494,20 @@ As a premium concierge, you build Custom Quotes (Drafts) for clients.
 
             // view_cart — stateless cart display
             if (functionName === "view_cart") {
-                const summaryText = cart.length > 0
-                    ? "Baik bosku, berikut adalah butiran troli draf (resit draf) ko yang terkini:"
-                    : "Troli draf ko masih kosong lagi, bossku. Mau saya carikan wiski atau beer premium untuk dimasukkan?";
+                let summaryText = "";
+                if (language === "en") {
+                    summaryText = cart.length > 0
+                        ? "Certainly, here are the details of your current quote draft (receipt):"
+                        : "Your quote draft is currently empty. Would you like me to find some premium whiskies or beers to add?";
+                } else if (language === "zh") {
+                    summaryText = cart.length > 0
+                        ? "好的，以下是您当前报价单（草稿）的详细信息："
+                        : "您的报价单草稿目前是空的。需要我为您寻找一些高端威士忌或啤酒加入吗？";
+                } else {
+                    summaryText = cart.length > 0
+                        ? "Baik bosku, berikut adalah butiran troli draf (resit draf) ko yang terkini:"
+                        : "Troli draf ko masih kosong lagi, bossku. Mau saya carikan wiski atau beer premium untuk dimasukkan?";
+                }
                 
                 return NextResponse.json({
                     reply: formatCartResult("cart_viewed", cart, summaryText)
