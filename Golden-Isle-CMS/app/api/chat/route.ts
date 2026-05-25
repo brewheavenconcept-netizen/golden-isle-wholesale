@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { buildContextBlock } from "@/lib/contextBuilder";
 
 async function saveLead(data: any) {
     // TODO: replace with Google Sheets webhook URL
@@ -154,7 +155,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const { message, messages, cart: incomingCart, language = "ms", action, leadContext = {} } = body;
+        const { message, messages, cart: incomingCart, language = "ms", action, leadContext = {}, customerContext } = body;
         const cart = Array.isArray(incomingCart) ? incomingCart : [];
 
         // Task 3: Lead Capture for WhatsApp click
@@ -191,16 +192,24 @@ export async function POST(req: Request) {
 - Persuasive Closer: Strategically nudge the customer to complete their order.`;
         }
         
-        const systemInstructionText = `You are Golden AI, a premium B2B wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
+        // Build context block from customer session (injected by ChatWidget)
+        const contextBlock = customerContext ? buildContextBlock(customerContext) : "";
+
+        const systemInstructionText = `You are Golden AI, a warm, knowledgeable B2B wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
 
 MISSION:
-Convert visitors into qualified buyers and process their payments.
+Convert visitors into qualified buyers. Make every interaction feel like talking to a knowledgeable friend who remembers everything and genuinely wants to help.
+
+CONVERSATIONAL STYLE:
+- Reference what you already know about the customer naturally in every response
+- NEVER ask for information you already have
+- Build on previous messages — if they mentioned beer earlier, don't treat them as a stranger now
+- Be specific: "Since you usually order Carlsberg..." not generic "Based on your preferences..."
+- Match their energy — casual tone = casual reply, formal = formal
 
 ${languageInstruction}
 
-STYLE:
-- premium, concise, proactive, sales-focused.
-- no long essays.
+${contextBlock}
 
 FLOW RULES:
 1. Main Menu: When a user starts or says hello, offer these options: 'Browse Products', 'Recommend by Budget', 'Build Quote', 'Talk to Sales'.
@@ -208,15 +217,27 @@ FLOW RULES:
 3. Category Click: Once a category is selected or mentioned, IMMEDIATELY use 'search_products' tool to show product cards. Do NOT ask any open-ended questions like "what is your budget?".
 4. Product Cards: When returning products via 'search_products', the UI will automatically show "Add to Quote", "More Like This", and "Checkout".
 5. Add to Quote: When they ask to add to quote/cart, use the 'add_to_cart' tool.
-6. Checkout: When they say checkout or pay, use the 'request_checkout' tool to ask for their name and phone number. If you already know their name and phone, pass it to the tool to display the Payment Options Card.
+6. Checkout: When they say checkout or pay, use the 'request_checkout' tool.
 
 GLOBAL RULES:
-- Never hallucinate products, prices, stock, payment links, or shipping details. Only recommend products that actually exist in the catalog.
+- Never hallucinate products, prices, stock, payment links, or shipping details.
 - If they want to talk to a human, provide a WhatsApp link.
 
+## PRICING GUARDRAILS
+- NEVER suggest, quote, or calculate any price not returned directly from the database search tool.
+- NEVER offer discounts, modify prices, or imply special rates not in the system.
+- If user asks for discount: respond with "Boss, harga borong kami dah competitive. Untuk pembelian 10 karton ke atas, hubungi sales terus untuk harga khas."
+- ALL prices must come from the search_products tool result only.
+
+## FLOW GUARDRAILS  
+- NEVER create, confirm, or finalise orders in text — the checkout_card UI handles this.
+- NEVER process, simulate, or describe payment — the payment page handles this.
+- NEVER bypass the checkout flow. If user asks to pay directly, call request_checkout tool.
+
 ## INTERACTIVE SUGGESTIONS
-- To provide quick contextual actions for the user, you can append the tag 'SHOW_SUGGESTIONS:item1,item2,...' at the end of your response.
+- Append 'SHOW_SUGGESTIONS:item1,item2,...' at the end of your response for quick contextual actions.
 - Example: SHOW_SUGGESTIONS:Browse Products,Recommend by Budget,Talk to Sales`;
+
 
         // Format history for OpenAI
         const openAiMessages = [

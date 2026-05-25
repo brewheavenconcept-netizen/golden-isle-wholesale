@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -13,12 +13,20 @@ import {
   Trash2,
   ArrowLeft,
   ShoppingCart,
+  Paperclip,
+  FileText,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePublicStore } from "@/hooks/usePublicStore";
 import { getProducts, createOrderWithStockCheck, clearCart } from "@/lib/storage";
 import { Order, OrderItem } from "@/types";
 import toast from "react-hot-toast";
+import {
+  CustomerContext,
+  createEmptyContext,
+  extractContextFromMessage,
+} from "@/lib/contextBuilder";
+import { generateContextualChips } from "@/lib/chipGenerator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,12 +68,12 @@ const TRANSLATIONS = {
   ms: {
     title: "Golden AI",
     subtitle: "Premium B2B Concierge",
-    placeholder: "Describe your wholesale requirements...",
-    welcomeTitle: "Selamat datang ke Golden AI",
-    welcomeDesc: "Tanya tentang katalog arak premium, sebut harga borong, atau kaedah pembayaran B2B.",
+    placeholder: "Taip sesuatu atau pilih di bawah...",
+    welcomeTitle: "Boss nak stok untuk event atau restoran? 🎯",
+    welcomeDesc: "Sy suggest dalam 60 saat. Pilih je di bawah.",
     quickActionsTitle: "Quick Actions",
     errorTitle: "Ralat Berlaku",
-    thinking: "Sedang merangka cadangan...",
+    thinking: "Sedang merangka cadangan terbaik...",
     userLabel: "Anda",
     botLabel: "Golden AI",
     quoteTitle: "Quote Draft",
@@ -76,13 +84,16 @@ const TRANSLATIONS = {
     noQuote: "Tiada draf sebut harga buat masa ini.",
     addedConfirm: "✅ Ditambah ke sebut harga draf",
     addedBtn: "✓ Added!",
-    addBtn: "Add to Order",
+    addBtn: "Add to Quote",
     waBtn: "WhatsApp",
     errReceipt: "Ralat memproses resit draf.",
     errProduct: "Ralat memproses senarai produk.",
     noProduct: "Tiada produk ditemui.",
     waProceedMsg: "Hi, saya mahu proceed pesanan borong untuk:\n\n",
     waTotalMsg: "\n*Jumlah Keseluruhan: RM {total}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!",
+    paymentSuccess: (orderId: string) => `🎉 Order ${orderId} confirmed!\n\nTeam kami akan contact boss dalam 30 minit via WhatsApp 📱\n\nSambil tunggu — nak tambah item lagi untuk order yang sama?`,
+    addMoreItems: "➕ Tambah Item Lagi",
+    talkToSales: "💬 Hubungi Sales",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Tolong recommend produk borong ikut budget saya." },
       { label: "Build Wholesale Quote", icon: "📦", query: "Saya nak minta sebut harga (wholesale quote)." },
@@ -93,11 +104,11 @@ const TRANSLATIONS = {
     title: "Golden AI",
     subtitle: "Premium B2B Concierge",
     placeholder: "Describe your wholesale requirements...",
-    welcomeTitle: "Welcome to Golden AI",
-    welcomeDesc: "Inquire about our premium wholesale liquor catalog, instant quotes, or corporate account setup.",
+    welcomeTitle: "Stocking up for an event or restaurant? 🎯",
+    welcomeDesc: "We'll suggest the perfect wholesale package in 60 seconds. Just select below.",
     quickActionsTitle: "Quick Actions",
     errorTitle: "Error Occurred",
-    thinking: "Drafting recommendations...",
+    thinking: "Curating the best wholesale options...",
     userLabel: "You",
     botLabel: "Golden AI",
     quoteTitle: "Quote Draft",
@@ -108,13 +119,16 @@ const TRANSLATIONS = {
     noQuote: "No quote drafts at the moment.",
     addedConfirm: "✅ Added to quote draft",
     addedBtn: "✓ Added!",
-    addBtn: "Add to Order",
+    addBtn: "Add to Quote",
     waBtn: "WhatsApp",
     errReceipt: "Error processing quote draft.",
     errProduct: "Error processing product list.",
     noProduct: "No listed products found.",
     waProceedMsg: "Hi, I would like to proceed with this wholesale order for:\n\n",
     waTotalMsg: "\n*Grand Total: RM {total}*\n\nPlease prepare the invoice & QR payment link. Thank you!",
+    paymentSuccess: (orderId: string) => `🎉 Order ${orderId} confirmed!\n\nOur team will contact you within 30 minutes via WhatsApp 📱\n\nWhile you wait — want to add more items to the same order?`,
+    addMoreItems: "➕ Add More Items",
+    talkToSales: "💬 Talk to Sales",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Please recommend wholesale products based on my budget." },
       { label: "Build Wholesale Quote", icon: "📦", query: "I would like to build a wholesale quote." },
@@ -124,12 +138,12 @@ const TRANSLATIONS = {
   zh: {
     title: "Golden AI",
     subtitle: "高端 B2B 采购助理",
-    placeholder: "Describe your wholesale requirements...",
-    welcomeTitle: "欢迎使用 Golden AI",
-    welcomeDesc: "咨询关于高端免税酒类目录、实时批发报价或 B2B 合作流程。",
+    placeholder: "请描述您的批发需求...",
+    welcomeTitle: "为活动或餐厅采购？我们60秒内为您推荐 🎯",
+    welcomeDesc: "选择下方选项，立即获取专属批发报价。",
     quickActionsTitle: "快捷操作",
     errorTitle: "发生错误",
-    thinking: "正在定制专属方案...",
+    thinking: "正在定制专属批发方案...",
     userLabel: "您",
     botLabel: "Golden AI",
     quoteTitle: "报价单草稿",
@@ -140,13 +154,16 @@ const TRANSLATIONS = {
     noQuote: "目前没有报价单草稿。",
     addedConfirm: "✅ 已添加到报价单草稿",
     addedBtn: "✓ 已添加!",
-    addBtn: "加入订单",
+    addBtn: "加入报价单",
     waBtn: "联系 WhatsApp",
     errReceipt: "处理报价草稿时出错。",
     errProduct: "处理产品列表时出错。",
     noProduct: "未找到相关产品。",
     waProceedMsg: "您好，我想为以下货品办理大宗批发订单：\n\n",
     waTotalMsg: "\n*总计金额: RM {total}*\n\n请准备发票和付款二维码。谢谢！",
+    paymentSuccess: (orderId: string) => `🎉 订单 ${orderId} 已确认！\n\n我们的团队将在30分钟内通过 WhatsApp 与您联系 📱\n\n趁等待期间 — 还想为同一张订单添加更多商品吗？`,
+    addMoreItems: "➕ 继续添加商品",
+    talkToSales: "💬 联系销售",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "请根据我的预算推荐批发产品。" },
       { label: "Build Wholesale Quote", icon: "📦", query: "我想获取批发报价单。" },
@@ -154,6 +171,7 @@ const TRANSLATIONS = {
     ]
   }
 };
+
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -323,17 +341,63 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
   );
 }
 
-function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart: (product: any) => void; onSendText: (text: string) => void; lang: Language }) {
+// ─── Urgency Copy Helper ──────────────────────────────────────────────────────
+
+function getUrgencyCopy(category: string, badge: string, lang: Language): string {
+  const cat = (category || "").toLowerCase();
+  if (badge === "TERHAD") {
+    if (lang === "zh") return "⚡ 库存有限 — 立即下单锁货！";
+    if (lang === "en") return "⚡ Limited stock — order now to secure yours!";
+    return "⚡ Stok terhad — pesan sekarang sebelum kehabisan!";
+  }
+  if (cat.includes("whisky") || cat.includes("whiskey")) {
+    if (lang === "zh") return "🥃 本月拿督餐厅热销款 — 批量订购享优先配送";
+    if (lang === "en") return "🥃 Top B2B pick this month — hotels & bars repeat ordering";
+    return "🥃 Pilihan #1 horeca Labuan bulan ini — restoran dah repeat order 🔥";
+  }
+  if (cat.includes("wine")) {
+    if (lang === "zh") return "🍷 宴会及高端晚宴首选 — 库存充足";
+    if (lang === "en") return "🍷 Event & gala dinner best seller — well stocked";
+    return "🍷 Best seller event & gala dinner — stok penuh sekarang";
+  }
+  if (cat.includes("beer") || cat.includes("craft")) {
+    if (lang === "zh") return "🍺 进口精酿 — 派对活动大量采购首选";
+    if (lang === "en") return "🍺 Imported craft — crowd favourite for events & parties";
+    return "🍺 Import premium — crowd favourite untuk event & majlis";
+  }
+  if (cat.includes("cognac") || cat.includes("brandy")) {
+    if (lang === "zh") return "✨ 高端礼品首选 — VIP 接待及商务场合热门款";
+    if (lang === "en") return "✨ Premium gifting & VIP hospitality favourite";
+    return "✨ Pilihan premium untuk hadiah VIP & majlis korporat";
+  }
+  if (lang === "zh") return "✨ 优质批发精选 — 现货供应";
+  if (lang === "en") return "✨ Premium wholesale selection — in stock now";
+  return "✨ Pilihan borong premium — stok tersedia sekarang";
+}
+
+function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
+  const [showQtyPicker, setShowQtyPicker] = useState(false);
+  const [selectedQty, setSelectedQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const handleAdd = (e: React.MouseEvent) => {
+  const handleAddClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToCart(p);
+    setShowQtyPicker(true);
+    setSelectedQty(1);
+  };
+
+  const handleConfirmAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onAddToCart(p, selectedQty);
+    setShowQtyPicker(false);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
+
+  const urgencyCopy = getUrgencyCopy(p.category, p.badge, lang);
 
   return (
     <div className="bg-white border border-slate-100/80 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
@@ -353,31 +417,88 @@ function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart
           <span className="text-3xl">🥃</span>
         </div>
       )}
-      <div className="p-5 flex-1 flex flex-col gap-2.5">
+      <div className="p-5 flex-1 flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-[10px] uppercase tracking-widest font-semibold text-[#D4AF37]">{p.category}</span>
         </div>
         <h4 className="text-[15px] font-semibold text-slate-900 leading-snug tracking-tight">{p.name}</h4>
+        {/* Urgency copy line */}
+        <p className="text-[11px] font-medium text-emerald-600 leading-snug">{urgencyCopy}</p>
         <p className="text-[12px] text-slate-400 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
         <div className="flex items-center justify-between mt-0.5">
           <span className="text-[16px] font-semibold text-[#1F2937] tracking-tight">{p.price}</span>
         </div>
-        <div className="flex flex-col gap-2 mt-2">
-          <button onClick={handleAdd}
-            className="w-full text-[12px] font-semibold tracking-wider uppercase text-white bg-[#1F2937] hover:bg-slate-800 py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] active:scale-98 cursor-pointer">
-            {added ? t.addedBtn : "Add to Quote"}
-          </button>
-          <div className="flex gap-2">
-            <button onClick={() => onSendText(`More like ${p.name}`)}
-              className="flex-1 text-[11px] font-medium text-slate-650 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
-              More Like This
+
+        {/* Quantity Picker (inline) */}
+        <AnimatePresence>
+          {showQtyPicker && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.18 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-3 mt-1">
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest text-center">
+                  {lang === "zh" ? "选择数量" : lang === "en" ? "Select Quantity" : "Pilih Kuantiti"}
+                </p>
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
+                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                  >−</button>
+                  <span className="text-[20px] font-bold text-slate-900 w-8 text-center">{selectedQty}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
+                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                  >+</button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowQtyPicker(false); }}
+                    className="flex-1 text-[11px] font-medium text-slate-500 bg-white border border-slate-200 py-2.5 rounded-full transition-all cursor-pointer hover:bg-slate-50"
+                  >
+                    {lang === "zh" ? "取消" : lang === "en" ? "Cancel" : "Batal"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmAdd}
+                    className="flex-1 text-[11px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-2.5 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
+                  >
+                    {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? `Add ${selectedQty} to Quote` : `Tambah ${selectedQty} ke Quote`}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!showQtyPicker && (
+          <div className="flex flex-col gap-2 mt-1">
+            <button onClick={handleAddClick}
+              className={`w-full text-[12px] font-semibold tracking-wider uppercase py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] active:scale-98 cursor-pointer ${
+                added
+                  ? "bg-emerald-500 text-white"
+                  : "bg-[#1F2937] hover:bg-slate-800 text-white"
+              }`}>
+              {added ? t.addedBtn : t.addBtn}
             </button>
-            <button onClick={() => onSendText(`Checkout`)}
-              className="flex-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
-              Checkout
-            </button>
+            <div className="flex gap-2">
+              <button onClick={() => onSendText(`More like ${p.name}`)}
+                className="flex-1 text-[11px] font-medium text-slate-650 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                More Like This
+              </button>
+              <button onClick={() => onSendText(`Checkout`)}
+                className="flex-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                Checkout
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -385,7 +506,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart
 
 // ─── Tool Result Renderers ──────────────────────────────────────────────────
 
-function ToolResultProductCards({ text, onAddToCart, onSendText, lang }: { text: string; onAddToCart: (product: any) => void; onSendText: (text: string) => void; lang: Language }) {
+function ToolResultProductCards({ text, onAddToCart, onSendText, lang }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
   try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
@@ -961,13 +1082,17 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [lang, setLang] = useState<Language>("ms");
   const [isMobile, setIsMobile] = useState(false);
-  
   const [currentStep, setCurrentStep] = useState<ChatStep>("START");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
+  // ── Customer Context — tracks everything we learn, injected into LLM
+  const [customerContext, setCustomerContext] = useState<CustomerContext>(createEmptyContext());
+  const [invoiceUploading, setInvoiceUploading] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const invoiceInputRef = useRef<HTMLInputElement>(null);
 
   const t = TRANSLATIONS[lang];
 
@@ -1111,16 +1236,14 @@ export default function ChatWidget() {
         localStorage.removeItem("golden_ai_cart");
       } catch (e) {}
 
-      // Add a success message to the chat
+      // Add a rich success message with upsell
+      const tLocal = TRANSLATIONS[lang];
+      const successText = tLocal.paymentSuccess(orderId);
       setMessages((prev) => [
         ...prev,
         {
           role: "model",
-          text: lang === "zh"
-            ? `🎉 订单创建成功！正在为您跳转至支付页面...`
-            : lang === "en"
-            ? `🎉 Order created successfully! Redirecting you to the payment page...`
-            : `🎉 Pesanan berjaya dicipta! Melencongkan anda ke laman pembayaran...`
+          text: `${successText}\nSHOW_SUGGESTIONS:${lang === "zh" ? "继续添加商品,联系销售" : lang === "en" ? "Add More Items,Talk to Sales" : "Tambah Item Lagi,Hubungi Sales"}`
         }
       ]);
       setCurrentStep("PAYMENT_COMPLETE");
@@ -1128,7 +1251,7 @@ export default function ChatWidget() {
       // Redirect to payment transfer page
       setTimeout(() => {
         router.push(`/payment/transfer/${orderId}`);
-      }, 1500);
+      }, 2500);
 
     } catch (err: any) {
       console.error("handleProcessCheckout error:", err);
@@ -1177,13 +1300,14 @@ export default function ChatWidget() {
 
   // ── handleAddToCart ───────────────────────────────────────────────────────────
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: any, quantity: number = 1) => {
+    const qty = Math.max(1, quantity);
     setCart((prev) => {
       const updated = [...prev];
       const existingIdx = updated.findIndex((c) => c.name.toLowerCase() === product.name.toLowerCase());
       const priceNum = parseFloat((product.price || "RM 0").replace(/[^0-9.]/g, "")) || 0;
       if (existingIdx > -1) {
-        updated[existingIdx].quantity += 1;
+        updated[existingIdx].quantity += qty;
         updated[existingIdx].total = `RM ${(updated[existingIdx].quantity * updated[existingIdx].priceNum).toFixed(2)}`;
       } else {
         updated.push({
@@ -1191,16 +1315,165 @@ export default function ChatWidget() {
           category: product.category || "Beverage",
           price: product.price,
           priceNum,
-          quantity: 1,
-          total: `RM ${priceNum.toFixed(2)}`,
+          quantity: qty,
+          total: `RM ${(qty * priceNum).toFixed(2)}`,
           image_url: product.image_url,
-          whatsapp_message: `Saya berminat dengan ${product.name} (1 unit, jumlah RM ${priceNum.toFixed(2)}). Boleh proceed pesanan?`
+          whatsapp_message: `Saya berminat dengan ${product.name} (${qty} unit, jumlah RM ${(qty * priceNum).toFixed(2)}). Boleh proceed pesanan?`
         });
       }
       return updated;
     });
     setTimeout(() => { autoViewCart(); }, 100);
+    // Update context — customer has added to cart
+    setCustomerContext(prev => ({
+      ...prev,
+      hasAddedToCart: true,
+      mentionedProducts: prev.mentionedProducts.includes(product.name)
+        ? prev.mentionedProducts
+        : [...prev.mentionedProducts, product.name],
+    }));
   };
+
+  // ── handleInvoiceUpload — Vision API ─────────────────────────────────────────
+
+  const handleInvoiceUpload = useCallback(async (file: File) => {
+    if (!file) return;
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+    if (!validTypes.includes(file.type) && !file.type.startsWith("image/")) {
+      toast.error("Please upload an image of your invoice (JPG, PNG, WebP)");
+      return;
+    }
+
+    setInvoiceUploading(true);
+    // Show upload message immediately
+    const uploadingMsg: Message = {
+      role: "user",
+      text: `📎 ${lang === "zh" ? "上传发票" : lang === "en" ? "Uploaded invoice" : "Upload invoice"}: ${file.name}`,
+    };
+    setMessages(prev => [...prev, uploadingMsg]);
+    if (currentStep === "START" || currentStep === "LANGUAGE_SELECTED") {
+      setCurrentStep("PRODUCT_RECOMMENDATION");
+    }
+
+    try {
+      // Convert file to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(",")[1]); // strip data:...;base64,
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch("/api/vision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: "model",
+            text: data.error || (lang === "en"
+              ? "Sorry, couldn't read that invoice. Please try a clearer image."
+              : lang === "zh"
+              ? "抱歉，无法识别该发票。请尝试更清晰的图片。"
+              : "Maaf, sy tak dapat baca invoice tu. Cuba gambar yang lebih jelas ya."),
+          },
+        ]);
+        return;
+      }
+
+      // Update customer context with invoice data
+      const newCtx: CustomerContext = {
+        ...customerContext,
+        hasUploadedInvoice: true,
+        previousSupplier: data.supplier || undefined,
+        monthlySpend: data.invoiceTotal || undefined,
+        invoiceData: {
+          supplier: data.supplier,
+          invoiceDate: data.invoiceDate,
+          items: data.items || [],
+          invoiceTotal: data.invoiceTotal || 0,
+          potentialSavings: data.potentialSavings || 0,
+        },
+      };
+
+      // Infer preferred category from invoice items
+      if (data.items?.length > 0) {
+        const firstItem = (data.items[0].name || "").toLowerCase();
+        if (firstItem.includes("beer") || firstItem.includes("carlsberg") || firstItem.includes("heineken") || firstItem.includes("tiger")) {
+          newCtx.preferredCategory = "beer";
+        } else if (firstItem.includes("whisky") || firstItem.includes("whiskey") || firstItem.includes("chivas") || firstItem.includes("jack")) {
+          newCtx.preferredCategory = "whisky";
+        } else if (firstItem.includes("wine") || firstItem.includes("penfolds")) {
+          newCtx.preferredCategory = "wine";
+        }
+      }
+
+      setCustomerContext(newCtx);
+
+      // Build the invoice result message
+      const savings = data.potentialSavings || 0;
+      const supplier = data.supplier || (lang === "en" ? "your supplier" : lang === "zh" ? "您的供应商" : "supplier lama");
+      let invoiceMsg = "";
+
+      if (lang === "en") {
+        invoiceMsg = `📋 Invoice analysed! I found **${data.items?.length || 0} items** from ${supplier}.\n\nYour previous spend: **RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
+        if (savings > 0) {
+          invoiceMsg += `\n💰 Switching to Golden Isle saves you **RM ${savings.toFixed(2)}** (${data.savingsPercent || 0}% savings) on this same order!`;
+        }
+        invoiceMsg += `\n\nWant me to build you a quote with our prices?`;
+      } else if (lang === "zh") {
+        invoiceMsg = `📋 发票分析完成！找到来自${supplier}的 **${data.items?.length || 0} 件商品**。\n\n您之前的花费：**RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
+        if (savings > 0) {
+          invoiceMsg += `\n💰 切换到Golden Isle可节省 **RM ${savings.toFixed(2)}**（节省${data.savingsPercent || 0}%）！`;
+        }
+        invoiceMsg += `\n\n要我根据我们的价格为您建立报价单吗？`;
+      } else {
+        invoiceMsg = `📋 Invoice boss dah sy analisa! Jumpa **${data.items?.length || 0} item** dari ${supplier}.\n\nSpend boss sebelum ni: **RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
+        if (savings > 0) {
+          invoiceMsg += `\n💰 Kalau boss tukar ke Golden Isle, jimat **RM ${savings.toFixed(2)}** (${data.savingsPercent || 0}% savings) untuk order yang sama!`;
+        }
+        invoiceMsg += `\n\nNak sy buatkan quote dengan harga Golden Isle sekarang?`;
+      }
+
+      // Generate contextual chips based on new invoice context
+      const chips = generateContextualChips(newCtx, lang);
+      const chipsStr = chips.map(c => c.label).join(",");
+
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "model",
+          text: `${invoiceMsg}\nSHOW_SUGGESTIONS:${chipsStr}`,
+        },
+      ]);
+
+    } catch (err) {
+      console.error("Invoice upload error:", err);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "model",
+          text: lang === "en"
+            ? "Something went wrong analysing the invoice. Please try again."
+            : lang === "zh"
+            ? "分析发票时出现错误，请重试。"
+            : "Ada masalah semasa analisa invoice. Cuba lagi ya.",
+        },
+      ]);
+    } finally {
+      setInvoiceUploading(false);
+      if (invoiceInputRef.current) invoiceInputRef.current.value = "";
+    }
+  }, [customerContext, lang, currentStep]);
 
   // ── handleChatSubmit ──────────────────────────────────────────────────────────
 
@@ -1217,10 +1490,21 @@ export default function ChatWidget() {
     setError(null);
 
     try {
+      // Extract context signals from user message (zero API cost)
+      const ctxUpdates = extractContextFromMessage(trimmedMessage, customerContext);
+      const updatedCtx = { ...customerContext, ...ctxUpdates };
+      setCustomerContext(updatedCtx);
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages, cart, language: lang, leadContext }),
+        body: JSON.stringify({
+          messages: updatedMessages,
+          cart,
+          language: lang,
+          leadContext,
+          customerContext: updatedCtx,
+        }),
       });
       const data: ChatResponse = await response.json();
       if (!response.ok) throw new Error(data.error || `Error ${response.status}`);
@@ -1335,9 +1619,47 @@ export default function ChatWidget() {
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
+  // ── handleSuggestionClickAndSubmit — Hybrid LLM routing ──────────────────────
+  // Deterministic chips = $0 (no API call)
+  // Only ambiguous/free text → real OpenAI call
+
   const handleSuggestionClickAndSubmit = async (query: string) => {
     const trimmedMessage = query.trim();
     if (!trimmedMessage) return;
+
+    const q = trimmedMessage.toLowerCase();
+
+    // ── DETERMINISTIC ROUTES (zero API cost) ─────────────────────────────────
+
+    // "View Cart" / "Quote" / cart-related chips
+    if (q === "view cart" || q === "tunjuk cart" || q === "cart" || q === "quote") {
+      setCurrentStep("QUOTE_REVIEW");
+      return;
+    }
+
+    // "Talk to Sales" / "WhatsApp" chips
+    if (
+      q.includes("talk to sales") || q.includes("hubungi sales") || q.includes("联系销售") ||
+      q.includes("whatsapp") || q.includes("human") || q.includes("sales team")
+    ) {
+      const waMsg = lang === "zh"
+        ? "您好，我需要销售人员协助处理批发订单。"
+        : lang === "en"
+        ? "Hi, I need assistance from the sales team for a wholesale order."
+        : "Hi, saya perlu bantuan dari tim sales untuk pesanan borong.";
+      window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // "Add More Items" after payment
+    if (
+      q === "add more items" || q === "tambah item lagi" || q === "继续添加商品"
+    ) {
+      setCurrentStep("LANGUAGE_SELECTED");
+      return;
+    }
+
+    // ── LLM ROUTE (API call for genuine free text) ────────────────────────────
 
     const newMsg: Message = { role: "user", text: trimmedMessage };
     const updatedMessages = [...messages, newMsg];
@@ -1596,14 +1918,14 @@ export default function ChatWidget() {
                             </div>
 
                             <div className="space-y-3 max-w-[320px]">
-                              <h3 className="text-[20px] font-semibold text-slate-900 tracking-tight leading-none">
-                                Hello! I'm Jenny ✨
+                              <h3 className="text-[20px] font-semibold text-slate-900 tracking-tight leading-snug">
+                                Boss nak stok untuk event atau restoran? 🎯
                               </h3>
                               <p className="text-[11px] font-semibold text-[#D4AF37] uppercase tracking-widest leading-none">
-                                Golden AI B2B Sales Assistant
+                                Golden AI · Premium B2B Concierge
                               </p>
                               <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
-                                I'm here to help you secure elite wholesale rates, source premium stocks, and build custom quote drafts instantly.
+                                Sy suggest dalam 60 saat. Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss. 👇
                               </p>
                             </div>
 
@@ -1839,31 +2161,64 @@ export default function ChatWidget() {
                     {/* ── Input Bar ── */}
                     {messages.length > 0 && (
                       <div className={`shrink-0 border-t border-slate-100/80 bg-white/40 backdrop-blur-md ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
-                        <form onSubmit={handleChatSubmit} className="relative flex items-center">
-                          <input
-                            ref={inputRef}
-                            type="text"
-                            required
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            disabled={loading}
-                            placeholder="Describe your wholesale requirements..."
-                            className="w-full bg-white/90 border border-slate-200/80 text-slate-900 placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:bg-white focus:border-slate-300 transition-all disabled:opacity-50 text-[13.5px] font-medium shadow-[0_2px_8px_rgba(0,0,0,0.02)] focus:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
-                          />
+                        {/* Hidden invoice file input */}
+                        <input
+                          ref={invoiceInputRef}
+                          type="file"
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleInvoiceUpload(file);
+                          }}
+                        />
+                        <form onSubmit={handleChatSubmit} className="relative flex items-center gap-2">
+                          {/* Upload invoice button */}
                           <motion.button
-                            whileTap={{ scale: loading ? 1 : 0.9 }}
-                            type="submit"
-                            disabled={loading || !message.trim()}
-                            className="absolute right-1.5 w-10 h-10 bg-[#1F2937] text-white rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] flex items-center justify-center cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            type="button"
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => invoiceInputRef.current?.click()}
+                            disabled={invoiceUploading || loading}
+                            title={lang === "zh" ? "上传发票" : lang === "en" ? "Upload invoice" : "Upload invoice"}
+                            className="shrink-0 w-10 h-10 rounded-full bg-slate-50 border border-slate-200 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/40 text-slate-400 hover:text-[#D4AF37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
                           >
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            {invoiceUploading
+                              ? <Loader2 className="w-4 h-4 animate-spin text-[#D4AF37]" />
+                              : <Paperclip className="w-4 h-4" />
+                            }
                           </motion.button>
+
+                          <div className="relative flex-1">
+                            <input
+                              ref={inputRef}
+                              type="text"
+                              required
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              disabled={loading || invoiceUploading}
+                              placeholder={t.placeholder}
+                              className="w-full bg-white/90 border border-slate-200/80 text-slate-900 placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:bg-white focus:border-slate-300 transition-all disabled:opacity-50 text-[13.5px] font-medium shadow-[0_2px_8px_rgba(0,0,0,0.02)] focus:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
+                            />
+                            <motion.button
+                              whileTap={{ scale: loading ? 1 : 0.9 }}
+                              type="submit"
+                              disabled={loading || invoiceUploading || !message.trim()}
+                              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1F2937] text-white rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] flex items-center justify-center cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            </motion.button>
+                          </div>
                         </form>
                         <p className="text-center text-[9.5px] text-slate-400 mt-3 select-none tracking-wide font-medium">
-                          Golden AI · Powered by OpenAI · Golden Isle Wholesale
+                          {lang === "en"
+                            ? "📎 Upload invoice to compare savings · Golden AI · Powered by OpenAI"
+                            : lang === "zh"
+                            ? "📎 上传发票比较节省 · Golden AI · Powered by OpenAI"
+                            : "📎 Upload invoice untuk compare savings · Golden AI · Powered by OpenAI"}
                         </p>
                       </div>
                     )}
+
                   </div>
                 )}
               </div>
