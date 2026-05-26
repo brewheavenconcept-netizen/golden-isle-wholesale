@@ -155,7 +155,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const { message, messages, cart: incomingCart, language = "ms", action, leadContext = {}, customerContext } = body;
+        const { message, messages, cart: incomingCart, language = "ms", action, leadContext = {}, customerContext, flowType } = body;
         const cart = Array.isArray(incomingCart) ? incomingCart : [];
 
         // Task 3: Lead Capture for WhatsApp click
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
         // Build context block from customer session (injected by ChatWidget)
         const contextBlock = customerContext ? buildContextBlock(customerContext) : "";
 
-        const systemInstructionText = `You are Golden AI, a warm, knowledgeable B2B wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
+        let systemInstructionText = `You are Golden AI, a warm, knowledgeable B2B wholesale sales assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
 
 MISSION:
 Convert visitors into qualified buyers. Make every interaction feel like talking to a knowledgeable friend who remembers everything and genuinely wants to help.
@@ -210,7 +210,27 @@ CONVERSATIONAL STYLE:
 ${languageInstruction}
 
 ${contextBlock}
+`;
 
+        if (flowType === "ask_question") {
+            systemInstructionText += `
+FAQ & CONSTRAINED ROLE RULES:
+1. You are strictly in FAQ Mode. Your only job is to answer questions about Golden Isle products, shipping, delivery, payments, and general B2B ordering.
+2. DO NOT recommend products or attempt to build a quote. If they ask for recommendations or a quote, tell them to use the main menu for those features.
+3. If a question is entirely off-topic (e.g., asking about politics, weather, writing code, or non-liquor/B2B topics), you MUST reply exactly with the sentinel word "OFF_TOPIC".
+4. Provide concise, helpful answers.
+`;
+        } else if (flowType === "wholesale_quote" || flowType === "competitor_compare") {
+            systemInstructionText += `
+QUOTE RECOMMENDATION RULES:
+1. When a user asks for recommendations, use the 'search_products' tool to show product cards. Do NOT ask any open-ended questions like "what is your budget?".
+2. Product Cards: When returning products via 'search_products', the UI will automatically show "Add to Quote", "More Like This", and "Checkout".
+3. Add to Quote: When they ask to add to quote, use the 'add_to_cart' tool.
+4. Keep conversation focused on building their B2B wholesale quote.
+`;
+        } else {
+            // General legacy flow rules
+            systemInstructionText += `
 FLOW RULES:
 1. Main Menu: When a user starts or says hello, offer these options: 'Browse Products', 'Recommend by Budget', 'Build Quote', 'Talk to Sales'.
 2. Browse Products: If they ask to browse, use the 'get_categories' tool to fetch and show category buttons.
@@ -218,7 +238,10 @@ FLOW RULES:
 4. Product Cards: When returning products via 'search_products', the UI will automatically show "Add to Quote", "More Like This", and "Checkout".
 5. Add to Quote: When they ask to add to quote/cart, use the 'add_to_cart' tool.
 6. Checkout: When they say checkout or pay, use the 'request_checkout' tool.
+`;
+        }
 
+        systemInstructionText += `
 GLOBAL RULES:
 - Never hallucinate products, prices, stock, payment links, or shipping details.
 - If they want to talk to a human, provide a WhatsApp link.
@@ -682,6 +705,16 @@ GLOBAL RULES:
 
         let reply = choiceMessage?.content;
 
+        if (reply && reply.includes("OFF_TOPIC")) {
+            if (language === "zh") {
+                reply = "抱歉，我只能回答与我们产品和订购相关的问题。请联系销售团队获取更多帮助。\nSHOW_SUGGESTIONS:联系销售";
+            } else if (language === "en") {
+                reply = "Sorry, I can only answer questions related to our products and orders. Please contact the sales team for further assistance.\nSHOW_SUGGESTIONS:Talk to Sales";
+            } else {
+                reply = "Maaf, saya hanya boleh bantu soalan berkaitan produk dan pesanan kami. Sila hubungi team sales untuk bantuan lanjut.\nSHOW_SUGGESTIONS:Hubungi Sales";
+            }
+        }
+
         if (!reply) {
             console.error("Unexpected OpenAI API response structure:", JSON.stringify(data));
             return NextResponse.json(
@@ -689,8 +722,6 @@ GLOBAL RULES:
                 { status: 502 }
             );
         }
-
-
         return NextResponse.json({ reply });
 
     } catch (error: any) {

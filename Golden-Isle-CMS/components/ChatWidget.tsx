@@ -54,16 +54,37 @@ interface CartItem {
 
 type Language = "ms" | "en" | "zh";
 
+// ─── Flow Type ────────────────────────────────────────────────────────────────
+type FlowType =
+  | "browse_products"      // Flow 1 — deterministic, no LLM
+  | "wholesale_quote"      // Flow 2 — LLM for recommendation only
+  | "competitor_compare"   // Flow 3 — OCR + then reuses Flow 2
+  | "ask_question"         // Flow 4 — constrained LLM
+  | null;
+
 type ChatStep =
+  // ── Entry ────────────────────────────────────────────────────────────────
   | "START"
-  | "LANGUAGE_SELECTED"
-  | "CATEGORY_SELECTED"
-  | "CUSTOMER_TYPE_SELECTED"
-  | "PRODUCT_RECOMMENDATION"
-  | "QUOTE_REVIEW"
+  | "MAIN_MENU"
+  // ── Flow 1: Browse Products (deterministic, zero LLM) ────────────────────
+  | "BROWSE_CATEGORY"
+  | "BROWSE_PRODUCTS"
+  | "CART_REVIEW"
   | "CHECKOUT_DETAILS"
   | "PAYMENT_SELECTION"
-  | "PAYMENT_COMPLETE";
+  | "PAYMENT_COMPLETE"
+  // ── Flow 2: Wholesale Quote (LLM for recommendation only) ─────────────────
+  | "QUOTE_CATEGORY"
+  | "QUOTE_BUSINESS_TYPE"
+  | "QUOTE_RECOMMENDATION"
+  | "QUOTE_REVIEW"
+  | "QUOTE_HANDOFF"
+  // ── Flow 3: Competitor Comparison (Vision API → then Flow 2) ─────────────
+  | "COMPARE_UPLOAD"
+  | "COMPARE_PROCESSING"
+  | "COMPARE_RESULTS"
+  // ── Flow 4: Ask a Question (constrained LLM) ──────────────────────────────
+  | "FAQ_CHAT";
 
 const TRANSLATIONS = {
   ms: {
@@ -95,6 +116,23 @@ const TRANSLATIONS = {
     paymentSuccess: (orderId: string) => `🎉 Order ${orderId} confirmed!\n\nTeam kami akan contact boss dalam 30 minit via WhatsApp 📱\n\nSambil tunggu — nak tambah item lagi untuk order yang sama?`,
     addMoreItems: "➕ Tambah Item Lagi",
     talkToSales: "💬 Hubungi Sales",
+    addCartBtn: "Tambah ke Troli",
+    menuGreeting: "Helo 👋 Macam mana kami boleh bantu boss hari ni?",
+    menuBrowse: "Browse Produk",
+    menuBrowseDesc: "Lihat katalog produk premium kami",
+    menuQuote: "Sebut Harga Borong",
+    menuQuoteDesc: "Bina sebut harga untuk pesanan pukal",
+    menuCompare: "Bandingkan Harga Pesaing",
+    menuCompareDesc: "Upload invois lama — kami tunjuk penjimatan boss",
+    menuFAQ: "Tanya Soalan",
+    menuFAQDesc: "Tentang produk, penghantaran atau pembayaran",
+    menuSales: "Bercakap dengan Sales",
+    menuSalesDesc: "Connect terus dengan team sales kami",
+    faqPlaceholder: "Tanya apa sahaja tentang produk kami...",
+    faqRefusal: "Maaf, saya hanya boleh bantu soalan berkaitan produk dan pesanan kami. Sila hubungi team sales untuk bantuan lanjut.",
+    compareUploadTitle: "Upload Invois Pesaing",
+    compareUploadDesc: "Upload invois supplier boss sekarang. Kami analisa dan tunjuk berapa boss boleh jimat dengan Golden Isle.",
+    compareUploadBtn: "Pilih Fail (JPG/PNG/PDF)",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Tolong recommend produk borong ikut budget saya." },
       { label: "Build Wholesale Quote", icon: "📦", query: "Saya nak minta sebut harga (wholesale quote)." },
@@ -130,6 +168,23 @@ const TRANSLATIONS = {
     paymentSuccess: (orderId: string) => `🎉 Order ${orderId} confirmed!\n\nOur team will contact you within 30 minutes via WhatsApp 📱\n\nWhile you wait — want to add more items to the same order?`,
     addMoreItems: "➕ Add More Items",
     talkToSales: "💬 Talk to Sales",
+    addCartBtn: "Add to Cart",
+    menuGreeting: "Hello 👋 How can we help you today?",
+    menuBrowse: "Browse Products",
+    menuBrowseDesc: "Explore our premium wholesale catalog",
+    menuQuote: "Get Wholesale Quote",
+    menuQuoteDesc: "Build a quote for your bulk order",
+    menuCompare: "Compare Competitor Price",
+    menuCompareDesc: "Upload your invoice — see how much you save",
+    menuFAQ: "Ask a Question",
+    menuFAQDesc: "About products, delivery or payment",
+    menuSales: "Talk to Sales",
+    menuSalesDesc: "Connect directly with our sales team",
+    faqPlaceholder: "Ask anything about our products or ordering...",
+    faqRefusal: "Sorry, I can only assist with questions related to our products and ordering. Please talk to our sales team for further assistance.",
+    compareUploadTitle: "Upload Competitor Invoice",
+    compareUploadDesc: "Upload your current supplier's invoice. We'll analyse it and show exactly how much you save with Golden Isle.",
+    compareUploadBtn: "Choose File (JPG/PNG/PDF)",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Please recommend wholesale products based on my budget." },
       { label: "Build Wholesale Quote", icon: "📦", query: "I would like to build a wholesale quote." },
@@ -165,6 +220,23 @@ const TRANSLATIONS = {
     paymentSuccess: (orderId: string) => `🎉 订单 ${orderId} 已确认！\n\n我们的团队将在30分钟内通过 WhatsApp 与您联系 📱\n\n趁等待期间 — 还想为同一张订单添加更多商品吗？`,
     addMoreItems: "➕ 继续添加商品",
     talkToSales: "💬 联系销售",
+    addCartBtn: "加入购物车",
+    menuGreeting: "您好 👋 今天我们能为您提供什么帮助？",
+    menuBrowse: "浏览产品",
+    menuBrowseDesc: "探索我们的优质批发目录",
+    menuQuote: "获取批发报价",
+    menuQuoteDesc: "为您的批量订单建立报价单",
+    menuCompare: "比较竞争对手价格",
+    menuCompareDesc: "上传发票 — 查看您能节省多少",
+    menuFAQ: "提问",
+    menuFAQDesc: "询问有关产品、配送或付款的问题",
+    menuSales: "联系销售",
+    menuSalesDesc: "直接与我们的销售团队联系",
+    faqPlaceholder: "请询问有关我们产品或订购的任何问题...",
+    faqRefusal: "抱歉，我只能回答与我们产品和订购相关的问题。如需进一步帮助，请联系我们的销售团队。",
+    compareUploadTitle: "上传竞争对手发票",
+    compareUploadDesc: "上传您当前供应商的发票。我们将进行分析，并向您展示使用Golden Isle可以节省多少费用。",
+    compareUploadBtn: "选择文件（JPG/PNG/PDF）",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "请根据我的预算推荐批发产品。" },
       { label: "Build Wholesale Quote", icon: "📦", query: "我想获取批发报价单。" },
@@ -376,7 +448,7 @@ function getUrgencyCopy(category: string, badge: string, lang: Language): string
   return "✨ Pilihan borong premium — stok tersedia sekarang";
 }
 
-function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
+function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: any; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote" }) {
   const t = TRANSLATIONS[lang];
   const [showQtyPicker, setShowQtyPicker] = useState(false);
   const [selectedQty, setSelectedQty] = useState(1);
@@ -470,7 +542,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart
                     onClick={handleConfirmAdd}
                     className="flex-1 text-[11px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-2.5 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
                   >
-                    {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? `Add ${selectedQty} to Quote` : `Tambah ${selectedQty} ke Quote`}
+                     {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? (mode === "cart" ? `Add ${selectedQty} to Cart` : `Add ${selectedQty} to Quote`) : (mode === "cart" ? `Tambah ${selectedQty} ke Troli` : `Tambah ${selectedQty} ke Quote`)}
                   </button>
                 </div>
               </div>
@@ -486,7 +558,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart
                   ? "bg-emerald-500 text-white"
                   : "bg-[#1F2937] hover:bg-slate-800 text-white"
               }`}>
-              {added ? t.addedBtn : t.addBtn}
+              {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
             </button>
             <div className="flex gap-2">
               <button onClick={() => onSendText(`More like ${p.name}`)}
@@ -507,7 +579,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang }: { p: any; onAddToCart
 
 // ─── Tool Result Renderers ──────────────────────────────────────────────────
 
-function ToolResultProductCards({ text, onAddToCart, onSendText, lang }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
+function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "quote" }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote" }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
   try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
@@ -524,7 +596,7 @@ function ToolResultProductCards({ text, onAddToCart, onSendText, lang }: { text:
       {data.products?.length > 0 ? (
         <div className="space-y-3">
           {data.products.map((p, idx) => (
-            <ProductCard key={`result-prod-${p.name}-${idx}`} p={p} onAddToCart={onAddToCart} onSendText={onSendText} lang={lang} />
+            <ProductCard key={`result-prod-${p.name}-${idx}`} p={p} onAddToCart={onAddToCart} onSendText={onSendText} lang={lang} mode={mode} />
           ))}
         </div>
       ) : (
@@ -818,49 +890,60 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
 
 // ─── Progress Tracker ─────────────────────────────────────────────────────────
 
-function ProgressTracker({ step }: { step: ChatStep }) {
-  const getActiveIndex = () => {
-    switch (step) {
-      case "START":
-      case "LANGUAGE_SELECTED":
-      case "CATEGORY_SELECTED":
-      case "CUSTOMER_TYPE_SELECTED":
-      case "PRODUCT_RECOMMENDATION":
-        return 0;
-      case "QUOTE_REVIEW":
-        return 1;
-      case "CHECKOUT_DETAILS":
-        return 2;
-      case "PAYMENT_SELECTION":
-      case "PAYMENT_COMPLETE":
-        return 3;
-      default:
-        return 0;
-    }
+function ProgressTracker({ step, flowType }: { step: ChatStep; flowType: FlowType }) {
+  // Don't show tracker for entry screens or FAQ
+  if (!flowType || flowType === "ask_question" || step === "START" || step === "MAIN_MENU") {
+    return null;
+  }
+
+  const stageConfig: Record<string, { stages: string[]; activeMap: Partial<Record<ChatStep, number>> }> = {
+    browse_products: {
+      stages: ["Browse", "Cart", "Checkout", "Payment"],
+      activeMap: {
+        BROWSE_CATEGORY: 0, BROWSE_PRODUCTS: 0,
+        CART_REVIEW: 1,
+        CHECKOUT_DETAILS: 2,
+        PAYMENT_SELECTION: 3, PAYMENT_COMPLETE: 3,
+      }
+    },
+    wholesale_quote: {
+      stages: ["Category", "Intent", "Recommend", "Quote"],
+      activeMap: {
+        QUOTE_CATEGORY: 0,
+        QUOTE_BUSINESS_TYPE: 1,
+        QUOTE_RECOMMENDATION: 2,
+        QUOTE_REVIEW: 3, QUOTE_HANDOFF: 3,
+      }
+    },
+    competitor_compare: {
+      stages: ["Upload", "Compare", "Quote"],
+      activeMap: {
+        COMPARE_UPLOAD: 0, COMPARE_PROCESSING: 0,
+        COMPARE_RESULTS: 1,
+        QUOTE_RECOMMENDATION: 2, QUOTE_REVIEW: 2, QUOTE_HANDOFF: 2,
+      }
+    },
   };
 
-  const activeIdx = getActiveIndex();
-  const stages = ["Discover", "Quote", "Checkout", "Payment"];
+  const config = stageConfig[flowType];
+  const stages = config?.stages ?? ["Browse", "Cart", "Checkout", "Payment"];
+  const activeIdx = (config?.activeMap as any)?.[step] ?? 0;
 
   return (
     <div className="bg-white/50 backdrop-blur-md px-6 py-2.5 border-b border-slate-100 flex items-center justify-between select-none shrink-0">
       <div className="flex items-center justify-between w-full relative">
-        {/* Background Line */}
         <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-100 -translate-y-1/2 z-0" />
-        
-        {/* Active Progress Line */}
-        <div 
-          className="absolute top-1/2 left-0 h-[2px] bg-[#D4AF37] -translate-y-1/2 z-0 transition-all duration-500 ease-out" 
-          style={{ width: `${(activeIdx / (stages.length - 1)) * 100}%` }}
+        <div
+          className="absolute top-1/2 left-0 h-[2px] bg-[#D4AF37] -translate-y-1/2 z-0 transition-all duration-500 ease-out"
+          style={{ width: `${(activeIdx / Math.max(stages.length - 1, 1)) * 100}%` }}
         />
-
         {stages.map((stage, idx) => (
           <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-white px-2 first:pl-0 last:pr-0">
             <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${
-              idx === activeIdx 
-                ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]" 
-                : idx < activeIdx 
-                  ? "bg-[#1F2937] border-[#1F2937]" 
+              idx === activeIdx
+                ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
+                : idx < activeIdx
+                  ? "bg-[#1F2937] border-[#1F2937]"
                   : "bg-white border-slate-200"
             }`} />
             <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${
@@ -877,7 +960,7 @@ function ProgressTracker({ step }: { step: ChatStep }) {
 
 // ─── Quote Review View ────────────────────────────────────────────────────────
 
-function QuoteReviewView({ cart, onBack, onCheckout, onRemove, onUpdateQty, lang }: { cart: CartItem[]; onBack: () => void; onCheckout: () => void; onRemove: (name: string) => void; onUpdateQty: (name: string, qty: number) => void; lang: Language }) {
+function QuoteReviewView({ cart, onBack, onCheckout, onRemove, onUpdateQty, lang, proceedLabel }: { cart: CartItem[]; onBack: () => void; onCheckout: () => void; onRemove: (name: string) => void; onUpdateQty: (name: string, qty: number) => void; lang: Language; proceedLabel?: string }) {
   const t = TRANSLATIONS[lang];
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
@@ -932,7 +1015,7 @@ function QuoteReviewView({ cart, onBack, onCheckout, onRemove, onUpdateQty, lang
           </div>
           <button onClick={onCheckout}
             className="w-full text-[12px] font-semibold tracking-wider uppercase text-white bg-[#1F2937] hover:bg-slate-800 py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] active:scale-98 cursor-pointer">
-            Proceed to Checkout
+            {proceedLabel ?? "Proceed to Checkout"}
           </button>
         </div>
       )}
@@ -1068,6 +1151,204 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
   );
 }
 
+// ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
+
+function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
+  const t = TRANSLATIONS[lang];
+  const options = [
+    { icon: "🛒", label: t.menuBrowse, desc: t.menuBrowseDesc, flow: "browse_products" as const },
+    { icon: "📋", label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
+    { icon: "📊", label: t.menuCompare, desc: t.menuCompareDesc, flow: "competitor_compare" as const },
+    { icon: "💬", label: t.menuFAQ, desc: t.menuFAQDesc, flow: "ask_question" as const },
+  ];
+  return (
+    <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
+      <div className="flex items-start gap-2.5">
+        <AvatarBot />
+        <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-[6px] px-4 py-3 shadow-sm max-w-[85%]">
+          <p className="text-[13.5px] text-slate-800 leading-relaxed">{t.menuGreeting}</p>
+        </div>
+      </div>
+      <div className="space-y-2.5 pb-4">
+        {options.map((opt) => (
+          <motion.button
+            key={opt.flow}
+            onClick={() => onSelect(opt.flow)}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 hover:shadow-sm transition-all text-left cursor-pointer group"
+          >
+            <span className="text-2xl shrink-0 group-hover:scale-105 transition-transform">{opt.icon}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-slate-800 leading-tight">{opt.label}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">{opt.desc}</p>
+            </div>
+            <span className="text-slate-300 text-[18px] font-bold group-hover:text-slate-500 transition-colors">›</span>
+          </motion.button>
+        ))}
+        <motion.button
+          onClick={onTalkToSales}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-sm transition-all text-left cursor-pointer group"
+        >
+          <span className="text-2xl shrink-0 group-hover:scale-105 transition-transform">📞</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold text-emerald-700 leading-tight">{t.menuSales}</p>
+            <p className="text-[11px] text-emerald-500 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
+          </div>
+          <span className="text-emerald-300 text-[18px] font-bold group-hover:text-emerald-500 transition-colors">›</span>
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
+// ─── BrowseProductsView — Deterministic Product Grid (no LLM) ─────────────────
+
+function BrowseProductsView({ category, storeId, onAddToCart, lang }: { category: string; storeId: string; onAddToCart: (product: any, quantity: number) => void; lang: Language }) {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const all = await getProducts(storeId || "00000000-0000-0000-0000-000000000000");
+        const filtered = (all as any[]).filter((p: any) => {
+          if (!category || category.toLowerCase() === "mixed wholesale") return true;
+          return p.category?.toLowerCase().includes(category.toLowerCase());
+        });
+        const result = filtered.length > 0 ? filtered : (all as any[]).slice(0, 6);
+        setProducts(result.map((p: any) => ({
+          ...p,
+          price: `RM ${Number(p.price).toFixed(2)}`,
+          badge: (p.stock_quantity || 0) < 10 ? "TERHAD" : "TERSEDIA",
+        })));
+      } catch {
+        setProducts([]);
+      } finally {
+        setLoadingProducts(false);
+      }
+    }
+    load();
+  }, [category, storeId]);
+
+  if (loadingProducts) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-7 h-7 animate-spin text-slate-400" />
+          <p className="text-[12px] text-slate-400 font-medium">
+            {lang === "zh" ? "加载产品中..." : lang === "en" ? "Loading products..." : "Memuatkan produk..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto px-4 py-5 space-y-3">
+      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-0.5">
+        {category} · {products.length} {lang === "zh" ? "款产品" : lang === "en" ? "products" : "produk"}
+      </p>
+      {products.length > 0 ? (
+        <div className="space-y-3 pb-4">
+          {products.map((p, idx) => (
+            <ProductCard
+              key={`browse-${p.name}-${idx}`}
+              p={p}
+              onAddToCart={onAddToCart}
+              onSendText={() => {}}
+              lang={lang}
+              mode="cart"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="h-40 flex items-center justify-center text-[12px] text-slate-400">
+          {lang === "zh" ? "未找到产品" : lang === "en" ? "No products found" : "Tiada produk dijumpai"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── CompareUploadView — Invoice Upload for Flow 3 ────────────────────────────
+
+function CompareUploadView({ lang, onUpload, uploading }: { lang: Language; onUpload: (file: File) => void; uploading: boolean }) {
+  const t = TRANSLATIONS[lang];
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div className="h-full flex flex-col items-center justify-center px-6 py-8 space-y-6 text-center">
+      <div className="w-20 h-20 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center shadow-sm">
+        <FileText className="w-9 h-9 text-[#D4AF37]" />
+      </div>
+      <div className="space-y-2 max-w-[280px]">
+        <h3 className="text-[17px] font-semibold text-slate-900 tracking-tight">{t.compareUploadTitle}</h3>
+        <p className="text-[12.5px] text-slate-400 leading-relaxed">{t.compareUploadDesc}</p>
+      </div>
+      <div className="w-full max-w-[280px] space-y-3">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*,.pdf"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onUpload(file);
+          }}
+        />
+        <button
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-full bg-[#1F2937] hover:bg-slate-800 text-white text-[12px] font-semibold tracking-wider uppercase transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        >
+          {uploading ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> {lang === "zh" ? "分析中..." : lang === "en" ? "Analysing..." : "Sedang analisa..."}</>
+          ) : (
+            <><Paperclip className="w-4 h-4" /> {t.compareUploadBtn}</>
+          )}
+        </button>
+        <p className="text-[10px] text-slate-400">
+          {lang === "zh" ? "支持: JPG, PNG, PDF · 最大 10MB" : lang === "en" ? "Supports: JPG, PNG, PDF · Max 10MB" : "Sokongan: JPG, PNG, PDF · Maks 10MB"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── QuoteHandoffView — WA Handoff Confirmation ───────────────────────────────
+
+function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void }) {
+  return (
+    <div className="h-full flex flex-col items-center justify-center px-6 space-y-6 text-center">
+      <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
+        <span className="text-4xl">✅</span>
+      </div>
+      <div className="space-y-2">
+        <h3 className="text-[17px] font-semibold text-slate-900">
+          {lang === "zh" ? "报价已发送！" : lang === "en" ? "Quote Sent!" : "Sebut Harga Dihantar!"}
+        </h3>
+        <p className="text-[12.5px] text-slate-400 leading-relaxed max-w-[250px]">
+          {lang === "zh"
+            ? "我们的销售团队将在30分钟内通过WhatsApp联系您。"
+            : lang === "en"
+            ? "Our sales team will contact you within 30 minutes via WhatsApp."
+            : "Team sales kami akan menghubungi boss dalam 30 minit melalui WhatsApp."}
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-[260px]">
+        <button
+          onClick={onBack}
+          className="w-full text-[12px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-3.5 rounded-full transition-all cursor-pointer shadow-sm"
+        >
+          {lang === "zh" ? "返回主菜单" : lang === "en" ? "Back to Main Menu" : "Kembali ke Menu Utama"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export default function ChatWidget() {
@@ -1084,6 +1365,9 @@ export default function ChatWidget() {
   const [lang, setLang] = useState<Language>("ms");
   const [isMobile, setIsMobile] = useState(false);
   const [currentStep, setCurrentStep] = useState<ChatStep>("START");
+  const [flowType, setFlowType] = useState<FlowType>(null);
+  const [browseCategory, setBrowseCategory] = useState<string>("");
+  const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
@@ -1352,8 +1636,9 @@ export default function ChatWidget() {
       text: `📎 ${lang === "zh" ? "上传发票" : lang === "en" ? "Uploaded invoice" : "Upload invoice"}: ${file.name}`,
     };
     setMessages(prev => [...prev, uploadingMsg]);
-    if (currentStep === "START" || currentStep === "LANGUAGE_SELECTED") {
-      setCurrentStep("PRODUCT_RECOMMENDATION");
+    // Transition to FAQ_CHAT or QUOTE_RECOMMENDATION so messages show
+    if (currentStep === "START" || currentStep === "MAIN_MENU" || currentStep === "COMPARE_UPLOAD") {
+      setCurrentStep("COMPARE_RESULTS");
     }
 
     try {
@@ -1505,6 +1790,7 @@ export default function ChatWidget() {
           language: lang,
           leadContext,
           customerContext: updatedCtx,
+          flowType,
         }),
       });
       const data: ChatResponse = await response.json();
@@ -1540,69 +1826,85 @@ export default function ChatWidget() {
   const handleLanguageSelect = (selectedLang: Language) => {
     setLang(selectedLang);
     try { localStorage.setItem("golden_ai_language", selectedLang); } catch (e) {}
-    setCurrentStep("LANGUAGE_SELECTED");
+    // New architecture: go to MAIN_MENU, not straight to category
+    setCurrentStep("MAIN_MENU");
+    setFlowType(null);
   };
 
-  const handleCategorySelect = (category: string) => {
-    setLeadContext(prev => ({ ...prev, preference: category }));
-    
-    // Add messages to chat
-    setMessages(prev => [
-      ...prev,
-      { role: "user", text: `Selected Category: ${category}` }
-    ]);
-    
-    setCurrentStep("CATEGORY_SELECTED");
-  };
+  // ── handleFlowSelect — User picks an intent from the main menu ───────────────
 
-  const handleBusinessTypeSelect = async (businessType: string) => {
-    setLeadContext(prev => ({ ...prev, quantity: businessType }));
-    
-    // Mark onboarding seen
-    try {
-      localStorage.setItem("golden_onboarding_seen", "true");
-      setOnboardingSeen(true);
-    } catch (e) {}
-    
-    // Add messages to chat
-    const userMsg: Message = { role: "user", text: `Selected Use Case: ${businessType}` };
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
-    
-    setCurrentStep("CUSTOMER_TYPE_SELECTED");
-    setLoading(true);
+  const handleFlowSelect = async (flow: Exclude<FlowType, null>) => {
+    setFlowType(flow);
+    setMessages([]);
     setError(null);
-
-    // Call dynamic backend search automatically
-    try {
-      const searchPrompt = `Recommend premium ${leadContext.preference || 'liquor'} tailored for ${businessType}`;
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...updatedMessages, { role: "user", text: searchPrompt }],
-          cart,
-          language: lang,
-          leadContext: { preference: leadContext.preference, quantity: businessType }
-        }),
-      });
-      const data: ChatResponse = await response.json();
-      if (data.reply) {
-        setMessages(prev => [...prev, { role: "model", text: data.reply! }]);
-        setCurrentStep("PRODUCT_RECOMMENDATION");
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to trigger catalog discovery.");
-    } finally {
-      setLoading(false);
+    switch (flow) {
+      case "browse_products":
+        setCurrentStep("BROWSE_CATEGORY");
+        break;
+      case "wholesale_quote":
+        setCurrentStep("QUOTE_CATEGORY");
+        break;
+      case "competitor_compare":
+        setCurrentStep("COMPARE_UPLOAD");
+        break;
+      case "ask_question":
+        setCurrentStep("FAQ_CHAT");
+        // Post a greeting so the chat area is non-empty
+        setMessages([{
+          role: "model",
+          text: lang === "zh"
+            ? "💬 请问您有什么问题？我只能回答与我们产品和订购相关的问题。"
+            : lang === "en"
+            ? "💬 What would you like to know? I can answer questions about our products, delivery, and ordering."
+            : "💬 Apa yang boss nak tanya? Sy boleh bantu soalan berkaitan produk, penghantaran dan pesanan kami."
+        }]);
+        break;
     }
   };
+
+  // ── handleTalkToSales — Direct WA escalation from main menu ─────────────────
+
+  const handleTalkToSales = () => {
+    const waMsg = lang === "zh"
+      ? "您好，我想和销售团队联系讨论批发订单。"
+      : lang === "en"
+      ? "Hi, I'd like to talk to the sales team about my wholesale order."
+      : "Hi, saya nak bercakap dengan team sales tentang pesanan borong saya.";
+    window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
+  };
+
+  // ── handleQuoteWAHandoff — Send quote to WA and go to QUOTE_HANDOFF screen ──
+
+  const handleQuoteWAHandoff = () => {
+    let waMsg = lang === "zh"
+      ? `您好，我想为以下货品办理大宗批发订单：\n\n`
+      : lang === "en"
+      ? `Hi, I would like to proceed with this wholesale order for:\n\n`
+      : `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
+    const items = quoteItems.length > 0 ? quoteItems : cart;
+    items.forEach((item) => {
+      waMsg += `• ${item.quantity}x ${item.name} (RM ${(item.priceNum || parseFloat((item.price || "0").replace(/[^0-9.]/g, ""))).toFixed(2)})\n`;
+    });
+    const grandTotal = items.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
+    waMsg += lang === "zh"
+      ? `\n*总计金额: RM ${grandTotal.toFixed(2)}*\n\n请准备发票和付款二维码。谢谢！`
+      : lang === "en"
+      ? `\n*Grand Total: RM ${grandTotal.toFixed(2)}*\n\nPlease prepare the invoice & QR payment link. Thank you!`
+      : `\n*Jumlah Keseluruhan: RM ${grandTotal.toFixed(2)}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!`;
+    window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
+    setCurrentStep("QUOTE_HANDOFF");
+  };
+
+
 
   const handleClearChat = () => {
     setMessages([]);
     setCart([]);
+    setQuoteItems([]);
     setError(null);
     setCurrentStep("START");
+    setFlowType(null);
+    setBrowseCategory("");
     setCustomerName("");
     setCustomerPhone("");
     setLeadContext({ budget: "", preference: "", quantity: "" });
@@ -1656,7 +1958,7 @@ export default function ChatWidget() {
     if (
       q === "add more items" || q === "tambah item lagi" || q === "继续添加商品"
     ) {
-      setCurrentStep("LANGUAGE_SELECTED");
+      setCurrentStep("MAIN_MENU");
       return;
     }
 
@@ -1817,8 +2119,10 @@ export default function ChatWidget() {
               <div className="flex items-center gap-3">
                 {isMobile ? (
                   <button type="button" onClick={() => {
-                    if (currentStep === "QUOTE_REVIEW" || currentStep === "CHECKOUT_DETAILS" || currentStep === "PAYMENT_SELECTION") {
-                      setCurrentStep("PRODUCT_RECOMMENDATION");
+                    if (currentStep === "QUOTE_REVIEW") {
+                      setCurrentStep("QUOTE_RECOMMENDATION");
+                    } else if (currentStep === "CHECKOUT_DETAILS" || currentStep === "PAYMENT_SELECTION") {
+                      setCurrentStep("CART_REVIEW");
                     } else {
                       setIsOpen(false);
                     }
@@ -1864,15 +2168,53 @@ export default function ChatWidget() {
             </div>
 
             {/* ── Progress Tracker ── */}
-            <ProgressTracker step={currentStep} />
+            <ProgressTracker step={currentStep} flowType={flowType} />
 
             {/* ── Main View Dispatcher ── */}
             <div className="flex-1 min-h-0 relative">
-                {currentStep === "QUOTE_REVIEW" ? (
+                {currentStep === "MAIN_MENU" ? (
+                  <GreetingMenuView
+                    lang={lang}
+                    onSelect={handleFlowSelect}
+                    onTalkToSales={handleTalkToSales}
+                  />
+                ) : currentStep === "BROWSE_PRODUCTS" || currentStep === "BROWSE_CATEGORY" ? (
+                  <BrowseProductsView
+                    category={browseCategory}
+                    storeId={storeId!}
+                    lang={lang}
+                    onAddToCart={(p, q) => handleAddToCart(p, q)}
+                  />
+                ) : currentStep === "COMPARE_UPLOAD" ? (
+                  <CompareUploadView
+                    lang={lang}
+                    uploading={invoiceUploading}
+                    onUpload={handleInvoiceUpload}
+                  />
+                ) : currentStep === "QUOTE_HANDOFF" ? (
+                  <QuoteHandoffView
+                    lang={lang}
+                    onBack={() => setCurrentStep("MAIN_MENU")}
+                  />
+                ) : currentStep === "QUOTE_REVIEW" ? (
+                  <QuoteReviewView
+                    cart={quoteItems}
+                    lang={lang}
+                    onBack={() => setCurrentStep("QUOTE_RECOMMENDATION")}
+                    onCheckout={handleQuoteWAHandoff}
+                    onRemove={(name) => {
+                      setQuoteItems(prev => prev.filter(item => item.name.toLowerCase() !== name.toLowerCase()));
+                    }}
+                    onUpdateQty={(name, qty) => {
+                      setQuoteItems(prev => prev.map(item => item.name.toLowerCase() === name.toLowerCase() ? { ...item, quantity: qty, total: `RM ${(qty * item.priceNum).toFixed(2)}` } : item));
+                    }}
+                    proceedLabel={lang === "zh" ? "联系WhatsApp完成" : lang === "en" ? "Proceed via WhatsApp" : "Proceed via WhatsApp"}
+                  />
+                ) : currentStep === "CART_REVIEW" ? (
                   <QuoteReviewView
                     cart={cart}
                     lang={lang}
-                    onBack={() => setCurrentStep("PRODUCT_RECOMMENDATION")}
+                    onBack={() => setCurrentStep("BROWSE_PRODUCTS")}
                     onCheckout={() => setCurrentStep("CHECKOUT_DETAILS")}
                     onRemove={handleCartRemoveItem}
                     onUpdateQty={handleCartUpdateQty}
@@ -1880,7 +2222,7 @@ export default function ChatWidget() {
                 ) : currentStep === "CHECKOUT_DETAILS" ? (
                   <CheckoutDetailsView
                     lang={lang}
-                    onBack={() => setCurrentStep("QUOTE_REVIEW")}
+                    onBack={() => setCurrentStep("CART_REVIEW")}
                     onSubmit={(name, phone) => {
                       setCustomerName(name);
                       setCustomerPhone(phone);
@@ -1920,110 +2262,76 @@ export default function ChatWidget() {
 
                             <div className="space-y-3 max-w-[320px]">
                               <h3 className="text-[20px] font-semibold text-slate-900 tracking-tight leading-snug">
-                                Boss nak stok untuk event atau restoran? 🎯
+                                {lang === "zh" ? "为活动或餐厅采购？🎯" : lang === "en" ? "Stocking up for an event or restaurant? 🎯" : "Boss nak stok untuk event atau restoran? 🎯"}
                               </h3>
                               <p className="text-[11px] font-semibold text-[#D4AF37] uppercase tracking-widest leading-none">
                                 Golden AI · Premium B2B Concierge
                               </p>
                               <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
-                                Sy suggest dalam 60 saat. Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss. 👇
+                                {lang === "zh" ? "请先选择您的语言 👇" : lang === "en" ? "Please select your language first 👇" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss. 👇"}
                               </p>
                             </div>
 
-                            {/* Language Card buttons */}
                             <div className="w-full max-w-[290px] bg-white/80 border border-slate-100 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-4">
                               <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">
                                 Choose Your Language / Pilih Bahasa
                               </p>
                               <div className="flex flex-col gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleLanguageSelect("en")}
-                                  className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98"
-                                >
-                                  <span>🇬🇧 English</span>
-                                  <span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Start</span>
+                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
+                                  <span>🇬🇧 English</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Start</span>
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleLanguageSelect("ms")}
-                                  className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98"
-                                >
-                                  <span>🇲🇾 Bahasa Melayu</span>
-                                  <span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Mula</span>
+                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
+                                  <span>🇲🇾 Bahasa Melayu</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Mula</span>
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleLanguageSelect("zh")}
-                                  className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98"
-                                >
-                                  <span>🇨🇳 中文 / 华语</span>
-                                  <span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">开始</span>
+                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
+                                  <span>🇨🇳 中文 / 华语</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">开始</span>
                                 </button>
                               </div>
                             </div>
                           </motion.div>
                         )}
 
-                        {/* ── STEP 2: Category first select cards ── */}
-                        {currentStep === "LANGUAGE_SELECTED" && (
-                          <motion.div 
-                            key="step-language"
-                            initial={{ opacity: 0, y: 12 }} 
-                            animate={{ opacity: 1, y: 0 }} 
-                            exit={{ opacity: 0, y: -12 }}
-                            className="py-4 px-4"
-                          >
-                            <CategorySelector onSelect={handleCategorySelect} />
+                        {/* ── Flow 2: Quote Category Selection ── */}
+                        {currentStep === "QUOTE_CATEGORY" && (
+                          <motion.div key="step-quote-cat" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4">
+                            <CategorySelector onSelect={(c) => {
+                              setLeadContext(prev => ({ ...prev, preference: c }));
+                              setMessages([{ role: "user", text: `Selected Category: ${c}` }]);
+                              setCurrentStep("QUOTE_BUSINESS_TYPE");
+                            }} />
                           </motion.div>
                         )}
 
-                        {/* ── STEP 3: Business type select cards ── */}
-                        {currentStep === "CATEGORY_SELECTED" && (
-                          <motion.div 
-                            key="step-category"
-                            initial={{ opacity: 0, y: 12 }} 
-                            animate={{ opacity: 1, y: 0 }} 
-                            exit={{ opacity: 0, y: -12 }}
-                            className="py-4 px-4 space-y-4"
-                          >
-                            <BusinessTypeSelector onSelect={handleBusinessTypeSelect} highlightFirst={!onboardingSeen} />
-
-                            {/* Premium Onboarding Helper Message */}
-                            {!onboardingSeen && (
-                              <motion.div 
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                                style={{
-                                  background: "rgba(255, 255, 255, 0.78)",
-                                  backdropFilter: "blur(24px)",
-                                  border: "1px solid rgba(255, 255, 255, 0.55)",
-                                  boxShadow: "0 8px 30px rgba(0, 0, 0, 0.03)"
-                                }}
-                                className="rounded-2xl p-5 flex items-start gap-4 relative overflow-hidden text-left"
-                              >
-                                <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100 shrink-0 shadow-sm">
-                                  <Sparkles className="w-4.5 h-4.5 text-[#D4AF37]" />
-                                </div>
-                                <div className="space-y-1.5 flex-1">
-                                  <h4 className="text-[14px] font-semibold text-[#111827] leading-snug">
-                                    Hi 👋 Welcome to Golden AI Concierge.
-                                  </h4>
-                                  <p className="text-[13px] text-[#374151] font-semibold leading-relaxed">
-                                    Need help choosing the right wholesale solution?
-                                  </p>
-                                  <p className="text-[12px] text-[#374151] font-normal leading-relaxed">
-                                    Please select your business type above to continue.
-                                  </p>
-                                </div>
-                              </motion.div>
-                            )}
+                        {/* ── Flow 2: Quote Business Type Selection ── */}
+                        {currentStep === "QUOTE_BUSINESS_TYPE" && (
+                          <motion.div key="step-quote-biz" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4 space-y-4">
+                            <BusinessTypeSelector onSelect={async (bt) => {
+                              setLeadContext(prev => ({ ...prev, quantity: bt }));
+                              const updatedMessages: Message[] = [...messages, { role: "user", text: `Selected Use Case: ${bt}` }];
+                              setMessages(updatedMessages);
+                              setCurrentStep("QUOTE_RECOMMENDATION");
+                              setLoading(true);
+                              try {
+                                const response = await fetch("/api/chat", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    messages: [...updatedMessages, { role: "user", text: `Recommend premium ${leadContext.preference || 'liquor'} tailored for ${bt}` }],
+                                    cart: quoteItems,
+                                    language: lang,
+                                    leadContext: { preference: leadContext.preference, quantity: bt },
+                                    flowType: "wholesale_quote"
+                                  }),
+                                });
+                                const data: ChatResponse = await response.json();
+                                if (data.reply) setMessages(prev => [...prev, { role: "model", text: data.reply! }]);
+                              } catch (e) { setError("Failed to get recommendation"); } finally { setLoading(false); }
+                            }} highlightFirst={false} />
                           </motion.div>
                         )}
 
                         {/* Free Chat / Active Conversation Messages */}
-                        {(currentStep === "CUSTOMER_TYPE_SELECTED" || currentStep === "PRODUCT_RECOMMENDATION" || currentStep === "PAYMENT_COMPLETE" || messages.length > 0) && (
+                        {(currentStep === "QUOTE_RECOMMENDATION" || currentStep === "COMPARE_RESULTS" || currentStep === "FAQ_CHAT" || currentStep === "PAYMENT_COMPLETE" || messages.length > 0) && (
                           <div key="step-chat" className="space-y-5">
                             {messages.map((msg, index) => (
                               <motion.div
