@@ -2123,17 +2123,66 @@ export default function ChatWidget() {
               isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
             }`}>
               <div className="flex items-center gap-3">
-                {isMobile ? (
-                  <button type="button" onClick={() => {
-                    if (currentStep === "QUOTE_REVIEW") {
-                      setCurrentStep("QUOTE_RECOMMENDATION");
-                    } else if (currentStep === "CHECKOUT_DETAILS" || currentStep === "PAYMENT_SELECTION") {
-                      setCurrentStep("CART_REVIEW");
-                    } else {
-                      setIsOpen(false);
-                    }
-                  }}
-                    className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-all">
+                {currentStep !== "START" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      switch (currentStep) {
+                        case "MAIN_MENU":
+                          setCurrentStep("START");
+                          break;
+                        case "BROWSE_CATEGORY":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "BROWSE_PRODUCTS":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "CART_REVIEW":
+                          setCurrentStep("BROWSE_PRODUCTS");
+                          break;
+                        case "CHECKOUT_DETAILS":
+                          setCurrentStep("CART_REVIEW");
+                          break;
+                        case "PAYMENT_SELECTION":
+                          setCurrentStep("CHECKOUT_DETAILS");
+                          break;
+                        case "PAYMENT_COMPLETE":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "QUOTE_CATEGORY":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "QUOTE_BUSINESS_TYPE":
+                          setCurrentStep("QUOTE_CATEGORY");
+                          break;
+                        case "QUOTE_RECOMMENDATION":
+                          setCurrentStep("QUOTE_BUSINESS_TYPE");
+                          break;
+                        case "QUOTE_REVIEW":
+                          setCurrentStep("QUOTE_RECOMMENDATION");
+                          break;
+                        case "QUOTE_HANDOFF":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "COMPARE_UPLOAD":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        case "COMPARE_PROCESSING":
+                          setCurrentStep("COMPARE_UPLOAD");
+                          break;
+                        case "COMPARE_RESULTS":
+                          setCurrentStep("COMPARE_UPLOAD");
+                          break;
+                        case "FAQ_CHAT":
+                          setCurrentStep("MAIN_MENU");
+                          break;
+                        default:
+                          setIsOpen(false);
+                          break;
+                      }
+                    }}
+                    className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+                  >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                 ) : null}
