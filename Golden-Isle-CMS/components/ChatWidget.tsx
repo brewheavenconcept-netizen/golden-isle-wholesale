@@ -1411,7 +1411,6 @@ export default function ChatWidget() {
       if (savedMessages) setMessages(JSON.parse(savedMessages));
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedLang && ["ms", "en", "zh"].includes(savedLang)) setLang(savedLang);
-      if (savedStep) setCurrentStep(savedStep);
       if (savedName) setCustomerName(savedName);
       if (savedPhone) setCustomerPhone(savedPhone);
       setOnboardingSeen(seenOnboarding === "true");
@@ -1429,10 +1428,6 @@ export default function ChatWidget() {
   useEffect(() => {
     try { localStorage.setItem("golden_ai_language", lang); } catch (e) {}
   }, [lang]);
-
-  useEffect(() => {
-    try { localStorage.setItem("golden_ai_step", currentStep); } catch (e) {}
-  }, [currentStep]);
 
   useEffect(() => {
     try {
@@ -1826,7 +1821,18 @@ export default function ChatWidget() {
   const handleLanguageSelect = (selectedLang: Language) => {
     setLang(selectedLang);
     try { localStorage.setItem("golden_ai_language", selectedLang); } catch (e) {}
-    // New architecture: go to MAIN_MENU, not straight to category
+    
+    if (messages.length === 0) {
+      setMessages([{
+        role: "model",
+        text: selectedLang === "zh"
+          ? "欢迎！Golden AI 在此为您提供高级批发服务。请从菜单中选择一项服务开始："
+          : selectedLang === "en"
+          ? "Welcome! Golden AI is here for your premium wholesale needs. Please select a service from the menu to start:"
+          : "Selamat datang! Golden AI di sini untuk keperluan borong premium anda. Sila pilih perkhidmatan dari menu untuk mula:"
+      }]);
+    }
+
     setCurrentStep("MAIN_MENU");
     setFlowType(null);
   };
