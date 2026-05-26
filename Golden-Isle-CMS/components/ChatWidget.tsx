@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -2072,12 +2073,35 @@ export default function ChatWidget() {
                                     )
                                   ) : (
                                     <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
-                                      <div className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block shadow-sm ${
-                                        msg.role === "user"
-                                          ? "bg-[#1F2937] text-white font-medium rounded-tr-[6px]"
-                                          : "bg-white border border-slate-100 text-slate-800 rounded-tl-[6px]"
-                                      }`}>
-                                        {msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()}
+                                      <div
+                                        className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block shadow-sm ${
+                                          msg.role === "user"
+                                            ? "bg-[#1F2937] text-white font-medium rounded-tr-[6px]"
+                                            : "bg-white border border-slate-100 text-slate-800 rounded-tl-[6px]"
+                                        }`}
+                                        style={{ overflowWrap: "break-word", wordBreak: "break-word", overflowX: "hidden" }}
+                                      >
+                                        {msg.role === "user" ? (
+                                          msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()
+                                        ) : (
+                                          <ReactMarkdown
+                                            components={{
+                                              img: ({ src, alt }) => (
+                                                <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg mt-2" />
+                                              ),
+                                              a: ({ href, children }) => (
+                                                <a href={href} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{children}</a>
+                                              ),
+                                              p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                                              ul: ({ children }) => <ul className="list-disc list-inside mb-1 space-y-0.5">{children}</ul>,
+                                              ol: ({ children }) => <ol className="list-decimal list-inside mb-1 space-y-0.5">{children}</ol>,
+                                              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                              code: ({ children }) => <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[12px] font-mono">{children}</code>,
+                                            }}
+                                          >
+                                            {msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()}
+                                          </ReactMarkdown>
+                                        )}
                                       </div>
                                       {msg.role === "model" && msg.text.includes("SHOW_SUGGESTIONS:") && (
                                         <SuggestionChips text={msg.text} onSelect={handleSuggestionClickAndSubmit} lang={lang} />
