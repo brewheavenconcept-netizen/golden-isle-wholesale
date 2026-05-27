@@ -1252,7 +1252,7 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
 
 // ─── BrowseProductsView — Deterministic Product Grid (no LLM) ─────────────────
 
-function BrowseProductsView({ category, storeId, onAddToCart, lang }: { category: string; storeId: string; onAddToCart: (product: any, quantity: number) => void; lang: Language }) {
+function BrowseProductsView({ category, storeId, onAddToCart, onSendText, lang }: { category: string; storeId: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -1304,7 +1304,7 @@ function BrowseProductsView({ category, storeId, onAddToCart, lang }: { category
               key={`browse-${p.name}-${idx}`}
               p={p}
               onAddToCart={onAddToCart}
-              onSendText={() => {}}
+              onSendText={onSendText}
               lang={lang}
               mode="cart"
             />
@@ -1589,11 +1589,11 @@ export default function ChatWidget() {
 
   // ── autoViewCart ─────────────────────────────────────────────────────────────
 
-  const autoViewCart = async () => {
+  const autoViewCart = async (latestCart?: CartItem[]) => {
     setLoading(true);
     setError(null);
     try {
-      const savedCart = JSON.parse(localStorage.getItem("golden_ai_cart") || "[]");
+      const savedCart = latestCart || JSON.parse(localStorage.getItem("golden_ai_cart") || "[]");
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1628,6 +1628,7 @@ export default function ChatWidget() {
 
   const handleAddToCart = (product: any, quantity: number = 1) => {
     const qty = Math.max(1, quantity);
+    let newCart: CartItem[] = [];
     setCart((prev) => {
       const updated = [...prev];
       const existingIdx = updated.findIndex((c) => c.name.toLowerCase() === product.name.toLowerCase());
@@ -1647,9 +1648,18 @@ export default function ChatWidget() {
           whatsapp_message: `Saya berminat dengan ${product.name} (${qty} unit, jumlah RM ${(qty * priceNum).toFixed(2)}). Boleh proceed pesanan?`
         });
       }
+      newCart = updated;
       return updated;
     });
-    setTimeout(() => { autoViewCart(); }, 100);
+    
+    // Immediately write to local storage to avoid race conditions
+    try { localStorage.setItem("golden_ai_cart", JSON.stringify(newCart)); } catch (e) {}
+
+    // Only call autoViewCart if we are inside a chat view where messages are visible
+    if (currentStep === "START" || currentStep === "QUOTE_RECOMMENDATION" || currentStep === "COMPARE_RESULTS") {
+      setTimeout(() => { autoViewCart(newCart); }, 100);
+    }
+    
     // Update context — customer has added to cart
     setCustomerContext(prev => ({
       ...prev,
@@ -1988,7 +1998,12 @@ export default function ChatWidget() {
 
     // "View Cart" / "Quote" / cart-related chips
     if (q === "view cart" || q === "tunjuk cart" || q === "cart" || q === "quote") {
-      setCurrentStep("QUOTE_REVIEW");
+      setCurrentStep("CART_REVIEW");
+      return;
+    }
+
+    if (q === "checkout" || q === "semak keluar" || q === "结账") {
+      setCurrentStep("CART_REVIEW");
       return;
     }
 
@@ -2015,6 +2030,10 @@ export default function ChatWidget() {
     }
 
     // ── LLM ROUTE (API call for genuine free text) ────────────────────────────
+    
+    if (currentStep !== "START") {
+      setCurrentStep("START");
+    }
 
     const newMsg: Message = { role: "user", text: trimmedMessage };
     const updatedMessages = [...messages, newMsg];
@@ -2285,6 +2304,7 @@ export default function ChatWidget() {
                     storeId={storeId!}
                     lang={lang}
                     onAddToCart={(p, q) => handleAddToCart(p, q)}
+                    onSendText={handleSuggestionClickAndSubmit}
                   />
                 ) : currentStep === "COMPARE_UPLOAD" ? (
                   <CompareUploadView
