@@ -488,12 +488,12 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
   const urgencyCopy = getUrgencyCopy(p.category, p.badge, lang);
 
   return (
-    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-[18px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
       {p.image_url ? (
-        <div className="w-full h-[200px] bg-slate-50 overflow-hidden relative">
+        <div className="w-full h-32 bg-slate-50 overflow-hidden relative">
           <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
-          <div className="absolute top-3.5 right-3.5">
-            <span className={`text-[9px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-full border shadow-sm backdrop-blur-md ${
+          <div className="absolute top-2 right-2">
+            <span className={`text-[8px] tracking-wider uppercase font-semibold px-2 py-0.5 rounded-full border shadow-sm backdrop-blur-md ${
               p.badge === "TERHAD" 
                 ? "bg-white/90 text-amber-600 border-amber-100/50" 
                 : "bg-white/90 text-emerald-600 border-emerald-100/50"
@@ -501,20 +501,20 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
           </div>
         </div>
       ) : (
-        <div className="w-full h-[140px] bg-slate-100 flex items-center justify-center border-b border-white/5">
-          <GlassWater className="w-8 h-8 text-[#d4af37]/40" />
+        <div className="w-full h-32 bg-slate-100 flex items-center justify-center border-b border-white/5">
+          <GlassWater className="w-6 h-6 text-[#d4af37]/40" />
         </div>
       )}
-      <div className="p-5 flex-1 flex flex-col gap-2">
+      <div className="p-3.5 flex-1 flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-widest font-semibold text-[#D4AF37]">{p.category}</span>
+          <span className="text-[9px] uppercase tracking-widest font-semibold text-[#D4AF37]">{p.category}</span>
         </div>
-        <h4 className="text-[15px] font-semibold text-[#1a1a1a] leading-snug tracking-tight">{p.name}</h4>
+        <h4 className="text-sm font-semibold text-[#1a1a1a] leading-snug tracking-tight">{p.name}</h4>
         {/* Urgency copy line */}
-        <p className="text-[11px] font-medium text-emerald-600 leading-snug">{urgencyCopy}</p>
-        <p className="text-[12px] text-slate-500 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
+        <p className="text-[10px] font-medium text-emerald-600 leading-snug">{urgencyCopy}</p>
+        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
         <div className="flex items-center justify-between mt-0.5">
-          <span className="text-[16px] font-semibold text-[#1a1a1a] tracking-tight">{p.price}</span>
+          <span className="text-sm font-semibold text-[#1a1a1a] tracking-tight">{p.price}</span>
         </div>
 
         {/* Quantity Picker (inline) */}
@@ -527,35 +527,35 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
               transition={{ duration: 0.18 }}
               className="overflow-hidden"
             >
-              <div className="bg-white border border-slate-200 rounded-2xl p-3 space-y-3 mt-1">
-                <p className="text-[10px] font-semibold text-[#1a1a1a] uppercase tracking-widest text-center">
+              <div className="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2.5 mt-1">
+                <p className="text-[9px] font-semibold text-[#1a1a1a] uppercase tracking-widest text-center">
                   {lang === "zh" ? "选择数量" : lang === "en" ? "Select Quantity" : "Pilih Kuantiti"}
                 </p>
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-3">
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
-                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                    className="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer active:scale-95"
                   >−</button>
-                  <span className="text-[20px] font-bold text-[#1a1a1a] w-8 text-center">{selectedQty}</span>
+                  <span className="text-[18px] font-bold text-[#1a1a1a] w-8 text-center">{selectedQty}</span>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
-                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                    className="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer active:scale-95"
                   >+</button>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setShowQtyPicker(false); }}
-                    className="flex-1 text-[11px] font-medium text-slate-500 bg-white border border-slate-200 py-2.5 rounded-full transition-all cursor-pointer hover:bg-slate-50"
+                    className="flex-1 text-[10px] font-medium text-slate-500 bg-white border border-slate-200 py-2 rounded-full transition-all cursor-pointer hover:bg-slate-50"
                   >
                     {lang === "zh" ? "取消" : lang === "en" ? "Cancel" : "Batal"}
                   </button>
                   <button
                     type="button"
                     onClick={handleConfirmAdd}
-                    className="flex-1 text-[11px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2.5 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
+                    className="flex-1 text-[10px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
                   >
                      {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? (mode === "cart" ? `Add ${selectedQty} to Cart` : `Add ${selectedQty} to Quote`) : (mode === "cart" ? `Tambah ${selectedQty} ke Troli` : `Tambah ${selectedQty} ke Quote`)}
                   </button>
@@ -566,22 +566,22 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
         </AnimatePresence>
 
         {!showQtyPicker && (
-          <div className="flex flex-col gap-2 mt-1">
+          <div className="flex flex-col gap-1.5 mt-1">
             <button onClick={handleAddClick}
-              className={`w-full text-[12px] font-semibold tracking-wider uppercase py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] active:scale-98 cursor-pointer ${
+              className={`w-full text-[11px] font-semibold tracking-wider uppercase py-2 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] active:scale-98 cursor-pointer ${
                 added
                   ? "bg-emerald-500 text-white"
                   : "bg-[#d4af37] hover:bg-[#b8960c] text-[#1a1a1a]"
               }`}>
               {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
             </button>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button onClick={() => onSendText(`More like ${p.name}`)}
-                className="flex-1 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                className="flex-1 text-[10px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2 rounded-full transition-all cursor-pointer shadow-sm">
                 More Like This
               </button>
               <button onClick={() => onSendText(`Checkout`)}
-                className="flex-1 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                className="flex-1 text-[10px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2 rounded-full transition-all cursor-pointer shadow-sm">
                 Checkout
               </button>
             </div>
