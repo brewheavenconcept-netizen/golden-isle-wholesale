@@ -62,13 +62,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className={`group bg-white rounded-[12px] border border-[#e8e5dd] shadow-sm transition-all duration-300 flex flex-col h-full ${isOutOfStock ? 'opacity-70 grayscale-[0.4]' : 'hover:shadow-md'}`}>
             <Link href={`/product/${product.id}`} className="block flex-1">
                 {/* Product Image */}
-                <div className="aspect-square bg-[#fafaf7] flex items-center justify-center overflow-hidden relative rounded-t-[12px] max-h-[160px]">
+                <div className="aspect-square bg-white flex items-center justify-center overflow-hidden relative rounded-t-[12px] max-h-[160px]">
                     {imageUrl ? (
                         <img
                             src={imageUrl}
                             alt={product.name}
                             loading="lazy"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                                 const sibling = e.currentTarget.nextElementSibling as HTMLElement | null;

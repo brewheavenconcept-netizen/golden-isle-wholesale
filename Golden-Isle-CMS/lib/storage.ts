@@ -315,8 +315,8 @@ export async function uploadPaymentProof(orderId: string, file: File): Promise<s
 }
 
 export async function uploadProductImage(file: File, storeId: string): Promise<string> {
-    const MAX_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_SIZE) throw new Error('Image size must be less than 2MB');
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) throw new Error('Image size must be less than 10MB');
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) throw new Error('Only JPG, PNG and WebP images are allowed');
     const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
@@ -453,8 +453,8 @@ export async function saveSettings(settings: StoreSettings, storeId: string): Pr
 }
 
 export async function uploadPaymentQR(file: File, storeId: string): Promise<string> {
-    const MAX_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_SIZE) throw new Error('Image size must be less than 2MB');
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) throw new Error('Image size must be less than 10MB');
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) throw new Error('Only JPG, PNG and WebP images are allowed');
     const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');

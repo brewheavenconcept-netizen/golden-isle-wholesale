@@ -471,8 +471,8 @@ export default function PaymentTransferClient() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('File too large. Max size is 2MB.');
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File too large. Max size is 10MB.');
         return;
       }
       setReceipt(file);
@@ -621,7 +621,7 @@ export default function PaymentTransferClient() {
                 <>
                   <div className="upload-icon">{Icons.upload}</div>
                   <div className="upload-title">Upload Payment Receipt</div>
-                  <div className="upload-hint">Max 2MB file (PNG, JPG)</div>
+                  <div className="upload-hint">Max 10MB file (PNG, JPG)</div>
                   <button className="upload-btn" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>{Icons.receipt} Upload Receipt</button>
                 </>
               ) : (

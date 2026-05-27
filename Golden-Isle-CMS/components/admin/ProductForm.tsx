@@ -191,7 +191,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                                         <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                                             Drag and drop your product images here, or click to browse
                                         </span>
-                                        <span className="text-xs text-slate-400 dark:text-gray-500 mt-1">PNG, JPG, WebP, up to 2MB</span>
+                                        <span className="text-xs text-slate-400 dark:text-gray-500 mt-1">PNG, JPG, WebP, up to 10MB</span>
                                     </>
                                 )}
                             </div>

@@ -415,7 +415,7 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
               {t.modifyBtn}
             </button>
             <button type="button" onClick={() => onWhatsAppCheckout(data!.products, grandTotal)}
-              className="flex-1 text-[11px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2.5 rounded-full text-center transition-all shadow-sm cursor-pointer">
+              className="flex-1 text-[11px] font-semibold text-white bg-[#b8960c] hover:bg-[#d4af37] py-2.5 rounded-full text-center transition-all shadow-sm cursor-pointer active:scale-[0.98]">
               {t.whatsappBtn}
             </button>
           </div>
@@ -463,7 +463,7 @@ function getUrgencyCopy(category: string, badge: string, lang: Language): string
   return "✨ Pilihan borong premium — stok tersedia sekarang";
 }
 
-function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: any; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote" }) {
+function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote", cartCount = 0 }: { p: any; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote"; cartCount?: number }) {
   const t = TRANSLATIONS[lang];
   const [showQtyPicker, setShowQtyPicker] = useState(false);
   const [selectedQty, setSelectedQty] = useState(1);
@@ -482,111 +482,118 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
     onAddToCart(p, selectedQty);
     setShowQtyPicker(false);
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   const urgencyCopy = getUrgencyCopy(p.category, p.badge, lang);
 
   return (
-    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-[18px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
-      {p.image_url ? (
-        <div className="w-full h-32 bg-slate-50 overflow-hidden relative">
-          <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
-          <div className="absolute top-2 right-2">
-            <span className={`text-[8px] tracking-wider uppercase font-semibold px-2 py-0.5 rounded-full border shadow-sm backdrop-blur-md ${
-              p.badge === "TERHAD" 
-                ? "bg-white/90 text-amber-600 border-amber-100/50" 
-                : "bg-white/90 text-emerald-600 border-emerald-100/50"
-            }`}>{p.badge}</span>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full h-32 bg-slate-100 flex items-center justify-center border-b border-white/5">
-          <GlassWater className="w-6 h-6 text-[#d4af37]/40" />
-        </div>
-      )}
-      <div className="p-3.5 flex-1 flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[9px] uppercase tracking-widest font-semibold text-[#D4AF37]">{p.category}</span>
-        </div>
-        <h4 className="text-sm font-semibold text-[#1a1a1a] leading-snug tracking-tight">{p.name}</h4>
-        {/* Urgency copy line */}
-        <p className="text-[10px] font-medium text-emerald-600 leading-snug">{urgencyCopy}</p>
-        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
-        <div className="flex items-center justify-between mt-0.5">
-          <span className="text-sm font-semibold text-[#1a1a1a] tracking-tight">{p.price}</span>
-        </div>
-
-        {/* Quantity Picker (inline) */}
-        <AnimatePresence>
-          {showQtyPicker && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.18 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2.5 mt-1">
-                <p className="text-[9px] font-semibold text-[#1a1a1a] uppercase tracking-widest text-center">
-                  {lang === "zh" ? "选择数量" : lang === "en" ? "Select Quantity" : "Pilih Kuantiti"}
-                </p>
-                <div className="flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
-                    className="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer active:scale-95"
-                  >−</button>
-                  <span className="text-[18px] font-bold text-[#1a1a1a] w-8 text-center">{selectedQty}</span>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
-                    className="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer active:scale-95"
-                  >+</button>
-                </div>
-                <div className="flex gap-1.5">
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setShowQtyPicker(false); }}
-                    className="flex-1 text-[10px] font-medium text-slate-500 bg-white border border-slate-200 py-2 rounded-full transition-all cursor-pointer hover:bg-slate-50"
-                  >
-                    {lang === "zh" ? "取消" : lang === "en" ? "Cancel" : "Batal"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleConfirmAdd}
-                    className="flex-1 text-[10px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
-                  >
-                     {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? (mode === "cart" ? `Add ${selectedQty} to Cart` : `Add ${selectedQty} to Quote`) : (mode === "cart" ? `Tambah ${selectedQty} ke Troli` : `Tambah ${selectedQty} ke Quote`)}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-[18px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-slate-200/80 transition-all duration-300 w-full relative">
+      <div className="flex flex-row">
+        {/* Image — Left Column */}
+        <div className="w-[40%] bg-white flex items-center justify-center p-1.5 border-r border-[#d4af37]/10 overflow-hidden">
+          {p.image_url ? (
+            <img src={p.image_url} alt={p.name} className="w-full h-[175px] object-contain scale-105 transition-transform duration-500 hover:scale-112" />
+          ) : (
+            <GlassWater className="w-8 h-8 text-[#d4af37]/40" />
           )}
-        </AnimatePresence>
+        </div>
 
-        {!showQtyPicker && (
-          <div className="flex flex-col gap-1.5 mt-1">
-            <button onClick={handleAddClick}
-              className={`w-full text-[11px] font-semibold tracking-wider uppercase py-2 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] active:scale-98 cursor-pointer ${
-                added
-                  ? "bg-emerald-500 text-white"
-                  : "bg-[#d4af37] hover:bg-[#b8960c] text-[#1a1a1a]"
+        {/* Content — Right Column */}
+        <div className="w-[60%] p-3.5 flex flex-col min-w-0 bg-white">
+          <div className="flex items-start justify-between gap-1 mb-1">
+            <span className="text-[9px] uppercase tracking-widest font-bold text-[#D4AF37]">{p.category}</span>
+          </div>
+          
+          <h4 className="text-[14px] font-bold text-[#1a1a1a] leading-tight mb-0.5 tracking-tight">{p.name}</h4>
+          
+          {p.description && (
+            <p className="text-[11px] text-slate-500 line-clamp-1 leading-relaxed font-normal mb-1.5">{p.description}</p>
+          )}
+          
+          <div className="text-[16px] font-black text-[#1a1a1a] tracking-tight mb-2">
+            {p.price}
+          </div>
+
+          {p.badge && (
+            <div className="mb-3">
+              <span className={`inline-flex items-center gap-1.5 text-[8.5px] tracking-wider uppercase font-bold px-2.5 py-1 rounded-full border ${
+                p.badge === "TERHAD"
+                  ? "bg-[#fafaf8] text-[#d4af37] border-[#d4af37]/20"
+                  : "bg-[#fafaf8] text-emerald-600 border-emerald-100"
               }`}>
-              {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
-            </button>
-            <div className="flex gap-1.5">
-              <button onClick={() => onSendText(`More like ${p.name}`)}
-                className="flex-1 text-[10px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2 rounded-full transition-all cursor-pointer shadow-sm">
-                More Like This
+                <span className={`w-1.5 h-1.5 rounded-full ${p.badge === "TERHAD" ? "bg-[#d4af37]" : "bg-emerald-500"}`}></span>
+                {p.badge}
+              </span>
+            </div>
+          )}
+
+          {/* Quantity Picker */}
+          <AnimatePresence>
+            {showQtyPicker && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.18 }}
+                className="overflow-hidden mb-2"
+              >
+                <div className="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2.5">
+                  <p className="text-[9px] font-semibold text-[#1a1a1a] uppercase tracking-widest text-center">
+                    {lang === "zh" ? "选择数量" : lang === "en" ? "Select Quantity" : "Pilih Kuantiti"}
+                  </p>
+                  <div className="flex items-center justify-center gap-3">
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
+                      className="w-7 h-7 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer">−</button>
+                    <span className="text-[16px] font-bold text-[#1a1a1a] w-6 text-center">{selectedQty}</span>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
+                      className="w-7 h-7 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px] transition-all cursor-pointer">+</button>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setShowQtyPicker(false); }}
+                      className="flex-1 text-[10px] font-medium text-slate-500 bg-white border border-slate-200 py-2 rounded-lg cursor-pointer hover:bg-slate-50">
+                      {lang === "zh" ? "取消" : lang === "en" ? "Cancel" : "Batal"}
+                    </button>
+                    <button type="button" onClick={handleConfirmAdd}
+                      className="flex-1 text-[10px] font-semibold text-white bg-[#b8960c] hover:bg-[#d4af37] py-2 rounded-lg cursor-pointer shadow-sm active:scale-[0.98] transition-all">
+                      {lang === "en" ? `Add ${selectedQty}` : `Tambah ${selectedQty}`}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!showQtyPicker && (
+            <div className="flex flex-col gap-2 mt-auto">
+              <button onClick={handleAddClick}
+                className={`w-full flex items-center justify-center gap-2 text-[11px] font-bold py-2.5 rounded-lg transition-all cursor-pointer shadow-sm active:scale-[0.98] ${
+                  added ? "bg-emerald-500 text-white" : "bg-[#b8960c] hover:bg-[#d4af37] text-white shadow-[0_4px_12px_rgba(184,150,12,0.15)]"
+                }`}>
+                <ShoppingCart className="w-3.5 h-3.5" />
+                {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
               </button>
-              <button onClick={() => onSendText(`Checkout`)}
-                className="flex-1 text-[10px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2 rounded-full transition-all cursor-pointer shadow-sm">
-                Checkout
+              
+              <button onClick={() => window.dispatchEvent(new CustomEvent('showProductDetails', { detail: p }))}
+                className="w-full flex items-center justify-center gap-2 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-lg cursor-pointer shadow-sm">
+                <AlertCircle className="w-3.5 h-3.5" />
+                View Details
               </button>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Checkout text link - bottom right */}
+          {!showQtyPicker && cartCount > 0 && (
+            <div className="flex justify-end mt-3">
+              <button 
+                onClick={() => onSendText("Checkout")}
+                className="text-[11px] font-bold text-[#b8960c] hover:text-[#d4af37] flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                Checkout <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -594,7 +601,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
 
 // ─── Tool Result Renderers ──────────────────────────────────────────────────
 
-function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "quote" }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote" }) {
+function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "quote", cartCount = 0 }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote"; cartCount?: number }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
   try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
@@ -611,7 +618,7 @@ function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "q
       {data.products?.length > 0 ? (
         <div className="space-y-3">
           {data.products.map((p, idx) => (
-            <ProductCard key={`result-prod-${p.name}-${idx}`} p={p} onAddToCart={onAddToCart} onSendText={onSendText} lang={lang} mode={mode} />
+            <ProductCard key={`result-prod-${p.name}-${idx}`} p={p} onAddToCart={onAddToCart} onSendText={onSendText} lang={lang} mode={mode} cartCount={cartCount} />
           ))}
         </div>
       ) : (
@@ -685,7 +692,7 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
 
       <div className="pt-2 space-y-2">
         <button onClick={() => onProcessCheckout('qr', data?.customer_name || '', data?.customer_phone || '')}
-          className="w-full text-[12px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] cursor-pointer">
+          className="w-full text-[12px] font-semibold text-white bg-[#b8960c] hover:bg-[#d4af37] py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(184,150,12,0.15)] active:scale-[0.98] cursor-pointer">
           QR Payment
         </button>
         <button onClick={() => onProcessCheckout('bank_transfer', data?.customer_name || '', data?.customer_phone || '')}
@@ -771,7 +778,7 @@ function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
       </div>
       <div className="pt-4">
         <button onClick={handleWaClick}
-          className="block w-full text-[12px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3 rounded-full text-center transition-all shadow-sm cursor-pointer">
+          className="block w-full text-[12px] font-semibold text-white bg-[#b8960c] hover:bg-[#d4af37] py-3 rounded-full text-center transition-all shadow-sm cursor-pointer active:scale-[0.98]">
           {t.whatsappBtn}
         </button>
       </div>
@@ -919,7 +926,7 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
 
 // ─── Progress Tracker ─────────────────────────────────────────────────────────
 
-function ProgressTracker({ step, flowType }: { step: ChatStep; flowType: FlowType }) {
+function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; flowType: FlowType; cartCount?: number }) {
   // Don't show tracker for entry screens or FAQ
   if (!flowType || flowType === "ask_question" || step === "START" || step === "MAIN_MENU") {
     return null;
@@ -966,22 +973,63 @@ function ProgressTracker({ step, flowType }: { step: ChatStep; flowType: FlowTyp
           className="absolute top-1/2 left-0 h-[2px] bg-[#D4AF37] -translate-y-1/2 z-0 transition-all duration-500 ease-out"
           style={{ width: `${(activeIdx / Math.max(stages.length - 1, 1)) * 100}%` }}
         />
-        {stages.map((stage, idx) => (
-          <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-[#ffffff] px-2 first:pl-0 last:pr-0">
-            <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${
-              idx === activeIdx
-                ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
-                : idx < activeIdx
-                  ? "bg-[#D4AF37] border-[#D4AF37]"
-                  : "bg-white border-slate-200"
-            }`} />
-            <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${
-              idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-[#1a1a1a]" : "text-slate-400"
-            }`}>
-              {stage}
-            </span>
-          </div>
-        ))}
+        {stages.map((stage, idx) => {
+          const isCartStage = stage.toLowerCase() === "cart" || stage.toLowerCase() === "quote";
+          return (
+            <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-[#ffffff] px-2 first:pl-0 last:pr-0">
+              {isCartStage ? (
+                <div className="relative">
+                  <motion.div
+                    key={`cart-bounce-${cartCount}`}
+                    animate={cartCount > 0 ? {
+                      y: [0, -7, 2, 0],
+                      scale: [1, 1.2, 0.95, 1],
+                    } : {}}
+                    transition={{
+                      duration: 0.5,
+                      ease: "easeInOut"
+                    }}
+                    className={`p-1 rounded-full border transition-all duration-350 flex items-center justify-center ${
+                      idx === activeIdx
+                        ? "bg-[#D4AF37]/10 border-[#D4AF37] text-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.4)]"
+                        : idx < activeIdx
+                          ? "bg-[#D4AF37] border-[#D4AF37] text-white"
+                          : "bg-white border-slate-200 text-slate-400"
+                    }`}
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                  </motion.div>
+                  
+                  {/* Cart Item Badge inside Stepper (pop animation on add) */}
+                  {cartCount > 0 && (
+                    <motion.span
+                      key={`stepper-badge-${cartCount}`}
+                      initial={{ scale: 0.3, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                      className="absolute -top-2 -right-2 bg-[#D4AF37] text-[#1a1a1a] text-[8px] font-black h-3.5 min-w-[14px] px-1 rounded-full flex items-center justify-center border border-white shadow-sm"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </div>
+              ) : (
+                <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${
+                  idx === activeIdx
+                    ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
+                    : idx < activeIdx
+                      ? "bg-[#D4AF37] border-[#D4AF37]"
+                      : "bg-white border-slate-200"
+                }`} />
+              )}
+              <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${
+                idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-[#1a1a1a]" : "text-slate-400"
+              }`}>
+                {stage}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1252,7 +1300,7 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
 
 // ─── BrowseProductsView — Deterministic Product Grid (no LLM) ─────────────────
 
-function BrowseProductsView({ category, storeId, onAddToCart, onSendText, lang }: { category: string; storeId: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language }) {
+function BrowseProductsView({ category, storeId, onAddToCart, onSendText, lang, cartCount = 0 }: { category: string; storeId: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; cartCount?: number }) {
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -1307,6 +1355,7 @@ function BrowseProductsView({ category, storeId, onAddToCart, onSendText, lang }
               onSendText={onSendText}
               lang={lang}
               mode="cart"
+              cartCount={cartCount}
             />
           ))}
         </div>
@@ -1400,6 +1449,13 @@ function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void
 export default function ChatWidget() {
   const router = useRouter();
   const { storeId } = usePublicStore();
+  const [previewProduct, setPreviewProduct] = useState<any | null>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => setPreviewProduct(e.detail);
+    window.addEventListener('showProductDetails', handler);
+    return () => window.removeEventListener('showProductDetails', handler);
+  }, []);
   const [isOpen, setIsOpen] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -1876,19 +1932,13 @@ export default function ChatWidget() {
 
   const handleLanguageSelect = (selectedLang: Language) => {
     setLang(selectedLang);
-    try { localStorage.setItem("golden_ai_language", selectedLang); } catch (e) {}
-    
-    if (messages.length === 0) {
-      setMessages([{
-        role: "model",
-        text: selectedLang === "zh"
-          ? "欢迎！Golden AI 在此为您提供高级批发服务。请从菜单中选择一项服务开始："
-          : selectedLang === "en"
-          ? "Welcome! Golden AI is here for your premium wholesale needs. Please select a service from the menu to start:"
-          : "Selamat datang! Golden AI di sini untuk keperluan borong premium anda. Sila pilih perkhidmatan dari menu untuk mula:"
-      }]);
-    }
-
+    setMessages([]);
+    setCart([]);
+    try {
+      localStorage.removeItem("golden_ai_messages");
+      localStorage.removeItem("golden_ai_cart");
+      localStorage.setItem("golden_ai_language", selectedLang);
+    } catch (e) {}
     setCurrentStep("MAIN_MENU");
     setFlowType(null);
   };
@@ -2250,7 +2300,15 @@ export default function ChatWidget() {
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
-                ) : null}
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-slate-100 transition-all cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
                 <div className="w-9 h-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center border border-[#d4af37]/30">
                   <Sparkles className="w-4 h-4 text-[#d4af37]" />
                 </div>
@@ -2288,7 +2346,7 @@ export default function ChatWidget() {
             </div>
 
             {/* ── Progress Tracker ── */}
-            <ProgressTracker step={currentStep} flowType={flowType} />
+            <ProgressTracker step={currentStep} flowType={flowType} cartCount={cart.reduce((a, c) => a + c.quantity, 0)} />
 
             {/* ── Main View Dispatcher ── */}
             <div className="flex-1 min-h-0 relative">
@@ -2305,6 +2363,7 @@ export default function ChatWidget() {
                     lang={lang}
                     onAddToCart={(p, q) => handleAddToCart(p, q)}
                     onSendText={handleSuggestionClickAndSubmit}
+                    cartCount={cart.reduce((a, c) => a + c.quantity, 0)}
                   />
                 ) : currentStep === "COMPARE_UPLOAD" ? (
                   <CompareUploadView
@@ -2470,7 +2529,7 @@ export default function ChatWidget() {
                                   {msg.role === "model" && msg.text.startsWith("TOOL_RESULT_QUOTE_CARD:") ? (
                                     <QuoteCardUI text={msg.text} lang={lang} />
                                   ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_PRODUCT_CARDS:") ? (
-                                    <ToolResultProductCards text={msg.text} onAddToCart={handleAddToCart} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
+                                    <ToolResultProductCards text={msg.text} onAddToCart={handleAddToCart} onSendText={handleSuggestionClickAndSubmit} lang={lang} cartCount={cart.reduce((a, c) => a + c.quantity, 0)} />
                                   ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CATEGORIES:") ? (
                                     <ToolResultCategories text={msg.text} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
                                   ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CHECKOUT_CARD:") ? (
@@ -2580,20 +2639,6 @@ export default function ChatWidget() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Floating Sticky Cart Button inside the Chat View */}
-                    {cart.length > 0 && (
-                      <motion.button
-                        key="floating-cart-btn"
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        whileHover={{ scale: 1.05 }}
-                        onClick={() => setCurrentStep("QUOTE_REVIEW")}
-                        className="absolute bottom-24 right-6 z-50 flex items-center gap-2 px-4.5 py-3 rounded-full bg-[#d4af37] text-[#1a1a1a] font-semibold text-[12px] tracking-wider uppercase shadow-[0_12px_32px_rgba(212,175,55,0.25)] hover:bg-[#b8960c] transition-all border border-[#d4af37]/20 cursor-pointer"
-                      >
-                        <ShoppingCart className="w-4 h-4 text-[#1a1a1a]" />
-                        <span>Quote ({cart.reduce((a, c) => a + c.quantity, 0)})</span>
-                      </motion.button>
-                    )}
 
                     {/* ── Human Escalation Banner ── */}
                     <div className="bg-[#fafaf8] border-t border-[#d4af37]/15 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
@@ -2674,6 +2719,77 @@ export default function ChatWidget() {
 
                   </div>
                 )}
+
+
+                {/* ── Mini Screen Product Details Overlay ── */}
+                <AnimatePresence>
+                  {previewProduct && (
+                    <motion.div
+                      initial={{ y: "100%", opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: "100%", opacity: 0 }}
+                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                      className="absolute inset-0 z-[100] bg-white flex flex-col"
+                    >
+                      {/* Header with Close Button */}
+                      <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
+                        <h3 className="text-[14px] font-bold text-[#1a1a1a]">Product Details</h3>
+                        <button 
+                          onClick={() => setPreviewProduct(null)}
+                          className="p-2 -mr-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {/* Scrollable Content */}
+                      <div className="flex-1 overflow-y-auto p-5">
+                        <div className="w-full bg-[#fafaf8] rounded-2xl flex items-center justify-center p-6 border border-[#d4af37]/10 mb-5">
+                          {previewProduct.image_url ? (
+                            <img src={previewProduct.image_url} alt={previewProduct.name} className="w-full max-w-[180px] h-auto object-contain" />
+                          ) : (
+                            <GlassWater className="w-12 h-12 text-[#d4af37]/40" />
+                          )}
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <span className="text-[10px] uppercase tracking-widest font-bold text-[#b8960c]">{previewProduct.category}</span>
+                            <h2 className="text-[18px] font-black text-[#1a1a1a] leading-tight mt-1">{previewProduct.name}</h2>
+                            <div className="text-[20px] font-black text-[#1a1a1a] tracking-tight mt-2">{previewProduct.price}</div>
+                          </div>
+                          
+                          {previewProduct.badge && (
+                            <span className={`inline-flex items-center gap-1.5 text-[9px] tracking-wider uppercase font-bold px-3 py-1.5 rounded-full border ${
+                              previewProduct.badge === "TERHAD"
+                                ? "bg-amber-50 text-[#b8960c] border-[#b8960c]/20"
+                                : "bg-emerald-50 text-emerald-600 border-emerald-200"
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${previewProduct.badge === "TERHAD" ? "bg-[#b8960c]" : "bg-emerald-500"}`}></span>
+                              {previewProduct.badge}
+                            </span>
+                          )}
+                          
+                          {previewProduct.description && (
+                            <div className="pt-2 border-t border-slate-100">
+                              <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</h4>
+                              <p className="text-[13px] text-slate-655 leading-relaxed font-medium">{previewProduct.description}</p>
+                            </div>
+                          )}
+                          
+                          <div className="pt-2 border-t border-slate-100 mt-4">
+                             <button 
+                               onClick={() => window.open(`/product/${previewProduct.id}`, '_blank')}
+                               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#b8960c] text-[#b8960c] hover:bg-[#b8960c]/5 hover:border-[#d4af37] hover:text-[#d4af37] font-bold text-[12px] transition-all cursor-pointer active:scale-[0.98]"
+                             >
+                               Open Full Page <ChevronRight className="w-4 h-4" /> 
+                             </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
             </motion.div>

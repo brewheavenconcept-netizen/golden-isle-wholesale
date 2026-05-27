@@ -5,22 +5,22 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
     {
-        title: "Whisky",
-        subtitle: "Single Malt, Blended, Bourbon & Rye",
-        price: "From RM 180",
-        img: "https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=800&q=80",
+        title: "Premium Lagers",
+        subtitle: "Crisp, Refreshing & Imported",
+        price: "From RM 120 / carton",
+        img: "https://images.unsplash.com/photo-1614316654271-9cece54682c0?w=800&q=80",
     },
     {
-        title: "Fine Wines",
-        subtitle: "Red, White & Vintage",
-        price: "From RM 95",
-        img: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&q=80",
+        title: "Craft Ales",
+        subtitle: "IPA, Pale Ale & Unique Brews",
+        price: "From RM 150 / carton",
+        img: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=800&q=80",
     },
     {
-        title: "Craft Beer",
-        subtitle: "IPA, Stout, Lager & Ale",
-        price: "From RM 45",
-        img: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80",
+        title: "Stouts & Porters",
+        subtitle: "Rich, Dark & Robust",
+        price: "From RM 160 / carton",
+        img: "https://images.unsplash.com/photo-1505075937365-240428d0092c?w=800&q=80",
     }
 ];
 
@@ -80,7 +80,7 @@ export function CollectionCarousel() {
                     Our <span className="text-[#b8960c] italic font-normal">Premium Collection</span>
                 </h2>
                 <p className="mt-4 text-lg text-[#6b6b6b] max-w-2xl mx-auto">
-                    Curated spirits and fine wines from the world&apos;s most renowned producers.
+                    Curated premium beers and craft brews from the world&apos;s most renowned breweries.
                 </p>
             </div>
 
@@ -137,7 +137,7 @@ export function CollectionCarousel() {
                                 else if (isCenter) {
                                     // Map slightly different display titles into standard categories
                                     let filterCat = slide.title;
-                                    if (filterCat === "Fine Wines") filterCat = "Wine";
+                                    if (filterCat === "Premium Lagers" || filterCat === "Craft Ales" || filterCat === "Stouts & Porters") filterCat = "Beer";
 
                                     window.dispatchEvent(new CustomEvent('filterCategory', { detail: filterCat }));
                                     document.getElementById("products")?.scrollIntoView({ behavior: 'smooth' });
