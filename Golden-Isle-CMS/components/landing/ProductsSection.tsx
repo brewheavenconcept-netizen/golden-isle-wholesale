@@ -26,6 +26,15 @@ export default function ProductsSection() {
     const [selectedCategory, setSelectedCategory] = useState('Whisky');
 
     useEffect(() => {
+        // Wait until the store lookup itself has settled
+        if (storeLoading) return;
+
+        // Store resolved to null — stop loading immediately so we show the empty state
+        if (!storeId) {
+            setLoading(false);
+            return;
+        }
+
         // Initialize Supabase Client
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -33,7 +42,6 @@ export default function ProductsSection() {
         );
 
         async function loadData() {
-            if (!storeId) return;
             setLoading(true);
             try {
                 console.log('Fetching products for store:', storeId);
@@ -41,7 +49,7 @@ export default function ProductsSection() {
                 const { data, error } = await supabase
                     .from('products')
                     .select('id, name, price, image_url, category, stock_status, stock_quantity, description')
-                    .eq('store_id', storeId)
+                    .eq('store_id', storeId!)
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -68,7 +76,7 @@ export default function ProductsSection() {
             }
         }
         loadData();
-    }, [storeId]);
+    }, [storeId, storeLoading]); // storeLoading ensures we re-run once the store resolves
 
     // Listen to custom category filter events from other components (like Carousel)
     useEffect(() => {

@@ -8,7 +8,7 @@ interface IconProps {
 export default function WhiskyIcon({ size = 56, className = '' }: IconProps) {
     return (
         <svg width={size} height={size * (56 / 48)} viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-            <rect x="19" y="0" width="10" height="6" rx="2" fill="#c9a84c" />
+            <rect x="19" y="0" width="10" height="6" rx="2" fill="#b8960c" />
             <rect x="20" y="6" width="8" height="14" rx="3" fill="#8B4513" />
             <rect x="21" y="6" width="3" height="14" fill="#a0522d" opacity="0.5" />
             <path d="M16 20 Q10 28 10 36 L38 36 Q38 28 32 20 Z" fill="#8B4513" />

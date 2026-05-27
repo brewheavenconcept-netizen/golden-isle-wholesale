@@ -9,10 +9,10 @@ export default function BeerIcon({ size = 56, className = '' }: IconProps) {
     return (
         <svg width={size} height={size * (56 / 54)} viewBox="0 0 60 72" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
             <path d="M44 26 Q58 26 58 38 Q58 50 44 50" stroke="#B8860B" strokeWidth="6" fill="none" strokeLinecap="round" />
-            <path d="M44 26 Q54 26 54 38 Q54 50 44 50" stroke="#d4a853" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5" />
+            <path d="M44 26 Q54 26 54 38 Q54 50 44 50" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5" />
             <rect x="6" y="20" width="40" height="46" rx="4" fill="#B8860B" />
-            <rect x="6" y="20" width="13" height="46" rx="3" fill="#c9a84c" opacity="0.3" />
-            <rect x="8" y="32" width="36" height="32" rx="2" fill="#d4a853" />
+            <rect x="6" y="20" width="13" height="46" rx="3" fill="#b8960c" opacity="0.3" />
+            <rect x="8" y="32" width="36" height="32" rx="2" fill="#d4af37" />
             <rect x="8" y="32" width="12" height="32" rx="2" fill="#e0b84d" opacity="0.3" />
             <ellipse cx="14" cy="32" rx="6" ry="5" fill="white" opacity="0.95" />
             <ellipse cx="24" cy="30" rx="7" ry="6" fill="white" opacity="0.95" />

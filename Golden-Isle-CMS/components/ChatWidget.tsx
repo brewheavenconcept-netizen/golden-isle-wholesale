@@ -16,6 +16,21 @@ import {
   ShoppingCart,
   Paperclip,
   FileText,
+  Wine,
+  Beer,
+  Package,
+  MessageSquare,
+  Phone,
+  ShoppingBag,
+  LayoutGrid,
+  Zap,
+  Building2,
+  Gift,
+  Globe,
+  CheckCircle2,
+  GlassWater,
+  TrendingDown,
+  ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePublicStore } from "@/hooks/usePublicStore";
@@ -250,16 +265,16 @@ const TRANSLATIONS = {
 
 function AvatarBot() {
   return (
-    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5 border border-slate-200/50 shadow-sm">
-      <Bot className="w-[14px] h-[14px] text-[#1F2937]" />
+    <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+      <Bot className="w-[14px] h-[14px] text-[#d4af37]" />
     </div>
   );
 }
 
 function AvatarUser() {
   return (
-    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center shrink-0 mt-0.5 border border-slate-300/30">
-      <User className="w-[14px] h-[14px] text-slate-600" />
+    <div className="w-8 h-8 rounded-full bg-[#1a2235] border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+      <User className="w-[14px] h-[14px] text-slate-300" />
     </div>
   );
 }
@@ -486,8 +501,8 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
           </div>
         </div>
       ) : (
-        <div className="w-full h-[140px] bg-slate-50 flex items-center justify-center border-b border-slate-100/60">
-          <span className="text-3xl">🥃</span>
+        <div className="w-full h-[140px] bg-[#0f0f14] flex items-center justify-center border-b border-white/5">
+          <GlassWater className="w-8 h-8 text-[#d4af37]/40" />
         </div>
       )}
       <div className="p-5 flex-1 flex flex-col gap-2">
@@ -773,13 +788,13 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
   const rawTags = match[1].split(",").map(s => s.trim());
   
   const iconMap: Record<string, string> = {
-    whisky: "🥃 Premium Whisky",
-    wine: "🍷 Fine Wine",
-    beer: "🍺 Premium Beer",
-    quote: "🧾 Build Quote",
-    payment: "💳 Payment Options",
-    contact: "📞 Talk to Sales",
-    sales: "📞 Talk to Sales"
+    whisky: "Premium Whisky",
+    wine: "Fine Wine",
+    beer: "Premium Beer",
+    quote: "Build Quote",
+    payment: "Payment Options",
+    contact: "Talk to Sales",
+    sales: "Talk to Sales"
   };
 
   const chipsToRender = rawTags.map(tag => {
@@ -787,7 +802,7 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
     if (formatted) {
       return { label: formatted, query: tag };
     }
-    return { label: `💡 ${tag}`, query: tag };
+    return { label: tag, query: tag };
   });
 
   return (
@@ -796,7 +811,7 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
         <button
           key={`chip-${chip.query}-${idx}`}
           onClick={() => onSelect(chip.query)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-slate-200/50 hover:border-slate-350 hover:bg-white transition-all text-[12px] font-medium text-slate-650 hover:text-slate-800 active:scale-95 cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/25 hover:bg-[#d4af37]/20 hover:border-[#d4af37]/50 transition-all text-[12px] font-medium text-[#d4af37] active:scale-95 cursor-pointer"
         >
           <span>{chip.label}</span>
         </button>
@@ -807,27 +822,34 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
 
 // ─── Deterministic Flow Pickers ──────────────────────────────────────────────
 
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  Whisky: <GlassWater className="w-5 h-5 text-[#d4af37]" />,
+  Wine: <Wine className="w-5 h-5 text-[#d4af37]" />,
+  Beer: <Beer className="w-5 h-5 text-[#d4af37]" />,
+  "Mixed Wholesale": <Package className="w-5 h-5 text-[#d4af37]" />,
+};
+
 function CategorySelector({ onSelect }: { onSelect: (category: string) => void }) {
   const categories = [
-    { name: "Whisky", icon: "🥃", desc: "Premium single malts & luxury B2B brands" },
-    { name: "Wine", icon: "🍷", desc: "Fine duty-free red, sparkling & white wines" },
-    { name: "Beer", icon: "🍺", desc: "Imported premium lagers & craft beers" },
-    { name: "Mixed Wholesale", icon: "📦", desc: "Custom mixed wholesale allocations" }
+    { name: "Whisky", desc: "Premium single malts & luxury B2B brands" },
+    { name: "Wine", desc: "Fine duty-free red, sparkling & white wines" },
+    { name: "Beer", desc: "Imported premium lagers & craft beers" },
+    { name: "Mixed Wholesale", desc: "Custom mixed wholesale allocations" }
   ];
 
   return (
-    <div className="space-y-4 w-full p-5 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest text-center">Pilih Kategori / Select Category</div>
+    <div className="space-y-4 w-full p-5 bg-[#111827] border border-[#d4af37]/15 rounded-3xl">
+      <div className="text-[11px] font-semibold text-[#d4af37]/60 uppercase tracking-widest text-center">Pilih Kategori / Select Category</div>
       <div className="grid grid-cols-2 gap-3">
         {categories.map((cat, idx) => (
           <button
             key={`cat-sel-${cat.name}-${idx}`}
             onClick={() => onSelect(cat.name)}
-            className="flex flex-col items-start p-4 rounded-[20px] border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer"
+            className="flex flex-col items-start p-4 rounded-[20px] border border-white/8 bg-[#0f0f14] hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer"
           >
-            <span className="text-3xl mb-3 group-hover:scale-105 transition-transform">{cat.icon}</span>
-            <span className="text-[13px] font-semibold text-slate-800">{cat.name}</span>
-            <span className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">{cat.desc}</span>
+            <span className="mb-3 group-hover:scale-105 transition-transform">{CATEGORY_ICONS[cat.name]}</span>
+            <span className="text-[13px] font-semibold text-white">{cat.name}</span>
+            <span className="text-[10px] text-slate-500 mt-1 leading-tight font-medium">{cat.desc}</span>
           </button>
         ))}
       </div>
@@ -835,17 +857,24 @@ function CategorySelector({ onSelect }: { onSelect: (category: string) => void }
   );
 }
 
+const BIZTYPE_ICONS: Record<string, React.ReactNode> = {
+  "Restaurant / Bar": <Wine className="w-5 h-5 text-[#d4af37]" />,
+  "Event / Party": <Sparkles className="w-5 h-5 text-[#d4af37]" />,
+  "Wholesale Reseller": <Package className="w-5 h-5 text-[#d4af37]" />,
+  "Personal Purchase": <Gift className="w-5 h-5 text-[#d4af37]" />,
+};
+
 function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: string) => void; highlightFirst?: boolean }) {
   const types = [
-    { name: "Restaurant / Bar", desc: "Horeca selection, premium wholesale margins", icon: "🍷" },
-    { name: "Event / Party", desc: "Volume-friendly crowd favorites & quick delivery", icon: "🎉" },
-    { name: "Wholesale Reseller", desc: "Best case rates, duty-free bulk logistics", icon: "📦" },
-    { name: "Personal Purchase", desc: "Premium single-bottle duty-free catalog", icon: "🎁" }
+    { name: "Restaurant / Bar", desc: "Horeca selection, premium wholesale margins" },
+    { name: "Event / Party", desc: "Volume-friendly crowd favorites & quick delivery" },
+    { name: "Wholesale Reseller", desc: "Best case rates, duty-free bulk logistics" },
+    { name: "Personal Purchase", desc: "Premium single-bottle duty-free catalog" }
   ];
 
   return (
-    <div className="space-y-4 w-full p-5 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest text-center">Tujuan Pesanan / Usage Intent</div>
+    <div className="space-y-4 w-full p-5 bg-[#111827] border border-[#d4af37]/15 rounded-3xl">
+      <div className="text-[11px] font-semibold text-[#d4af37]/60 uppercase tracking-widest text-center">Tujuan Pesanan / Usage Intent</div>
       <div className="grid grid-cols-2 gap-3">
         {types.map((t, idx) => {
           const isHighlighted = idx === 0 && highlightFirst;
@@ -856,13 +885,13 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
               animate={isHighlighted ? {
                 boxShadow: [
                   "0 0 0 rgba(212, 175, 55, 0)",
-                  "0 0 15px rgba(212, 175, 55, 0.25)",
+                  "0 0 15px rgba(212, 175, 55, 0.3)",
                   "0 0 0 rgba(212, 175, 55, 0)"
                 ],
                 borderColor: [
-                  "rgba(241, 245, 249, 1)",
-                  "rgba(212, 175, 55, 0.4)",
-                  "rgba(241, 245, 249, 1)"
+                  "rgba(255,255,255,0.06)",
+                  "rgba(212, 175, 55, 0.5)",
+                  "rgba(255,255,255,0.06)"
                 ]
               } : undefined}
               transition={isHighlighted ? {
@@ -870,11 +899,11 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
                 duration: 2.2,
                 ease: "easeInOut"
               } : undefined}
-              className={`flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-100 hover:border-slate-350 hover:bg-slate-50/50 hover:shadow-sm transition-all text-left group active:scale-98 cursor-pointer relative ${isHighlighted ? "overflow-visible" : "overflow-hidden"}`}
+              className={`flex flex-col items-start p-4 rounded-[20px] bg-[#0f0f14] border border-white/8 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer relative ${isHighlighted ? "overflow-visible" : "overflow-hidden"}`}
             >
-              <span className="text-2xl mb-2 group-hover:scale-105 transition-transform">{t.icon}</span>
-              <span className="text-[13px] font-semibold text-slate-800 leading-tight">{t.name}</span>
-              <span className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">{t.desc}</span>
+              <span className="mb-2 group-hover:scale-105 transition-transform">{BIZTYPE_ICONS[t.name]}</span>
+              <span className="text-[13px] font-semibold text-white leading-tight">{t.name}</span>
+              <span className="text-[10px] text-slate-500 mt-1 leading-tight font-medium">{t.desc}</span>
               {isHighlighted && (
                 <div className="absolute -bottom-14 right-2 z-50 pointer-events-none">
                   <OnboardingPointer />
@@ -1106,44 +1135,50 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
         <div className="space-y-3 pt-2">
           <button
             onClick={() => onProcessCheckout('qr', name, phone)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-slate-400 hover:bg-white transition-all text-left shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#111827] border border-white/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl">⚡</span>
+              <div className="w-8 h-8 rounded-xl bg-[#d4af37]/15 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-[#d4af37]" />
+              </div>
               <div>
-                <span className="text-[13px] font-black text-slate-800 block">DuitNow QR</span>
+                <span className="text-[13px] font-bold text-white block">DuitNow QR</span>
                 <span className="text-[10px] text-slate-500">Instant validation, automatic credit</span>
               </div>
             </div>
-            <span className="text-slate-400 font-bold">→</span>
+            <ChevronRight className="w-4 h-4 text-slate-600" />
           </button>
 
           <button
             onClick={() => onProcessCheckout('bank_transfer', name, phone)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-slate-400 hover:bg-white transition-all text-left shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#111827] border border-white/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🏦</span>
+              <div className="w-8 h-8 rounded-xl bg-[#d4af37]/15 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-[#d4af37]" />
+              </div>
               <div>
-                <span className="text-[13px] font-black text-slate-800 block">Bank Transfer</span>
+                <span className="text-[13px] font-bold text-white block">Bank Transfer</span>
                 <span className="text-[10px] text-slate-500">Manual upload, bank transaction slip</span>
               </div>
             </div>
-            <span className="text-slate-400 font-bold">→</span>
+            <ChevronRight className="w-4 h-4 text-slate-600" />
           </button>
 
           <button
             onClick={() => onProcessCheckout('whatsapp', name, phone)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-emerald-50 border border-emerald-100 hover:border-emerald-300 hover:bg-white transition-all text-left shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#d4af37] hover:bg-[#b8960c] transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl text-emerald-500">💬</span>
+              <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-black" />
+              </div>
               <div>
-                <span className="text-[13px] font-black text-emerald-600 block">Talk to Human Sales</span>
-                <span className="text-[10px] text-emerald-500">Support chat, manual order checkout</span>
+                <span className="text-[13px] font-bold text-black block">Talk to Human Sales</span>
+                <span className="text-[10px] text-black/60">Support chat, manual order checkout</span>
               </div>
             </div>
-            <span className="text-emerald-500 font-bold">→</span>
+            <ChevronRight className="w-4 h-4 text-black/60" />
           </button>
         </div>
       </div>
@@ -1153,20 +1188,27 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
 
 // ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
 
+const MENU_ICONS: Record<string, React.ReactNode> = {
+  browse_products: <ShoppingBag className="w-5 h-5 text-[#d4af37]" />,
+  wholesale_quote: <LayoutGrid className="w-5 h-5 text-[#d4af37]" />,
+  competitor_compare: <TrendingDown className="w-5 h-5 text-[#d4af37]" />,
+  ask_question: <MessageSquare className="w-5 h-5 text-[#d4af37]" />,
+};
+
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
   const t = TRANSLATIONS[lang];
   const options = [
-    { icon: "🛒", label: t.menuBrowse, desc: t.menuBrowseDesc, flow: "browse_products" as const },
-    { icon: "📋", label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
-    { icon: "📊", label: t.menuCompare, desc: t.menuCompareDesc, flow: "competitor_compare" as const },
-    { icon: "💬", label: t.menuFAQ, desc: t.menuFAQDesc, flow: "ask_question" as const },
+    { label: t.menuBrowse, desc: t.menuBrowseDesc, flow: "browse_products" as const },
+    { label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
+    { label: t.menuCompare, desc: t.menuCompareDesc, flow: "competitor_compare" as const },
+    { label: t.menuFAQ, desc: t.menuFAQDesc, flow: "ask_question" as const },
   ];
   return (
     <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
       <div className="flex items-start gap-2.5">
         <AvatarBot />
-        <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-[6px] px-4 py-3 shadow-sm max-w-[85%]">
-          <p className="text-[13.5px] text-slate-800 leading-relaxed">{t.menuGreeting}</p>
+        <div className="bg-[#111827] border border-white/10 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%]">
+          <p className="text-[13.5px] text-slate-200 leading-relaxed">{t.menuGreeting}</p>
         </div>
       </div>
       <div className="space-y-2.5 pb-4">
@@ -1176,28 +1218,32 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             onClick={() => onSelect(opt.flow)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 hover:shadow-sm transition-all text-left cursor-pointer group"
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#111827] border border-white/8 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group"
           >
-            <span className="text-2xl shrink-0 group-hover:scale-105 transition-transform">{opt.icon}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-slate-800 leading-tight">{opt.label}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">{opt.desc}</p>
+            <div className="w-9 h-9 rounded-xl bg-[#d4af37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
+              {MENU_ICONS[opt.flow]}
             </div>
-            <span className="text-slate-300 text-[18px] font-bold group-hover:text-slate-500 transition-colors">›</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-white leading-tight">{opt.label}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{opt.desc}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-[#d4af37] transition-colors" />
           </motion.button>
         ))}
         <motion.button
           onClick={onTalkToSales}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-sm transition-all text-left cursor-pointer group"
+          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#d4af37] hover:bg-[#b8960c] transition-all text-left cursor-pointer group"
         >
-          <span className="text-2xl shrink-0 group-hover:scale-105 transition-transform">📞</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-emerald-700 leading-tight">{t.menuSales}</p>
-            <p className="text-[11px] text-emerald-500 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
+          <div className="w-9 h-9 rounded-xl bg-black/10 flex items-center justify-center shrink-0">
+            <Phone className="w-5 h-5 text-black" />
           </div>
-          <span className="text-emerald-300 text-[18px] font-bold group-hover:text-emerald-500 transition-colors">›</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold text-black leading-tight">{t.menuSales}</p>
+            <p className="text-[11px] text-black/60 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-black/50" />
         </motion.button>
       </div>
     </div>
@@ -1322,14 +1368,14 @@ function CompareUploadView({ lang, onUpload, uploading }: { lang: Language; onUp
 function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void }) {
   return (
     <div className="h-full flex flex-col items-center justify-center px-6 space-y-6 text-center">
-      <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
-        <span className="text-4xl">✅</span>
+      <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center">
+        <CheckCircle2 className="w-9 h-9 text-[#d4af37]" />
       </div>
       <div className="space-y-2">
-        <h3 className="text-[17px] font-semibold text-slate-900">
+        <h3 className="text-[17px] font-semibold text-white">
           {lang === "zh" ? "报价已发送！" : lang === "en" ? "Quote Sent!" : "Sebut Harga Dihantar!"}
         </h3>
-        <p className="text-[12.5px] text-slate-400 leading-relaxed max-w-[250px]">
+        <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-[250px]">
           {lang === "zh"
             ? "我们的销售团队将在30分钟内通过WhatsApp联系您。"
             : lang === "en"
@@ -1340,7 +1386,7 @@ function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void
       <div className="flex flex-col gap-2 w-full max-w-[260px]">
         <button
           onClick={onBack}
-          className="w-full text-[12px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-3.5 rounded-full transition-all cursor-pointer shadow-sm"
+          className="w-full text-[12px] font-semibold text-black bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all cursor-pointer"
         >
           {lang === "zh" ? "返回主菜单" : lang === "en" ? "Back to Main Menu" : "Kembali ke Menu Utama"}
         </button>
@@ -2061,12 +2107,12 @@ export default function ChatWidget() {
             whileTap={{ scale: 0.95 }}
             aria-label="Open Golden AI chat"
             style={{ zIndex: 9999 }}
-            className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-white/90 backdrop-blur-md hover:bg-white text-slate-800 flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.06)] cursor-pointer border border-slate-200/80 transition-all"
+            className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-[#0f0f11] border border-[#d4af37]/40 hover:border-[#d4af37]/80 text-white flex items-center justify-center shadow-[0_8px_32px_rgba(212,175,55,0.18)] cursor-pointer transition-all"
           >
-            <Bot className="w-6 h-6 text-[#1F2937]" />
-            <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-emerald-450 border-2 border-white animate-pulse" />
+            <Sparkles className="w-5 h-5 text-[#d4af37]" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#d4af37] border-2 border-[#0f0f11] animate-pulse" />
             {cart.length > 0 && (
-              <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#D4AF37] text-white text-[9px] font-bold flex items-center justify-center shadow-sm">
+              <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#d4af37] text-black text-[9px] font-bold flex items-center justify-center shadow-sm">
                 {cart.reduce((a, c) => a + c.quantity, 0)}
               </span>
             )}
@@ -2102,16 +2148,16 @@ export default function ChatWidget() {
             style={{
               zIndex: 9998,
               fontFamily: "var(--font-inter), var(--font-dm-sans), sans-serif",
-              background: "rgba(255, 255, 255, 0.82)",
-              backdropFilter: "blur(18px)",
-              border: "1px solid rgba(255, 255, 255, 0.45)",
-              boxShadow: "0 24px 60px -12px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04)"
+              background: "#0a0a0f",
+              backdropFilter: "blur(24px)",
+              border: "1px solid rgba(212,175,55,0.18)",
+              boxShadow: "0 24px 80px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.06), 0 0 60px rgba(212,175,55,0.04)"
             }}
             className={`
-              fixed flex flex-col overflow-hidden text-slate-800
+              fixed flex flex-col overflow-hidden text-slate-100
               ${isMobile
                 // Mobile: full screen, slides up from bottom
-                ? "inset-0 rounded-none bg-white"
+                ? "inset-0 rounded-none"
                 // Desktop: premium floating panel, larger
                 : "bottom-6 right-6 w-[440px] h-[660px] rounded-[32px]"
               }
@@ -2119,7 +2165,7 @@ export default function ChatWidget() {
           >
 
             {/* ── Header ── */}
-            <div className={`flex items-center justify-between shrink-0 border-b border-slate-100 bg-white/40 backdrop-blur-md ${
+            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/10 bg-black/20 backdrop-blur-md ${
               isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
             }`}>
               <div className="flex items-center gap-3">
@@ -2181,17 +2227,17 @@ export default function ChatWidget() {
                           break;
                       }
                     }}
-                    className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+                    className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-[#d4af37]/10 transition-all cursor-pointer"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                 ) : null}
-                <div className="w-9 h-9 rounded-full bg-slate-50/50 flex items-center justify-center shadow-sm border border-slate-150">
-                  <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                <div className="w-9 h-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center border border-[#d4af37]/30">
+                  <Sparkles className="w-4 h-4 text-[#d4af37]" />
                 </div>
                 <div>
-                  <h2 className="text-[15px] font-semibold text-[#1F2937] tracking-tight leading-none">Golden AI</h2>
-                  <p className="text-[10px] text-slate-400 font-medium mt-1">Premium Concierge Assistant</p>
+                  <h2 className="text-[15px] font-semibold text-white tracking-tight leading-none">Golden AI</h2>
+                  <p className="text-[10px] text-[#d4af37]/60 font-medium mt-1 tracking-widest uppercase">Premium Concierge</p>
                 </div>
               </div>
 
@@ -2203,19 +2249,19 @@ export default function ChatWidget() {
                       e.stopPropagation();
                       handleClearChat();
                     }}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50/50 active:scale-95 transition-all cursor-pointer"
+                    className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 active:scale-95 transition-all cursor-pointer"
                     title="Clear chat"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[10px] font-medium text-[#d4af37]/70 bg-[#d4af37]/10 border border-[#d4af37]/20 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse" />
                   Online
                 </div>
                 {!isMobile && (
                   <button type="button" onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-xl text-slate-450 hover:text-slate-700 hover:bg-slate-50 transition-all">
+                    className="p-1.5 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/10 transition-all">
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -2309,37 +2355,37 @@ export default function ChatWidget() {
                             className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
                           >
                             <div className="relative">
-                              <div className="w-20 h-20 rounded-full bg-slate-50/50 flex items-center justify-center shadow-sm border border-slate-150">
-                                <Sparkles className="w-10 h-10 text-[#D4AF37]" />
+                              <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center">
+                                <Sparkles className="w-10 h-10 text-[#d4af37]" />
                               </div>
-                              <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white animate-pulse" />
+                              <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-[#0a0a0f] animate-pulse" />
                             </div>
 
                             <div className="space-y-3 max-w-[320px]">
-                              <h3 className="text-[20px] font-semibold text-slate-900 tracking-tight leading-snug">
-                                {lang === "zh" ? "为活动或餐厅采购？🎯" : lang === "en" ? "Stocking up for an event or restaurant? 🎯" : "Boss nak stok untuk event atau restoran? 🎯"}
+                              <h3 className="text-[20px] font-semibold text-white tracking-tight leading-snug">
+                                {lang === "zh" ? "为活动或餐厅采购？" : lang === "en" ? "Stocking up for an event or restaurant?" : "Boss nak stok untuk event atau restoran?"}
                               </h3>
-                              <p className="text-[11px] font-semibold text-[#D4AF37] uppercase tracking-widest leading-none">
+                              <p className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest leading-none">
                                 Golden AI · Premium B2B Concierge
                               </p>
-                              <p className="text-[13px] text-slate-400 leading-relaxed font-normal">
-                                {lang === "zh" ? "请先选择您的语言 👇" : lang === "en" ? "Please select your language first 👇" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss. 👇"}
+                              <p className="text-[13px] text-slate-500 leading-relaxed font-normal">
+                                {lang === "zh" ? "请先选择您的语言" : lang === "en" ? "Please select your language first" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss."}
                               </p>
                             </div>
 
-                            <div className="w-full max-w-[290px] bg-white/80 border border-slate-100 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-4">
-                              <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">
-                                Choose Your Language / Pilih Bahasa
+                            <div className="w-full max-w-[290px] bg-[#111827] border border-[#d4af37]/15 rounded-3xl p-5 space-y-4">
+                              <p className="text-[9px] font-semibold text-[#d4af37]/50 uppercase tracking-widest flex items-center justify-center gap-1.5">
+                                <Globe className="w-3 h-3" /> Choose Your Language / Pilih Bahasa
                               </p>
                               <div className="flex flex-col gap-2">
-                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
-                                  <span>🇬🇧 English</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Start</span>
+                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                  <span>English</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Start</span>
                                 </button>
-                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
-                                  <span>🇲🇾 Bahasa Melayu</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">Mula</span>
+                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                  <span>Bahasa Melayu</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Mula</span>
                                 </button>
-                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200/80 bg-white hover:border-slate-350 hover:bg-slate-50 text-[13px] font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between shadow-sm active:scale-98">
-                                  <span>🇨🇳 中文 / 华语</span><span className="text-[9px] text-[#D4AF37] font-semibold uppercase tracking-wider">开始</span>
+                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                  <span>中文 / 华语</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">开始</span>
                                 </button>
                               </div>
                             </div>
@@ -2437,10 +2483,10 @@ export default function ChatWidget() {
                                   ) : (
                                     <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
                                       <div
-                                        className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block shadow-sm ${
+                                        className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${
                                           msg.role === "user"
-                                            ? "bg-[#1F2937] text-white font-medium rounded-tr-[6px]"
-                                            : "bg-white border border-slate-100 text-slate-800 rounded-tl-[6px]"
+                                            ? "bg-[#d4af37]/15 border border-[#d4af37]/25 text-white font-medium rounded-tr-[6px]"
+                                            : "bg-[#111827] border border-white/8 text-slate-200 rounded-tl-[6px]"
                                         }`}
                                         style={{ overflowWrap: "break-word", wordBreak: "break-word", overflowX: "hidden" }}
                                       >
@@ -2479,19 +2525,19 @@ export default function ChatWidget() {
                             {/* Loading */}
                             {loading && (
                               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5">
-                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 mt-0.5 border border-slate-200">
-                                  <Loader2 className="w-4 h-4 text-slate-700 animate-spin" />
+                                <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5">
+                                  <Loader2 className="w-4 h-4 text-[#d4af37] animate-spin" />
                                 </div>
                                 <div className="flex flex-col items-start">
-                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.botLabel}</span>
-                                  <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5 shadow-sm">
+                                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{t.botLabel}</span>
+                                  <div className="bg-[#111827] border border-white/8 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
                                     <span className="flex gap-1">
                                       {[0, 1, 2].map((i) => (
-                                        <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"
+                                        <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/60 animate-bounce"
                                           style={{ animationDelay: `${i * 0.15}s` }} />
                                       ))}
                                     </span>
-                                    <span className="text-[12px] text-slate-450 font-medium">{t.thinking}</span>
+                                    <span className="text-[12px] text-slate-500 font-medium">{t.thinking}</span>
                                   </div>
                                 </div>
                               </motion.div>
@@ -2530,24 +2576,24 @@ export default function ChatWidget() {
                     )}
 
                     {/* ── Human Escalation Banner ── */}
-                    <div className="bg-[#F8F8F8] border-t border-slate-100/50 px-6 py-2.5 flex items-center justify-between text-[11px] text-slate-500 shrink-0 select-none">
+                    <div className="bg-black/30 border-t border-[#d4af37]/10 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
                       <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                        <span className="text-slate-400 font-medium">Need human assistance?</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+                        <span className="text-slate-500 font-medium">Need human assistance?</span>
                       </div>
                       <a
                         href="https://wa.me/601164073143?text=Hi,%20saya%20perlu%20bantuan%20dari%20tim%20sales%20untuk%20pesanan%20borong."
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#1F2937] hover:text-[#D4AF37] font-semibold underline tracking-wide transition-colors uppercase text-[10px]"
+                        className="text-[#d4af37] hover:text-[#b8960c] font-semibold tracking-wide transition-colors uppercase text-[10px]"
                       >
-                        Talk to Sales Team
+                        Talk to Sales
                       </a>
                     </div>
 
                     {/* ── Input Bar ── */}
                     {messages.length > 0 && (
-                      <div className={`shrink-0 border-t border-slate-100/80 bg-white/40 backdrop-blur-md ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
+                      <div className={`shrink-0 border-t border-[#d4af37]/10 bg-black/20 backdrop-blur-md ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
                         {/* Hidden invoice file input */}
                         <input
                           ref={invoiceInputRef}
@@ -2567,10 +2613,10 @@ export default function ChatWidget() {
                             onClick={() => invoiceInputRef.current?.click()}
                             disabled={invoiceUploading || loading}
                             title={lang === "zh" ? "上传发票" : lang === "en" ? "Upload invoice" : "Upload invoice"}
-                            className="shrink-0 w-10 h-10 rounded-full bg-slate-50 border border-slate-200 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/40 text-slate-400 hover:text-[#D4AF37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
+                            className="shrink-0 w-10 h-10 rounded-full bg-[#111827] border border-white/10 hover:bg-[#d4af37]/10 hover:border-[#d4af37]/40 text-slate-500 hover:text-[#d4af37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
                           >
                             {invoiceUploading
-                              ? <Loader2 className="w-4 h-4 animate-spin text-[#D4AF37]" />
+                              ? <Loader2 className="w-4 h-4 animate-spin text-[#d4af37]" />
                               : <Paperclip className="w-4 h-4" />
                             }
                           </motion.button>
@@ -2584,24 +2630,24 @@ export default function ChatWidget() {
                               onChange={(e) => setMessage(e.target.value)}
                               disabled={loading || invoiceUploading}
                               placeholder={t.placeholder}
-                              className="w-full bg-white/90 border border-slate-200/80 text-slate-900 placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:bg-white focus:border-slate-300 transition-all disabled:opacity-50 text-[13.5px] font-medium shadow-[0_2px_8px_rgba(0,0,0,0.02)] focus:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
+                              className="w-full bg-[#111827] border border-white/10 text-white placeholder:text-slate-600 pl-5 pr-14 py-3.5 rounded-full outline-none focus:border-[#d4af37]/40 focus:bg-[#1a1a2e] transition-all disabled:opacity-50 text-[13.5px] font-medium"
                             />
                             <motion.button
                               whileTap={{ scale: loading ? 1 : 0.9 }}
                               type="submit"
                               disabled={loading || invoiceUploading || !message.trim()}
-                              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1F2937] text-white rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] flex items-center justify-center cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#d4af37] text-black rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-[#b8960c] disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                             </motion.button>
                           </div>
                         </form>
-                        <p className="text-center text-[9.5px] text-slate-400 mt-3 select-none tracking-wide font-medium">
+                        <p className="text-center text-[9.5px] text-slate-600 mt-3 select-none tracking-wide font-medium">
                           {lang === "en"
-                            ? "📎 Upload invoice to compare savings · Golden AI · Powered by OpenAI"
+                            ? "Upload invoice to compare savings · Golden AI"
                             : lang === "zh"
-                            ? "📎 上传发票比较节省 · Golden AI · Powered by OpenAI"
-                            : "📎 Upload invoice untuk compare savings · Golden AI · Powered by OpenAI"}
+                            ? "上传发票比较节省 · Golden AI"
+                            : "Upload invoice untuk compare savings · Golden AI"}
                         </p>
                       </div>
                     )}

@@ -34,8 +34,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
         return (
             <div className="flex flex-col items-center z-10 relative">
-                <AllCategoryIcon size={40} className="text-[#d4a853] opacity-90 drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]" />
-                <span className="text-[8px] font-bold mt-2 uppercase tracking-widest text-[#d4a853]">NO IMAGE</span>
+                <AllCategoryIcon size={40} className="text-[#d4af37] opacity-90 drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]" />
+                <span className="text-[8px] font-bold mt-2 uppercase tracking-widest text-[#d4af37]">NO IMAGE</span>
             </div>
         );
     };

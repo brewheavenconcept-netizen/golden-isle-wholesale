@@ -18,7 +18,7 @@ const testimonials = [
 
 export function TestimonialsSection() {
     return (
-        <section className="py-24 bg-[#0a0a0a] border-b border-[#d4a853]/15 relative overflow-hidden">
+        <section className="py-24 bg-[#0a0a0a] border-b border-[#d4af37]/15 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
                 <div className="text-center mb-16">
@@ -35,7 +35,7 @@ export function TestimonialsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.2 }}
-                            className="bg-[#111827] rounded-2xl p-8 border border-[#d4a853]/20 hover:border-[#d4a853] hover:-translate-y-1 transition-all duration-300 shadow-sm relative group"
+                            className="bg-[#111827] rounded-2xl p-8 border border-[#d4af37]/20 hover:border-[#d4af37] hover:-translate-y-1 transition-all duration-300 shadow-sm relative group"
                         >
                             <Quote className="w-10 h-10 text-[#b8960c] mb-6 opacity-80" />
                             <p className="text-lg md:text-xl text-[#9ca3af] leading-relaxed mb-8 italic" style={{ fontFamily: '"Cormorant Garamond", serif' }}>

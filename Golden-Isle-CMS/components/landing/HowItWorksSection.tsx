@@ -26,7 +26,7 @@ const steps = [
 
 export function HowItWorksSection() {
     return (
-        <section className="py-24 bg-[#0a0a0a] border-y border-[#d4a853]/15 relative overflow-hidden">
+        <section className="py-24 bg-[#0a0a0a] border-y border-[#d4af37]/15 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="flex flex-col md:flex-row gap-16 items-center">
                     <motion.div
@@ -55,15 +55,15 @@ export function HowItWorksSection() {
                             >
                                 <div className="relative z-10 group cursor-default">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <div className="text-xs font-bold uppercase tracking-widest text-[#d4a853]">
+                                        <div className="text-xs font-bold uppercase tracking-widest text-[#d4af37]">
                                             Step {parseInt(step.num)}
                                         </div>
                                         {/* Optional connector line on desktop, hide on last step */}
                                         {index < steps.length - 1 && (
-                                            <div className="hidden sm:block h-[1px] flex-grow bg-gradient-to-r from-[#d4a853]/50 to-transparent ml-2" />
+                                            <div className="hidden sm:block h-[1px] flex-grow bg-gradient-to-r from-[#d4af37]/50 to-transparent ml-2" />
                                         )}
                                     </div>
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#d4a853] to-[#c9a84c] text-[#0a0a0a] flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(212,168,83,0.2)] group-hover:shadow-[0_0_30px_rgba(212,168,83,0.4)] transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#d4af37] to-[#b8960c] text-[#0a0a0a] flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(212,168,83,0.2)] group-hover:shadow-[0_0_30px_rgba(212,168,83,0.4)] transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
                                         <step.icon className="w-7 h-7" />
                                     </div>
                                     <h3 className="text-lg font-bold text-white mb-2">
