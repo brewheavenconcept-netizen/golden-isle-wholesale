@@ -15,7 +15,6 @@ import {
   ArrowLeft,
   ShoppingCart,
   Paperclip,
-  FileText,
   Wine,
   Beer,
   Package,
@@ -29,8 +28,10 @@ import {
   Globe,
   CheckCircle2,
   GlassWater,
-  TrendingDown,
   ChevronRight,
+  Truck,
+  Wallet,
+  MessageCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePublicStore } from "@/hooks/usePublicStore";
@@ -73,7 +74,7 @@ type Language = "ms" | "en" | "zh";
 type FlowType =
   | "browse_products"      // Flow 1 — deterministic, no LLM
   | "wholesale_quote"      // Flow 2 — LLM for recommendation only
-  | "competitor_compare"   // Flow 3 — OCR + then reuses Flow 2
+  | "delivery_coverage"    // Flow 3 — deterministic delivery
   | "ask_question"         // Flow 4 — constrained LLM
   | null;
 
@@ -94,10 +95,8 @@ type ChatStep =
   | "QUOTE_RECOMMENDATION"
   | "QUOTE_REVIEW"
   | "QUOTE_HANDOFF"
-  // ── Flow 3: Competitor Comparison (Vision API → then Flow 2) ─────────────
-  | "COMPARE_UPLOAD"
-  | "COMPARE_PROCESSING"
-  | "COMPARE_RESULTS"
+  // ── Flow 3: Delivery Coverage ──────────────────────────────────────────────
+  | "DELIVERY_AREA"
   // ── Flow 4: Ask a Question (constrained LLM) ──────────────────────────────
   | "FAQ_CHAT";
 
@@ -110,7 +109,7 @@ const TRANSLATIONS = {
     welcomeDesc: "Sy suggest dalam 60 saat. Pilih je di bawah.",
     quickActionsTitle: "Quick Actions",
     errorTitle: "Ralat Berlaku",
-    thinking: "Sedang merangka cadangan terbaik...",
+    thinking: "Sedang membuat cadangan terbaik...",
     userLabel: "Anda",
     botLabel: "Golden AI",
     quoteTitle: "Quote Draft",
@@ -137,17 +136,14 @@ const TRANSLATIONS = {
     menuBrowseDesc: "Lihat katalog produk premium kami",
     menuQuote: "Sebut Harga Borong",
     menuQuoteDesc: "Bina sebut harga untuk pesanan pukal",
-    menuCompare: "Bandingkan Harga Pesaing",
-    menuCompareDesc: "Upload invois lama — kami tunjuk penjimatan boss",
-    menuFAQ: "Tanya Soalan",
-    menuFAQDesc: "Tentang produk, penghantaran atau pembayaran",
+    menuDelivery: "Kawasan Penghantaran",
+    menuDeliveryDesc: "Semak kawasan & ETA penghantaran",
+    menuFAQ: "Tanya Golden AI",
+    menuFAQDesc: "Pilih produk, semak delivery & MOQ instant",
     menuSales: "Bercakap dengan Sales",
     menuSalesDesc: "Connect terus dengan team sales kami",
     faqPlaceholder: "Tanya apa sahaja tentang produk kami...",
     faqRefusal: "Maaf, saya hanya boleh bantu soalan berkaitan produk dan pesanan kami. Sila hubungi team sales untuk bantuan lanjut.",
-    compareUploadTitle: "Upload Invois Pesaing",
-    compareUploadDesc: "Upload invois supplier boss sekarang. Kami analisa dan tunjuk berapa boss boleh jimat dengan Golden Isle.",
-    compareUploadBtn: "Pilih Fail (JPG/PNG/PDF)",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Tolong recommend produk borong ikut budget saya." },
       { label: "Build Wholesale Quote", icon: "📦", query: "Saya nak minta sebut harga (wholesale quote)." },
@@ -189,17 +185,14 @@ const TRANSLATIONS = {
     menuBrowseDesc: "Explore our premium wholesale catalog",
     menuQuote: "Get Wholesale Quote",
     menuQuoteDesc: "Build a quote for your bulk order",
-    menuCompare: "Compare Competitor Price",
-    menuCompareDesc: "Upload your invoice — see how much you save",
-    menuFAQ: "Ask a Question",
-    menuFAQDesc: "About products, delivery or payment",
+    menuDelivery: "Delivery Coverage",
+    menuDeliveryDesc: "Check delivery area & ETA",
+    menuFAQ: "Ask Golden AI",
+    menuFAQDesc: "Choose products, check delivery & MOQ instantly",
     menuSales: "Talk to Sales",
     menuSalesDesc: "Connect directly with our sales team",
     faqPlaceholder: "Ask anything about our products or ordering...",
     faqRefusal: "Sorry, I can only assist with questions related to our products and ordering. Please talk to our sales team for further assistance.",
-    compareUploadTitle: "Upload Competitor Invoice",
-    compareUploadDesc: "Upload your current supplier's invoice. We'll analyse it and show exactly how much you save with Golden Isle.",
-    compareUploadBtn: "Choose File (JPG/PNG/PDF)",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "Please recommend wholesale products based on my budget." },
       { label: "Build Wholesale Quote", icon: "📦", query: "I would like to build a wholesale quote." },
@@ -241,17 +234,14 @@ const TRANSLATIONS = {
     menuBrowseDesc: "探索我们的优质批发目录",
     menuQuote: "获取批发报价",
     menuQuoteDesc: "为您的批量订单建立报价单",
-    menuCompare: "比较竞争对手价格",
-    menuCompareDesc: "上传发票 — 查看您能节省多少",
-    menuFAQ: "提问",
-    menuFAQDesc: "询问有关产品、配送或付款的问题",
+    menuDelivery: "配送范围",
+    menuDeliveryDesc: "查看配送区域和预计时间",
+    menuFAQ: "询问 Golden AI",
+    menuFAQDesc: "即时选择产品、查询配送及起订量",
     menuSales: "联系销售",
     menuSalesDesc: "直接与我们的销售团队联系",
     faqPlaceholder: "请询问有关我们产品或订购的任何问题...",
     faqRefusal: "抱歉，我只能回答与我们产品和订购相关的问题。如需进一步帮助，请联系我们的销售团队。",
-    compareUploadTitle: "上传竞争对手发票",
-    compareUploadDesc: "上传您当前供应商的发票。我们将进行分析，并向您展示使用Golden Isle可以节省多少费用。",
-    compareUploadBtn: "选择文件（JPG/PNG/PDF）",
     suggestions: [
       { label: "Recommend by Budget", icon: "🥃", query: "请根据我的预算推荐批发产品。" },
       { label: "Build Wholesale Quote", icon: "📦", query: "我想获取批发报价单。" },
@@ -283,26 +273,26 @@ function OnboardingPointer() {
   return (
     <div className="relative flex flex-col items-center justify-center pointer-events-none">
       {/* Curved dotted line with arrowhead guiding attention from bottom-right up to the touch target */}
-      <svg 
-        className="absolute -right-8 top-10 w-16 h-20 overflow-visible pointer-events-none opacity-90" 
-        viewBox="0 0 60 80" 
+      <svg
+        className="absolute -right-8 top-10 w-16 h-20 overflow-visible pointer-events-none opacity-90"
+        viewBox="0 0 60 80"
         fill="none"
       >
-        <path 
-          d="M45,75 Q60,45 28,10" 
-          stroke="#D4AF37" 
-          strokeWidth="1.5" 
-          strokeDasharray="4,4" 
+        <path
+          d="M45,75 Q60,45 28,10"
+          stroke="#D4AF37"
+          strokeWidth="1.5"
+          strokeDasharray="4,4"
           strokeLinecap="round"
         />
         {/* Elegant golden arrowhead */}
-        <path 
-          d="M23,16 L28,8 L35,13" 
-          fill="none" 
-          stroke="#D4AF37" 
-          strokeWidth="1.5" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
+        <path
+          d="M23,16 L28,8 L35,13"
+          fill="none"
+          stroke="#D4AF37"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
 
@@ -327,38 +317,38 @@ function OnboardingPointer() {
         </div>
 
         {/* Realistic modern 3D sleeve-cuff cursor hand SVG */}
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 28" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 28"
           className="w-11 h-13 drop-shadow-[0_6px_14px_rgba(0,0,0,0.12)] relative z-10 mt-4"
         >
           {/* Blue Sleeve / Cuff */}
-          <path 
-            d="M7 21h10v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5Z" 
-            fill="#3B82F6" 
-            stroke="#2563EB" 
+          <path
+            d="M7 21h10v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5Z"
+            fill="#3B82F6"
+            stroke="#2563EB"
             strokeWidth="1"
           />
-          <path 
-            d="M7 21h10v2.5H7V21Z" 
+          <path
+            d="M7 21h10v2.5H7V21Z"
             fill="#EFF6FF"
           />
 
           {/* Hand Body & Skin Fingers */}
-          <path 
-            d="M10 16.5V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18c0 3.31-2.69 6-6 6h-2c-2.48 0-4.58-1.51-5.48-3.68l-1.42-3.55a1.5 1.5 0 0 1 2.3-1.8l2.18 1.63V16.5Z" 
-            fill="#FCD34D" 
-            stroke="#D97706" 
-            strokeWidth="1.2" 
-            strokeLinecap="round" 
+          <path
+            d="M10 16.5V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V12h1V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18c0 3.31-2.69 6-6 6h-2c-2.48 0-4.58-1.51-5.48-3.68l-1.42-3.55a1.5 1.5 0 0 1 2.3-1.8l2.18 1.63V16.5Z"
+            fill="#FCD34D"
+            stroke="#D97706"
+            strokeWidth="1.2"
+            strokeLinecap="round"
             strokeLinejoin="round"
           />
-          
+
           {/* Subtle highlights */}
-          <path 
-            d="M11 4.5v5M14 6.5v4M17 8.5v3" 
-            stroke="#F59E0B" 
-            strokeWidth="1" 
+          <path
+            d="M11 4.5v5M14 6.5v4M17 8.5v3"
+            stroke="#F59E0B"
+            strokeWidth="1"
             strokeLinecap="round"
           />
         </svg>
@@ -372,7 +362,7 @@ function OnboardingPointer() {
 function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text: string; onModifyQuote: () => void; onWhatsAppCheckout: (products: CartItem[], total: number) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
   let data: { action: string; summary: string; products: CartItem[] } | null = null;
-  try { data = JSON.parse(text.substring(12)); } catch (e) {}
+  try { data = JSON.parse(text.substring(12)); } catch (e) { }
 
   if (!data) return (
     <div className="bg-[#fafaf8] border border-[#d4af37]/20 text-[#1a1a1a] text-[13px] p-4 rounded-2xl rounded-tl-[5px] shadow-sm">
@@ -504,24 +494,23 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote", cartCou
           <div className="flex items-start justify-between gap-1 mb-1">
             <span className="text-[9px] uppercase tracking-widest font-bold text-[#D4AF37]">{p.category}</span>
           </div>
-          
+
           <h4 className="text-[14px] font-bold text-[#1a1a1a] leading-tight mb-0.5 tracking-tight">{p.name}</h4>
-          
+
           {p.description && (
             <p className="text-[11px] text-slate-500 line-clamp-1 leading-relaxed font-normal mb-1.5">{p.description}</p>
           )}
-          
+
           <div className="text-[16px] font-black text-[#1a1a1a] tracking-tight mb-2">
             {p.price}
           </div>
 
           {p.badge && (
             <div className="mb-3">
-              <span className={`inline-flex items-center gap-1.5 text-[8.5px] tracking-wider uppercase font-bold px-2.5 py-1 rounded-full border ${
-                p.badge === "TERHAD"
-                  ? "bg-[#fafaf8] text-[#d4af37] border-[#d4af37]/20"
-                  : "bg-[#fafaf8] text-emerald-600 border-emerald-100"
-              }`}>
+              <span className={`inline-flex items-center gap-1.5 text-[8.5px] tracking-wider uppercase font-bold px-2.5 py-1 rounded-full border ${p.badge === "TERHAD"
+                ? "bg-[#fafaf8] text-[#d4af37] border-[#d4af37]/20"
+                : "bg-[#fafaf8] text-emerald-600 border-emerald-100"
+                }`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${p.badge === "TERHAD" ? "bg-[#d4af37]" : "bg-emerald-500"}`}></span>
                 {p.badge}
               </span>
@@ -567,13 +556,12 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote", cartCou
           {!showQtyPicker && (
             <div className="flex flex-col gap-2 mt-auto">
               <button onClick={handleAddClick}
-                className={`w-full flex items-center justify-center gap-2 text-[11px] font-bold py-2.5 rounded-lg transition-all cursor-pointer shadow-sm active:scale-[0.98] ${
-                  added ? "bg-emerald-500 text-white" : "bg-[#b8960c] hover:bg-[#d4af37] text-white shadow-[0_4px_12px_rgba(184,150,12,0.15)]"
-                }`}>
+                className={`w-full flex items-center justify-center gap-2 text-[11px] font-bold py-2.5 rounded-lg transition-all cursor-pointer shadow-sm active:scale-[0.98] ${added ? "bg-emerald-500 text-white" : "bg-[#b8960c] hover:bg-[#d4af37] text-white shadow-[0_4px_12px_rgba(184,150,12,0.15)]"
+                  }`}>
                 <ShoppingCart className="w-3.5 h-3.5" />
                 {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
               </button>
-              
+
               <button onClick={() => window.dispatchEvent(new CustomEvent('showProductDetails', { detail: p }))}
                 className="w-full flex items-center justify-center gap-2 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-lg cursor-pointer shadow-sm">
                 <AlertCircle className="w-3.5 h-3.5" />
@@ -585,7 +573,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote", cartCou
           {/* Checkout text link - bottom right */}
           {!showQtyPicker && cartCount > 0 && (
             <div className="flex justify-end mt-3">
-              <button 
+              <button
                 onClick={() => onSendText("Checkout")}
                 className="text-[11px] font-bold text-[#b8960c] hover:text-[#d4af37] flex items-center gap-1 transition-colors cursor-pointer"
               >
@@ -604,7 +592,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote", cartCou
 function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "quote", cartCount = 0 }: { text: string; onAddToCart: (product: any, quantity: number) => void; onSendText: (text: string) => void; lang: Language; mode?: "cart" | "quote"; cartCount?: number }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
-  try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
+  try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) { }
 
   if (!data) return (
     <div className="text-slate-600 text-[13px] p-3.5 bg-[#fafaf8] border border-slate-200 rounded-2xl rounded-tl-[5px] shadow-sm">
@@ -641,7 +629,7 @@ const ROTATING_PROMPTS = [
 
 function ToolResultCategories({ text, onSendText, lang }: { text: string; onSendText: (text: string) => void; lang: Language }) {
   let categories: { label: string, value: string }[] = [];
-  try { categories = JSON.parse(text.substring("TOOL_RESULT_CATEGORIES:".length)); } catch (e) {}
+  try { categories = JSON.parse(text.substring("TOOL_RESULT_CATEGORIES:".length)); } catch (e) { }
 
   if (!categories || categories.length === 0) return null;
 
@@ -665,7 +653,7 @@ function ToolResultCategories({ text, onSendText, lang }: { text: string; onSend
 
 function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text: string; cart: CartItem[]; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string) => void; lang: Language }) {
   let data: { customer_name?: string; customer_phone?: string } | null = null;
-  try { data = JSON.parse(text.substring("TOOL_RESULT_CHECKOUT_CARD:".length)); } catch (e) {}
+  try { data = JSON.parse(text.substring("TOOL_RESULT_CHECKOUT_CARD:".length)); } catch (e) { }
 
   if (!data || !data.customer_name || !data.customer_phone) {
     return (
@@ -683,7 +671,7 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
         <ShoppingCart className="w-4 h-4 text-[#1a1a1a]" />
         <span className="text-[11px] font-semibold text-[#1a1a1a] uppercase tracking-wider">Checkout</span>
       </div>
-      
+
       <div className="py-3 text-[12px] text-slate-650 space-y-1 font-medium">
         <p><strong className="text-[#1a1a1a] font-semibold">Name:</strong> {data.customer_name}</p>
         <p><strong className="text-[#1a1a1a] font-semibold">Phone:</strong> {data.customer_phone}</p>
@@ -711,7 +699,7 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
 function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddToCart: (product: any) => void; lang: Language }) {
   const t = TRANSLATIONS[lang];
   let data: { summary: string; products: any[] } | null = null;
-  try { data = JSON.parse(text.substring("TOOL_RESULT:".length)); } catch (e) {}
+  try { data = JSON.parse(text.substring("TOOL_RESULT:".length)); } catch (e) { }
 
   if (!data) return null;
 
@@ -737,7 +725,7 @@ function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddTo
 function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
   const t = TRANSLATIONS[lang];
   let data: { items: any[]; total_amount: number } | null = null;
-  try { data = JSON.parse(text.substring("TOOL_RESULT_QUOTE_CARD:".length)); } catch (e) {}
+  try { data = JSON.parse(text.substring("TOOL_RESULT_QUOTE_CARD:".length)); } catch (e) { }
 
   if (!data) return null;
 
@@ -747,14 +735,14 @@ function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "whatsapp_click", language: lang, cart: data?.items || [] })
-    }).catch(() => {});
-    
+    }).catch(() => { });
+
     let msg = `🛒 *New Lead - Golden AI*\n---------------------------\n`;
     data!.items.forEach((item) => {
       msg += `• ${item.quantity}x ${item.name} (RM ${item.price})\n`;
     });
     msg += `---------------------------\n💰 *TOTAL: RM ${data!.total_amount.toFixed(2)}*\n🌐 Language: ${lang.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
-    
+
     window.open(`https://wa.me/601164073143?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
   };
 
@@ -791,9 +779,9 @@ function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
 function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (option: string) => void; lang: Language }) {
   const match = text.match(/SHOW_SUGGESTIONS:(.*)/);
   if (!match) return null;
-  
+
   const rawTags = match[1].split(",").map(s => s.trim());
-  
+
   const iconMap: Record<string, string> = {
     whisky: "Premium Whisky",
     wine: "Fine Wine",
@@ -951,14 +939,6 @@ function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; fl
         QUOTE_REVIEW: 3, QUOTE_HANDOFF: 3,
       }
     },
-    competitor_compare: {
-      stages: ["Upload", "Compare", "Quote"],
-      activeMap: {
-        COMPARE_UPLOAD: 0, COMPARE_PROCESSING: 0,
-        COMPARE_RESULTS: 1,
-        QUOTE_RECOMMENDATION: 2, QUOTE_REVIEW: 2, QUOTE_HANDOFF: 2,
-      }
-    },
   };
 
   const config = stageConfig[flowType];
@@ -989,17 +969,16 @@ function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; fl
                       duration: 0.5,
                       ease: "easeInOut"
                     }}
-                    className={`p-1 rounded-full border transition-all duration-350 flex items-center justify-center ${
-                      idx === activeIdx
-                        ? "bg-[#D4AF37]/10 border-[#D4AF37] text-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.4)]"
-                        : idx < activeIdx
-                          ? "bg-[#D4AF37] border-[#D4AF37] text-white"
-                          : "bg-white border-slate-200 text-slate-400"
-                    }`}
+                    className={`p-1 rounded-full border transition-all duration-350 flex items-center justify-center ${idx === activeIdx
+                      ? "bg-[#D4AF37]/10 border-[#D4AF37] text-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.4)]"
+                      : idx < activeIdx
+                        ? "bg-[#D4AF37] border-[#D4AF37] text-white"
+                        : "bg-white border-slate-200 text-slate-400"
+                      }`}
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
                   </motion.div>
-                  
+
                   {/* Cart Item Badge inside Stepper (pop animation on add) */}
                   {cartCount > 0 && (
                     <motion.span
@@ -1014,17 +993,15 @@ function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; fl
                   )}
                 </div>
               ) : (
-                <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${
-                  idx === activeIdx
-                    ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
-                    : idx < activeIdx
-                      ? "bg-[#D4AF37] border-[#D4AF37]"
-                      : "bg-white border-slate-200"
-                }`} />
+                <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${idx === activeIdx
+                  ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
+                  : idx < activeIdx
+                    ? "bg-[#D4AF37] border-[#D4AF37]"
+                    : "bg-white border-slate-200"
+                  }`} />
               )}
-              <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${
-                idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-[#1a1a1a]" : "text-slate-400"
-              }`}>
+              <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-[#1a1a1a]" : "text-slate-400"
+                }`}>
                 {stage}
               </span>
             </div>
@@ -1234,22 +1211,137 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
   );
 }
 
+// ─── Premium AI Sales Concierge (Golden AI) ───────────────────────────────────
+
+const CONCIERGE_CARDS = [
+  {
+    title: "Delivery Question",
+    subtitle: "Check delivery timing & area",
+    icon: "truck",
+    step: "DELIVERY_ASK",
+    botReply: "Sure 🚚 Where should we deliver?",
+    chips: ["Kota Kinabalu", "Tawau", "Sandakan", "Lahad Datu", "Other Area"]
+  },
+  {
+    title: "Help Me Choose",
+    subtitle: "AI product guidance",
+    icon: "sparkles",
+    step: "CHOOSE_ASK",
+    botReply: "Happy to help 🥃 What are you buying for?",
+    chips: ["Restaurant / Bar", "Event / Party", "Retail Resale", "Personal Use"]
+  },
+  {
+    title: "Wholesale Pricing",
+    subtitle: "Get quote guidance",
+    icon: "wallet",
+    step: "WHOLESALE_ASK",
+    botReply: "Sure 💰 What best describes your purchase?",
+    chips: ["Restaurant / Bar", "Retail Shop", "Event Bulk Order", "Distributor"]
+  },
+  {
+    title: "Minimum Order",
+    subtitle: "MOQ information",
+    icon: "package",
+    step: "MOQ_ASK",
+    botReply: "Minimum order usually starts from 1 carton depending on category.\n\nWhat are you planning to buy?",
+    chips: ["Whisky", "Beer", "Wine", "Mixed Order"]
+  },
+  {
+    title: "Ask Something Else",
+    subtitle: "Custom question",
+    icon: "message-circle",
+    step: "FREE_CHAT",
+    botReply: "Sure 💬 What is on your mind? Ask me anything about our premium labels, wholesale pricing, delivery, or custom orders.",
+    chips: ["Check Delivery Area", "Talk to Sales", "Browse Products"]
+  }
+];
+
+const CONCIERGE_ICONS: Record<string, React.ReactNode> = {
+  truck: <Truck className="w-5 h-5 text-[#d4af37]" />,
+  sparkles: <Sparkles className="w-5 h-5 text-[#d4af37]" />,
+  wallet: <Wallet className="w-5 h-5 text-[#d4af37]" />,
+  package: <Package className="w-5 h-5 text-[#d4af37]" />,
+  "message-circle": <MessageCircle className="w-5 h-5 text-[#d4af37]" />
+};
+
+function ConciergeEntryView({ onSelect }: { onSelect: (card: typeof CONCIERGE_CARDS[0]) => void }) {
+  return (
+    <div className="h-full overflow-y-auto px-5 py-6 space-y-6">
+      {/* Bot Greeting */}
+      <div className="flex items-start gap-2.5">
+        <AvatarBot />
+        <div className="bg-[#f5f5f0] border border-[#d4af37]/15 rounded-3xl rounded-tl-[6px] px-4 py-3.5 max-w-[85%] shadow-sm">
+          <p className="text-[13.5px] text-[#1a1a1a] leading-relaxed font-semibold">
+            👋 Hi! Need quick answers before placing your order?
+            <span className="text-slate-500 text-[12px] font-normal mt-1.5 block leading-normal">
+              I can help you choose products, check delivery, pricing, and wholesale options.
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {/* List of Premium Cards */}
+      <div className="space-y-3 pb-4">
+        {CONCIERGE_CARDS.map((card, idx) => (
+          <motion.button
+            key={`concierge-card-${idx}`}
+            onClick={() => onSelect(card)}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37]/35 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.01)]"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
+              {CONCIERGE_ICONS[card.icon]}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13.5px] font-bold text-[#1a1a1a] leading-tight">{card.title}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-tight font-medium">{card.subtitle}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#d4af37] transition-colors" />
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function appendSuggestionsIfMissing(reply: string, lang: Language): string {
+  if (reply.includes("SHOW_SUGGESTIONS:")) return reply;
+
+  const q = reply.toLowerCase();
+  let suggestions: string[] = [];
+
+  if (q.includes("whisky") || q.includes("whiskey") || q.includes("macallan") || q.includes("johnnie")) {
+    suggestions = ["Black Label", "Red Label", "Browse Whisky", "Talk to Sales"];
+  } else if (q.includes("delivery") || q.includes("hantar") || q.includes("tonight") || q.includes("hari") || q.includes("area") || q.includes("kawasan")) {
+    suggestions = ["Check Delivery Area", "Talk to Sales", "Browse Products"];
+  } else if (q.includes("price") || q.includes("harga") || q.includes("wholesale") || q.includes("borong") || q.includes("quote")) {
+    suggestions = ["Get Wholesale Quote", "Browse Products", "Talk to Sales"];
+  } else if (q.includes("moq") || q.includes("minimum") || q.includes("carton")) {
+    suggestions = ["Minimum Order", "Browse Products", "Talk to Sales"];
+  } else {
+    suggestions = ["Browse Products", "Get Wholesale Quote", "Talk to Sales"];
+  }
+
+  return `${reply}\nSHOW_SUGGESTIONS:${suggestions.join(",")}`;
+}
+
 // ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
   browse_products: <ShoppingBag className="w-5 h-5 text-[#d4af37]" />,
   wholesale_quote: <LayoutGrid className="w-5 h-5 text-[#d4af37]" />,
-  competitor_compare: <TrendingDown className="w-5 h-5 text-[#d4af37]" />,
+  delivery_coverage: <Package className="w-5 h-5 text-[#d4af37]" />,
   ask_question: <MessageSquare className="w-5 h-5 text-[#d4af37]" />,
 };
 
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS[lang] as any;
   const options = [
     { label: t.menuBrowse, desc: t.menuBrowseDesc, flow: "browse_products" as const },
-    { label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
-    { label: t.menuCompare, desc: t.menuCompareDesc, flow: "competitor_compare" as const },
     { label: t.menuFAQ, desc: t.menuFAQDesc, flow: "ask_question" as const },
+    { label: t.menuDelivery, desc: t.menuDeliveryDesc, flow: "delivery_coverage" as const },
+    { label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
   ];
   return (
     <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
@@ -1368,49 +1460,7 @@ function BrowseProductsView({ category, storeId, onAddToCart, onSendText, lang, 
   );
 }
 
-// ─── CompareUploadView — Invoice Upload for Flow 3 ────────────────────────────
 
-function CompareUploadView({ lang, onUpload, uploading }: { lang: Language; onUpload: (file: File) => void; uploading: boolean }) {
-  const t = TRANSLATIONS[lang];
-  const inputRef = useRef<HTMLInputElement>(null);
-  return (
-    <div className="h-full flex flex-col items-center justify-center px-6 py-8 space-y-6 text-center">
-      <div className="w-20 h-20 rounded-full bg-[#fafaf8] border border-[#d4af37]/20 flex items-center justify-center shadow-sm">
-        <FileText className="w-9 h-9 text-[#d4af37]" />
-      </div>
-      <div className="space-y-2 max-w-[280px]">
-        <h3 className="text-[17px] font-semibold text-[#1a1a1a] tracking-tight">{t.compareUploadTitle}</h3>
-        <p className="text-[12.5px] text-slate-500 leading-relaxed">{t.compareUploadDesc}</p>
-      </div>
-      <div className="w-full max-w-[280px] space-y-3">
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*,.pdf"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onUpload(file);
-          }}
-        />
-        <button
-          onClick={() => inputRef.current?.click()}
-          disabled={uploading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-full bg-[#d4af37] hover:bg-[#b8960c] text-[#1a1a1a] text-[12px] font-semibold tracking-wider uppercase transition-all shadow-[0_4px_12px_rgba(212,175,55,0.25)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-        >
-          {uploading ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> {lang === "zh" ? "分析中..." : lang === "en" ? "Analysing..." : "Sedang analisa..."}</>
-          ) : (
-            <><Paperclip className="w-4 h-4" /> {t.compareUploadBtn}</>
-          )}
-        </button>
-        <p className="text-[10px] text-slate-400">
-          {lang === "zh" ? "支持: JPG, PNG, PDF · 最大 10MB" : lang === "en" ? "Supports: JPG, PNG, PDF · Max 10MB" : "Sokongan: JPG, PNG, PDF · Maks 10MB"}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 // ─── QuoteHandoffView — WA Handoff Confirmation ───────────────────────────────
 
@@ -1428,8 +1478,8 @@ function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void
           {lang === "zh"
             ? "我们的销售团队将在30分钟内通过WhatsApp联系您。"
             : lang === "en"
-            ? "Our sales team will contact you within 30 minutes via WhatsApp."
-            : "Team sales kami akan menghubungi boss dalam 30 minit melalui WhatsApp."}
+              ? "Our sales team will contact you within 30 minutes via WhatsApp."
+              : "Team sales kami akan menghubungi boss dalam 30 minit melalui WhatsApp."}
         </p>
       </div>
       <div className="flex flex-col gap-2 w-full max-w-[260px]">
@@ -1472,14 +1522,13 @@ export default function ChatWidget() {
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [conciergeStep, setConciergeStep] = useState<string>("ENTRY");
 
   // ── Customer Context — tracks everything we learn, injected into LLM
   const [customerContext, setCustomerContext] = useState<CustomerContext>(createEmptyContext());
-  const [invoiceUploading, setInvoiceUploading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const invoiceInputRef = useRef<HTMLInputElement>(null);
 
   const t = TRANSLATIONS[lang];
 
@@ -1516,26 +1565,26 @@ export default function ChatWidget() {
       if (savedName) setCustomerName(savedName);
       if (savedPhone) setCustomerPhone(savedPhone);
       setOnboardingSeen(seenOnboarding === "true");
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem("golden_ai_messages", JSON.stringify(messages)); } catch (e) {}
+    try { localStorage.setItem("golden_ai_messages", JSON.stringify(messages)); } catch (e) { }
   }, [messages]);
 
   useEffect(() => {
-    try { localStorage.setItem("golden_ai_cart", JSON.stringify(cart)); } catch (e) {}
+    try { localStorage.setItem("golden_ai_cart", JSON.stringify(cart)); } catch (e) { }
   }, [cart]);
 
   useEffect(() => {
-    try { localStorage.setItem("golden_ai_language", lang); } catch (e) {}
+    try { localStorage.setItem("golden_ai_language", lang); } catch (e) { }
   }, [lang]);
 
   useEffect(() => {
     try {
       localStorage.setItem("golden_ai_name", customerName);
       localStorage.setItem("golden_ai_phone", customerPhone);
-    } catch (e) {}
+    } catch (e) { }
   }, [customerName, customerPhone]);
 
   useEffect(() => {
@@ -1616,7 +1665,7 @@ export default function ChatWidget() {
       setCart([]);
       try {
         localStorage.removeItem("golden_ai_cart");
-      } catch (e) {}
+      } catch (e) { }
 
       // Add a rich success message with upsell
       const tLocal = TRANSLATIONS[lang];
@@ -1668,9 +1717,9 @@ export default function ChatWidget() {
         ]);
         if (data.reply.startsWith("TOOL_RESULT:")) {
           try {
-             const parsed = JSON.parse(data.reply.substring(12));
-             if (parsed?.action && Array.isArray(parsed.products)) setCart(parsed.products);
-          } catch (e) {}
+            const parsed = JSON.parse(data.reply.substring(12));
+            if (parsed?.action && Array.isArray(parsed.products)) setCart(parsed.products);
+          } catch (e) { }
         }
       }
     } catch (err) {
@@ -1707,15 +1756,15 @@ export default function ChatWidget() {
       newCart = updated;
       return updated;
     });
-    
+
     // Immediately write to local storage to avoid race conditions
-    try { localStorage.setItem("golden_ai_cart", JSON.stringify(newCart)); } catch (e) {}
+    try { localStorage.setItem("golden_ai_cart", JSON.stringify(newCart)); } catch (e) { }
 
     // Only call autoViewCart if we are inside a chat view where messages are visible
-    if (currentStep === "START" || currentStep === "QUOTE_RECOMMENDATION" || currentStep === "COMPARE_RESULTS") {
+    if (currentStep === "START" || currentStep === "QUOTE_RECOMMENDATION") {
       setTimeout(() => { autoViewCart(newCart); }, 100);
     }
-    
+
     // Update context — customer has added to cart
     setCustomerContext(prev => ({
       ...prev,
@@ -1728,145 +1777,7 @@ export default function ChatWidget() {
 
   // ── handleInvoiceUpload — Vision API ─────────────────────────────────────────
 
-  const handleInvoiceUpload = useCallback(async (file: File) => {
-    if (!file) return;
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
-    if (!validTypes.includes(file.type) && !file.type.startsWith("image/")) {
-      toast.error("Please upload an image of your invoice (JPG, PNG, WebP)");
-      return;
-    }
 
-    setInvoiceUploading(true);
-    // Show upload message immediately
-    const uploadingMsg: Message = {
-      role: "user",
-      text: `📎 ${lang === "zh" ? "上传发票" : lang === "en" ? "Uploaded invoice" : "Upload invoice"}: ${file.name}`,
-    };
-    setMessages(prev => [...prev, uploadingMsg]);
-    // Transition to FAQ_CHAT or QUOTE_RECOMMENDATION so messages show
-    if (currentStep === "START" || currentStep === "MAIN_MENU" || currentStep === "COMPARE_UPLOAD") {
-      setCurrentStep("COMPARE_RESULTS");
-    }
-
-    try {
-      // Convert file to base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          resolve(result.split(",")[1]); // strip data:...;base64,
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      const res = await fetch("/api/vision", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        setMessages(prev => [
-          ...prev,
-          {
-            role: "model",
-            text: data.error || (lang === "en"
-              ? "Sorry, couldn't read that invoice. Please try a clearer image."
-              : lang === "zh"
-              ? "抱歉，无法识别该发票。请尝试更清晰的图片。"
-              : "Maaf, sy tak dapat baca invoice tu. Cuba gambar yang lebih jelas ya."),
-          },
-        ]);
-        return;
-      }
-
-      // Update customer context with invoice data
-      const newCtx: CustomerContext = {
-        ...customerContext,
-        hasUploadedInvoice: true,
-        previousSupplier: data.supplier || undefined,
-        monthlySpend: data.invoiceTotal || undefined,
-        invoiceData: {
-          supplier: data.supplier,
-          invoiceDate: data.invoiceDate,
-          items: data.items || [],
-          invoiceTotal: data.invoiceTotal || 0,
-          potentialSavings: data.potentialSavings || 0,
-        },
-      };
-
-      // Infer preferred category from invoice items
-      if (data.items?.length > 0) {
-        const firstItem = (data.items[0].name || "").toLowerCase();
-        if (firstItem.includes("beer") || firstItem.includes("carlsberg") || firstItem.includes("heineken") || firstItem.includes("tiger")) {
-          newCtx.preferredCategory = "beer";
-        } else if (firstItem.includes("whisky") || firstItem.includes("whiskey") || firstItem.includes("chivas") || firstItem.includes("jack")) {
-          newCtx.preferredCategory = "whisky";
-        } else if (firstItem.includes("wine") || firstItem.includes("penfolds")) {
-          newCtx.preferredCategory = "wine";
-        }
-      }
-
-      setCustomerContext(newCtx);
-
-      // Build the invoice result message
-      const savings = data.potentialSavings || 0;
-      const supplier = data.supplier || (lang === "en" ? "your supplier" : lang === "zh" ? "您的供应商" : "supplier lama");
-      let invoiceMsg = "";
-
-      if (lang === "en") {
-        invoiceMsg = `📋 Invoice analysed! I found **${data.items?.length || 0} items** from ${supplier}.\n\nYour previous spend: **RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
-        if (savings > 0) {
-          invoiceMsg += `\n💰 Switching to Golden Isle saves you **RM ${savings.toFixed(2)}** (${data.savingsPercent || 0}% savings) on this same order!`;
-        }
-        invoiceMsg += `\n\nWant me to build you a quote with our prices?`;
-      } else if (lang === "zh") {
-        invoiceMsg = `📋 发票分析完成！找到来自${supplier}的 **${data.items?.length || 0} 件商品**。\n\n您之前的花费：**RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
-        if (savings > 0) {
-          invoiceMsg += `\n💰 切换到Golden Isle可节省 **RM ${savings.toFixed(2)}**（节省${data.savingsPercent || 0}%）！`;
-        }
-        invoiceMsg += `\n\n要我根据我们的价格为您建立报价单吗？`;
-      } else {
-        invoiceMsg = `📋 Invoice boss dah sy analisa! Jumpa **${data.items?.length || 0} item** dari ${supplier}.\n\nSpend boss sebelum ni: **RM ${data.invoiceTotal?.toFixed(2) || "0.00"}**`;
-        if (savings > 0) {
-          invoiceMsg += `\n💰 Kalau boss tukar ke Golden Isle, jimat **RM ${savings.toFixed(2)}** (${data.savingsPercent || 0}% savings) untuk order yang sama!`;
-        }
-        invoiceMsg += `\n\nNak sy buatkan quote dengan harga Golden Isle sekarang?`;
-      }
-
-      // Generate contextual chips based on new invoice context
-      const chips = generateContextualChips(newCtx, lang);
-      const chipsStr = chips.map(c => c.label).join(",");
-
-      setMessages(prev => [
-        ...prev,
-        {
-          role: "model",
-          text: `${invoiceMsg}\nSHOW_SUGGESTIONS:${chipsStr}`,
-        },
-      ]);
-
-    } catch (err) {
-      console.error("Invoice upload error:", err);
-      setMessages(prev => [
-        ...prev,
-        {
-          role: "model",
-          text: lang === "en"
-            ? "Something went wrong analysing the invoice. Please try again."
-            : lang === "zh"
-            ? "分析发票时出现错误，请重试。"
-            : "Ada masalah semasa analisa invoice. Cuba lagi ya.",
-        },
-      ]);
-    } finally {
-      setInvoiceUploading(false);
-      if (invoiceInputRef.current) invoiceInputRef.current.value = "";
-    }
-  }, [customerContext, lang, currentStep]);
 
   // ── handleChatSubmit ──────────────────────────────────────────────────────────
 
@@ -1903,7 +1814,8 @@ export default function ChatWidget() {
       const data: ChatResponse = await response.json();
       if (!response.ok) throw new Error(data.error || `Error ${response.status}`);
       if (data.reply) {
-        setMessages((prev) => [...prev, { role: "model", text: data.reply! }]);
+        const processedReply = appendSuggestionsIfMissing(data.reply, lang);
+        setMessages((prev) => [...prev, { role: "model", text: processedReply }]);
         if (data.reply.startsWith("TOOL_RESULT:")) {
           try {
             const parsed = JSON.parse(data.reply.substring(12));
@@ -1917,7 +1829,7 @@ export default function ChatWidget() {
                 quantity: parsed.data.quantity || prev.quantity
               }));
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       } else {
         throw new Error("Empty reply from AI.");
@@ -1938,7 +1850,7 @@ export default function ChatWidget() {
       localStorage.removeItem("golden_ai_messages");
       localStorage.removeItem("golden_ai_cart");
       localStorage.setItem("golden_ai_language", selectedLang);
-    } catch (e) {}
+    } catch (e) { }
     setCurrentStep("MAIN_MENU");
     setFlowType(null);
   };
@@ -1956,20 +1868,17 @@ export default function ChatWidget() {
       case "wholesale_quote":
         setCurrentStep("QUOTE_CATEGORY");
         break;
-      case "competitor_compare":
-        setCurrentStep("COMPARE_UPLOAD");
+      case "delivery_coverage":
+        setCurrentStep("DELIVERY_AREA");
+        setMessages([{
+          role: "model",
+          text: "🚚 Which delivery area should we check?\nSHOW_SUGGESTIONS:Tawau,Kota Kinabalu,Sandakan,Lahad Datu,Semporna,Other Area"
+        }]);
         break;
       case "ask_question":
         setCurrentStep("FAQ_CHAT");
-        // Post a greeting so the chat area is non-empty
-        setMessages([{
-          role: "model",
-          text: lang === "zh"
-            ? "💬 请问您有什么问题？我只能回答与我们产品和订购相关的问题。"
-            : lang === "en"
-            ? "💬 What would you like to know? I can answer questions about our products, delivery, and ordering."
-            : "💬 Apa yang boss nak tanya? Sy boleh bantu soalan berkaitan produk, penghantaran dan pesanan kami."
-        }]);
+        setConciergeStep("ENTRY");
+        setMessages([]);
         break;
     }
   };
@@ -1980,8 +1889,8 @@ export default function ChatWidget() {
     const waMsg = lang === "zh"
       ? "您好，我想和销售团队联系讨论批发订单。"
       : lang === "en"
-      ? "Hi, I'd like to talk to the sales team about my wholesale order."
-      : "Hi, saya nak bercakap dengan team sales tentang pesanan borong saya.";
+        ? "Hi, I'd like to talk to the sales team about my wholesale order."
+        : "Hi, saya nak bercakap dengan team sales tentang pesanan borong saya.";
     window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
   };
 
@@ -1991,8 +1900,8 @@ export default function ChatWidget() {
     let waMsg = lang === "zh"
       ? `您好，我想为以下货品办理大宗批发订单：\n\n`
       : lang === "en"
-      ? `Hi, I would like to proceed with this wholesale order for:\n\n`
-      : `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
+        ? `Hi, I would like to proceed with this wholesale order for:\n\n`
+        : `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
     const items = quoteItems.length > 0 ? quoteItems : cart;
     items.forEach((item) => {
       waMsg += `• ${item.quantity}x ${item.name} (RM ${(item.priceNum || parseFloat((item.price || "0").replace(/[^0-9.]/g, ""))).toFixed(2)})\n`;
@@ -2001,8 +1910,8 @@ export default function ChatWidget() {
     waMsg += lang === "zh"
       ? `\n*总计金额: RM ${grandTotal.toFixed(2)}*\n\n请准备发票和付款二维码。谢谢！`
       : lang === "en"
-      ? `\n*Grand Total: RM ${grandTotal.toFixed(2)}*\n\nPlease prepare the invoice & QR payment link. Thank you!`
-      : `\n*Jumlah Keseluruhan: RM ${grandTotal.toFixed(2)}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!`;
+        ? `\n*Grand Total: RM ${grandTotal.toFixed(2)}*\n\nPlease prepare the invoice & QR payment link. Thank you!`
+        : `\n*Jumlah Keseluruhan: RM ${grandTotal.toFixed(2)}*\n\nSila sediakan bil & pautan QR untuk pembayaran. Terima kasih!`;
     window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
     setCurrentStep("QUOTE_HANDOFF");
   };
@@ -2026,7 +1935,7 @@ export default function ChatWidget() {
       localStorage.removeItem("golden_ai_step");
       localStorage.removeItem("golden_ai_name");
       localStorage.removeItem("golden_ai_phone");
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleSuggestionClick = (query: string) => {
@@ -2065,8 +1974,8 @@ export default function ChatWidget() {
       const waMsg = lang === "zh"
         ? "您好，我需要销售人员协助处理批发订单。"
         : lang === "en"
-        ? "Hi, I need assistance from the sales team for a wholesale order."
-        : "Hi, saya perlu bantuan dari tim sales untuk pesanan borong.";
+          ? "Hi, I need assistance from the sales team for a wholesale order."
+          : "Hi, saya perlu bantuan dari tim sales untuk pesanan borong.";
       window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
       return;
     }
@@ -2079,8 +1988,150 @@ export default function ChatWidget() {
       return;
     }
 
-    // ── LLM ROUTE (API call for genuine free text) ────────────────────────────
+    // ── DETERMINISTIC CONCIERGE STATES (zero API cost) ─────────────────────
+    if (currentStep === "FAQ_CHAT") {
+      let replyText = "";
+      let nextStep = conciergeStep;
+      let nextChips: string[] = [];
+
+      // 1. Delivery Flow
+      if (conciergeStep === "DELIVERY_ASK") {
+        const area = q;
+        if (area.includes("tawau")) {
+          replyText = "Yes, we deliver to Tawau. Delivery usually takes 1–2 working days depending on stock availability.";
+        } else if (area.includes("kota kinabalu") || area.includes("kk")) {
+          replyText = "Yes, we deliver to Kota Kinabalu. Delivery usually takes 1–2 working days depending on stock availability.";
+        } else if (area.includes("sandakan")) {
+          replyText = "Yes, we deliver to Sandakan. Delivery usually takes 1–2 working days depending on stock availability.";
+        } else if (area.includes("lahad datu")) {
+          replyText = "Yes, we deliver to Lahad Datu. Delivery usually takes 1–2 working days depending on stock availability.";
+        } else {
+          replyText = "Yes, we coordinate delivery across Sabah & Labuan through reliable B2B logistic partners.";
+        }
+        replyText += "\n\nIs this urgent delivery or normal planning?";
+        nextChips = ["Urgent", "Normal", "Browse Products"];
+        nextStep = "DELIVERY_RESULT";
+      } else if (conciergeStep === "DELIVERY_RESULT") {
+        if (q.includes("urgent")) {
+          replyText = "For urgent delivery, our sales team can confirm fastest availability immediately.";
+          nextChips = ["Talk to Sales", "Browse Products"];
+        } else if (q.includes("normal") || q.includes("planning")) {
+          replyText = "Great planning! Normal scheduled delivery is fully available. Feel free to browse our premium catalog or let me help you build a wholesale quote draft.";
+          nextChips = ["Browse Products", "Get Wholesale Quote"];
+        }
+      }
+
+      // 2. Help Me Choose Flow
+      else if (conciergeStep === "CHOOSE_ASK") {
+        if (q.includes("event") || q.includes("party")) {
+          replyText = "Nice 🎉 For an event, what kind of vibe are you going for?";
+          nextChips = ["Premium", "Casual Crowd", "Elegant", "Not Sure"];
+          nextStep = "CHOOSE_EVENT_VIBE";
+        } else if (q.includes("restaurant") || q.includes("bar")) {
+          replyText = "Perfect 🥃 Restocking or building a new menu? We offer highly competitive wholesale pricing for high-volume accounts.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        } else if (q.includes("retail") || q.includes("resale") || q.includes("shop")) {
+          replyText = "Got it! Whether you are stocking shelves or curating a personal collection, we have direct duty-free pricing on all premium labels.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        } else if (q.includes("personal") || q.includes("use")) {
+          replyText = "Got it! For your personal collection or immediate enjoyment, we have a stunning selection of single malts and fine wines.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        }
+      } else if (conciergeStep === "CHOOSE_EVENT_VIBE") {
+        if (q.includes("premium") || q.includes("elegant")) {
+          replyText = "An elegant/premium vibe deserves fine labels. Single malts like Macallan and rare wines will elevate your event and leave a lasting impression.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        } else if (q.includes("casual")) {
+          replyText = "A casual crowd is all about easy-drinking favorites. Premium imported beers and light wines are perfect for keeping the energy high and the drinks flowing.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        } else if (q.includes("not sure") || q.includes("sure")) {
+          replyText = "If you want easy crowd-friendly choices, beer usually works well. For premium events, whisky is popular.\n\nWant me to show matching options?";
+          nextChips = ["Show Products", "Ask Another Question", "Talk to Sales"];
+          nextStep = "CHOOSE_RESULT";
+        }
+      }
+
+      // 3. Wholesale Pricing Flow
+      else if (conciergeStep === "WHOLESALE_ASK") {
+        replyText = "Estimated monthly volume?";
+        nextChips = ["Small", "Medium", "Large", "Not Sure"];
+        nextStep = "WHOLESALE_VOLUME";
+      } else if (conciergeStep === "WHOLESALE_VOLUME") {
+        if (q.includes("large")) {
+          replyText = "Larger orders may qualify for better pricing.";
+          nextChips = ["Get Custom Quote", "Browse Products"];
+          nextStep = "WHOLESALE_RESULT";
+        } else {
+          replyText = "We cater to all batch sizes starting from just 1 carton! We can prepare a custom wholesale quote to suit your needs.";
+          nextChips = ["Get Wholesale Quote", "Browse Products", "Talk to Sales"];
+          nextStep = "WHOLESALE_RESULT";
+        }
+      }
+
+      // 4. MOQ Flow
+      else if (conciergeStep === "MOQ_ASK") {
+        replyText = "Category-specific MOQ may apply.";
+        nextChips = ["Browse Products", "Talk to Sales"];
+        nextStep = "MOQ_RESULT";
+      }
+
+      // If we matched one of our deterministic paths, handle it locally
+      if (replyText) {
+        setConciergeStep(nextStep);
+        setMessages([...messages, { role: "user", text: trimmedMessage }, { role: "model", text: `${replyText}\nSHOW_SUGGESTIONS:${nextChips.join(",")}` }]);
+        setMessage("");
+        return;
+      }
+    }
+
+    // Direct general navigations in concierge flow
+    if (q === "browse products" || q === "show products" || q === "browse produk") {
+      handleFlowSelect("browse_products");
+      return;
+    }
+
+    if (q === "get wholesale quote" || q === "get custom quote" || q === "wholesale quote") {
+      handleFlowSelect("wholesale_quote");
+      return;
+    }
+
+    if (q === "ask another question" || q === "tanya soalan lain") {
+      setConciergeStep("ENTRY");
+      setMessages([]);
+      return;
+    }
+
+    // ── Delivery Coverage Deterministic Routes ──
+    const dRoute = q.toLowerCase();
+    let dReply = "";
+    if (dRoute === "tawau") {
+      dReply = "✅ Delivery to Tawau usually takes around 1 working day depending on stock availability.";
+    } else if (dRoute === "kota kinabalu") {
+      dReply = "✅ Delivery to Kota Kinabalu usually takes 1-2 working days depending on stock availability.";
+    } else if (dRoute === "sandakan") {
+      dReply = "✅ Delivery to Sandakan usually takes around 1-2 working days depending on logistics schedule.";
+    } else if (dRoute === "lahad datu") {
+      dReply = "✅ Delivery to Lahad Datu usually takes around 1 working day depending on stock.";
+    } else if (dRoute === "semporna") {
+      dReply = "✅ Delivery to Semporna usually takes around 1-2 working days depending on route scheduling.";
+    } else if (dRoute === "other area") {
+      dReply = "📍 Tell us your location and we’ll check delivery availability for you.";
+    }
     
+    if (dReply) {
+      setCurrentStep("DELIVERY_AREA");
+      setMessages([...messages, { role: "user", text: trimmedMessage }, { role: "model", text: dReply + "\nSHOW_SUGGESTIONS:Browse Products,Ask Question,Talk to Sales" }]);
+      setMessage("");
+      return;
+    }
+
+    // ── LLM ROUTE (API call for genuine free text) ────────────────────────────
+
     if (currentStep !== "START") {
       setCurrentStep("START");
     }
@@ -2101,14 +2152,15 @@ export default function ChatWidget() {
       const data: ChatResponse = await response.json();
       if (!response.ok) throw new Error(data.error || `Error ${response.status}`);
       if (data.reply) {
-        setMessages((prev) => [...prev, { role: "model", text: data.reply! }]);
+        const processedReply = appendSuggestionsIfMissing(data.reply, lang);
+        setMessages((prev) => [...prev, { role: "model", text: processedReply }]);
         if (data.reply.startsWith("TOOL_RESULT:")) {
           try {
             const parsed = JSON.parse(data.reply.substring(12));
             if (parsed && (parsed.action === "cart_updated" || parsed.action === "cart_viewed") && Array.isArray(parsed.products)) {
               setCart(parsed.products);
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       } else {
         throw new Error("Empty reply from AI.");
@@ -2151,15 +2203,15 @@ export default function ChatWidget() {
 
   const panelVariants = isMobile
     ? {
-        initial: { y: "100%", opacity: 1 },
-        animate: { y: 0, opacity: 1 },
-        exit: { y: "100%", opacity: 1 },
-      }
+      initial: { y: "100%", opacity: 1 },
+      animate: { y: 0, opacity: 1 },
+      exit: { y: "100%", opacity: 1 },
+    }
     : {
-        initial: { opacity: 0, y: 20, scale: 0.96 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: 20, scale: 0.96 },
-      };
+      initial: { opacity: 0, y: 20, scale: 0.96 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+      exit: { opacity: 0, y: 20, scale: 0.96 },
+    };
 
   return (
     <>
@@ -2234,9 +2286,8 @@ export default function ChatWidget() {
           >
 
             {/* ── Header ── */}
-            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/20 bg-white ${
-              isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
-            }`}>
+            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/20 bg-white ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
+              }`}>
               <div className="flex items-center gap-3">
                 {currentStep !== "START" ? (
                   <button
@@ -2248,9 +2299,15 @@ export default function ChatWidget() {
                           break;
                         case "BROWSE_CATEGORY":
                           setCurrentStep("MAIN_MENU");
+                          setFlowType(null);
+                          setMessages([]);
+                          setError(null);
                           break;
                         case "BROWSE_PRODUCTS":
                           setCurrentStep("MAIN_MENU");
+                          setFlowType(null);
+                          setMessages([]);
+                          setError(null);
                           break;
                         case "CART_REVIEW":
                           setCurrentStep("BROWSE_PRODUCTS");
@@ -2263,9 +2320,15 @@ export default function ChatWidget() {
                           break;
                         case "PAYMENT_COMPLETE":
                           setCurrentStep("MAIN_MENU");
+                          setFlowType(null);
+                          setMessages([]);
+                          setError(null);
                           break;
                         case "QUOTE_CATEGORY":
                           setCurrentStep("MAIN_MENU");
+                          setFlowType(null);
+                          setMessages([]);
+                          setError(null);
                           break;
                         case "QUOTE_BUSINESS_TYPE":
                           setCurrentStep("QUOTE_CATEGORY");
@@ -2278,18 +2341,34 @@ export default function ChatWidget() {
                           break;
                         case "QUOTE_HANDOFF":
                           setCurrentStep("MAIN_MENU");
+                          setFlowType(null);
+                          setMessages([]);
+                          setMessage("");
+                          setError(null);
                           break;
-                        case "COMPARE_UPLOAD":
+                        case "DELIVERY_AREA":
                           setCurrentStep("MAIN_MENU");
-                          break;
-                        case "COMPARE_PROCESSING":
-                          setCurrentStep("COMPARE_UPLOAD");
-                          break;
-                        case "COMPARE_RESULTS":
-                          setCurrentStep("COMPARE_UPLOAD");
+                          setFlowType(null);
+                          setMessages([]);
+                          setMessage("");
+                          setError(null);
+                          setLoading(false);
                           break;
                         case "FAQ_CHAT":
-                          setCurrentStep("MAIN_MENU");
+                          if (conciergeStep !== "ENTRY") {
+                            setConciergeStep("ENTRY");
+                            setMessages([]);
+                            setMessage("");
+                            setError(null);
+                            setLoading(false);
+                          } else {
+                            setCurrentStep("MAIN_MENU");
+                            setFlowType(null);
+                            setMessages([]);
+                            setMessage("");
+                            setError(null);
+                            setLoading(false);
+                          }
                           break;
                         default:
                           setIsOpen(false);
@@ -2320,8 +2399,8 @@ export default function ChatWidget() {
 
               <div className="flex items-center gap-2">
                 {messages.length > 0 && (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleClearChat();
@@ -2350,449 +2429,418 @@ export default function ChatWidget() {
 
             {/* ── Main View Dispatcher ── */}
             <div className="flex-1 min-h-0 relative">
-                {currentStep === "MAIN_MENU" ? (
-                  <GreetingMenuView
-                    lang={lang}
-                    onSelect={handleFlowSelect}
-                    onTalkToSales={handleTalkToSales}
-                  />
-                ) : currentStep === "BROWSE_PRODUCTS" || currentStep === "BROWSE_CATEGORY" ? (
-                  <BrowseProductsView
-                    category={browseCategory}
-                    storeId={storeId!}
-                    lang={lang}
-                    onAddToCart={(p, q) => handleAddToCart(p, q)}
-                    onSendText={handleSuggestionClickAndSubmit}
-                    cartCount={cart.reduce((a, c) => a + c.quantity, 0)}
-                  />
-                ) : currentStep === "COMPARE_UPLOAD" ? (
-                  <CompareUploadView
-                    lang={lang}
-                    uploading={invoiceUploading}
-                    onUpload={handleInvoiceUpload}
-                  />
-                ) : currentStep === "QUOTE_HANDOFF" ? (
-                  <QuoteHandoffView
-                    lang={lang}
-                    onBack={() => setCurrentStep("MAIN_MENU")}
-                  />
-                ) : currentStep === "QUOTE_REVIEW" ? (
-                  <QuoteReviewView
-                    cart={quoteItems}
-                    lang={lang}
-                    onBack={() => setCurrentStep("QUOTE_RECOMMENDATION")}
-                    onCheckout={handleQuoteWAHandoff}
-                    onRemove={(name) => {
-                      setQuoteItems(prev => prev.filter(item => item.name.toLowerCase() !== name.toLowerCase()));
-                    }}
-                    onUpdateQty={(name, qty) => {
-                      setQuoteItems(prev => prev.map(item => item.name.toLowerCase() === name.toLowerCase() ? { ...item, quantity: qty, total: `RM ${(qty * item.priceNum).toFixed(2)}` } : item));
-                    }}
-                    proceedLabel={lang === "zh" ? "联系WhatsApp完成" : lang === "en" ? "Proceed via WhatsApp" : "Proceed via WhatsApp"}
-                  />
-                ) : currentStep === "CART_REVIEW" ? (
-                  <QuoteReviewView
-                    cart={cart}
-                    lang={lang}
-                    onBack={() => setCurrentStep("BROWSE_PRODUCTS")}
-                    onCheckout={() => setCurrentStep("CHECKOUT_DETAILS")}
-                    onRemove={handleCartRemoveItem}
-                    onUpdateQty={handleCartUpdateQty}
-                  />
-                ) : currentStep === "CHECKOUT_DETAILS" ? (
-                  <CheckoutDetailsView
-                    lang={lang}
-                    onBack={() => setCurrentStep("CART_REVIEW")}
-                    onSubmit={(name, phone) => {
-                      setCustomerName(name);
-                      setCustomerPhone(phone);
-                      setCurrentStep("PAYMENT_SELECTION");
-                    }}
-                  />
-                ) : currentStep === "PAYMENT_SELECTION" ? (
-                  <PaymentSelectionView
-                    cart={cart}
-                    name={customerName}
-                    phone={customerPhone}
-                    lang={lang}
-                    onBack={() => setCurrentStep("CHECKOUT_DETAILS")}
-                    onProcessCheckout={handleProcessCheckout}
-                  />
-                ) : (
-                  /* ── Chat Messages Mode ── */
-                  <div className="h-full flex flex-col justify-between">
-                    <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-5 space-y-5 min-h-0 overscroll-contain">
-                      <AnimatePresence initial={false}>
+              {currentStep === "MAIN_MENU" ? (
+                <GreetingMenuView
+                  lang={lang}
+                  onSelect={handleFlowSelect}
+                  onTalkToSales={handleTalkToSales}
+                />
+              ) : currentStep === "FAQ_CHAT" && conciergeStep === "ENTRY" ? (
+                <ConciergeEntryView
+                  onSelect={(card) => {
+                    setConciergeStep(card.step);
+                    setMessages([
+                      { role: "user", text: card.title },
+                      { role: "model", text: `${card.botReply}\nSHOW_SUGGESTIONS:${card.chips.join(",")}` }
+                    ]);
+                  }}
+                />
+              ) : currentStep === "BROWSE_PRODUCTS" || currentStep === "BROWSE_CATEGORY" ? (
+                <BrowseProductsView
+                  category={browseCategory}
+                  storeId={storeId!}
+                  lang={lang}
+                  onAddToCart={(p, q) => handleAddToCart(p, q)}
+                  onSendText={handleSuggestionClickAndSubmit}
+                  cartCount={cart.reduce((a, c) => a + c.quantity, 0)}
+                />
 
-                        {/* ── STEP 1: Onboarding Welcome (Language selection) ── */}
-                        {currentStep === "START" && (
-                          <motion.div
-                            key="step-start"
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -12 }}
-                            className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
-                          >
-                            <div className="relative">
-                              <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center">
-                                <Sparkles className="w-10 h-10 text-[#d4af37]" />
-                              </div>
-                              <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
+              ) : currentStep === "QUOTE_HANDOFF" ? (
+                <QuoteHandoffView
+                  lang={lang}
+                  onBack={() => setCurrentStep("MAIN_MENU")}
+                />
+              ) : currentStep === "QUOTE_REVIEW" ? (
+                <QuoteReviewView
+                  cart={quoteItems}
+                  lang={lang}
+                  onBack={() => setCurrentStep("QUOTE_RECOMMENDATION")}
+                  onCheckout={handleQuoteWAHandoff}
+                  onRemove={(name) => {
+                    setQuoteItems(prev => prev.filter(item => item.name.toLowerCase() !== name.toLowerCase()));
+                  }}
+                  onUpdateQty={(name, qty) => {
+                    setQuoteItems(prev => prev.map(item => item.name.toLowerCase() === name.toLowerCase() ? { ...item, quantity: qty, total: `RM ${(qty * item.priceNum).toFixed(2)}` } : item));
+                  }}
+                  proceedLabel={lang === "zh" ? "联系WhatsApp完成" : lang === "en" ? "Proceed via WhatsApp" : "Proceed via WhatsApp"}
+                />
+              ) : currentStep === "CART_REVIEW" ? (
+                <QuoteReviewView
+                  cart={cart}
+                  lang={lang}
+                  onBack={() => setCurrentStep("BROWSE_PRODUCTS")}
+                  onCheckout={() => setCurrentStep("CHECKOUT_DETAILS")}
+                  onRemove={handleCartRemoveItem}
+                  onUpdateQty={handleCartUpdateQty}
+                />
+              ) : currentStep === "CHECKOUT_DETAILS" ? (
+                <CheckoutDetailsView
+                  lang={lang}
+                  onBack={() => setCurrentStep("CART_REVIEW")}
+                  onSubmit={(name, phone) => {
+                    setCustomerName(name);
+                    setCustomerPhone(phone);
+                    setCurrentStep("PAYMENT_SELECTION");
+                  }}
+                />
+              ) : currentStep === "PAYMENT_SELECTION" ? (
+                <PaymentSelectionView
+                  cart={cart}
+                  name={customerName}
+                  phone={customerPhone}
+                  lang={lang}
+                  onBack={() => setCurrentStep("CHECKOUT_DETAILS")}
+                  onProcessCheckout={handleProcessCheckout}
+                />
+              ) : (
+                /* ── Chat Messages Mode ── */
+                <div className="h-full flex flex-col justify-between">
+                  <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-5 space-y-5 min-h-0 overscroll-contain">
+                    <AnimatePresence initial={false}>
+
+                      {/* ── STEP 1: Onboarding Welcome (Language selection) ── */}
+                      {currentStep === "START" && (
+                        <motion.div
+                          key="step-start"
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -12 }}
+                          className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
+                        >
+                          <div className="relative">
+                            <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center">
+                              <Sparkles className="w-10 h-10 text-[#d4af37]" />
                             </div>
+                            <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
+                          </div>
 
-                            <div className="space-y-3 max-w-[320px]">
-                              <h3 className="text-[20px] font-semibold text-[#1a1a1a] tracking-tight leading-snug">
-                                {lang === "zh" ? "为活动或餐厅采购？" : lang === "en" ? "Stocking up for an event or restaurant?" : "Boss nak stok untuk event atau restoran?"}
-                              </h3>
-                              <p className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest leading-none">
-                                Golden AI · Premium B2B Concierge
-                              </p>
-                              <p className="text-[13px] text-slate-600 leading-relaxed font-normal">
-                                {lang === "zh" ? "请先选择您的语言" : lang === "en" ? "Please select your language first" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss."}
-                              </p>
+                          <div className="space-y-3 max-w-[320px]">
+                            <h3 className="text-[20px] font-semibold text-[#1a1a1a] tracking-tight leading-snug">
+                              {lang === "zh" ? "为活动或餐厅采购？" : lang === "en" ? "Stocking up for an event or restaurant?" : "Boss nak stok untuk event atau restoran?"}
+                            </h3>
+                            <p className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest leading-none">
+                              Golden AI · Premium B2B Concierge
+                            </p>
+                            <p className="text-[13px] text-slate-600 leading-relaxed font-normal">
+                              {lang === "zh" ? "请先选择您的语言" : lang === "en" ? "Please select your language first" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss."}
+                            </p>
+                          </div>
+
+                          <div className="w-full max-w-[290px] bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl p-5 space-y-4">
+                            <p className="text-[9px] font-semibold text-[#d4af37] uppercase tracking-widest flex items-center justify-center gap-1.5">
+                              <Globe className="w-3 h-3" /> Choose Your Language / Pilih Bahasa
+                            </p>
+                            <div className="flex flex-col gap-2">
+                              <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <span>English</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Start</span>
+                              </button>
+                              <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <span>Bahasa Melayu</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Mula</span>
+                              </button>
+                              <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <span>中文 / 华语</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">开始</span>
+                              </button>
                             </div>
+                          </div>
+                        </motion.div>
+                      )}
 
-                            <div className="w-full max-w-[290px] bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl p-5 space-y-4">
-                              <p className="text-[9px] font-semibold text-[#d4af37] uppercase tracking-widest flex items-center justify-center gap-1.5">
-                                <Globe className="w-3 h-3" /> Choose Your Language / Pilih Bahasa
-                              </p>
-                              <div className="flex flex-col gap-2">
-                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                  <span>English</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Start</span>
-                                </button>
-                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                  <span>Bahasa Melayu</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Mula</span>
-                                </button>
-                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                  <span>中文 / 华语</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">开始</span>
-                                </button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
+                      {/* ── Flow 2: Quote Category Selection ── */}
+                      {currentStep === "QUOTE_CATEGORY" && (
+                        <motion.div key="step-quote-cat" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4">
+                          <CategorySelector onSelect={(c) => {
+                            setLeadContext(prev => ({ ...prev, preference: c }));
+                            setMessages([{ role: "user", text: `Selected Category: ${c}` }]);
+                            setCurrentStep("QUOTE_BUSINESS_TYPE");
+                          }} />
+                        </motion.div>
+                      )}
 
-                        {/* ── Flow 2: Quote Category Selection ── */}
-                        {currentStep === "QUOTE_CATEGORY" && (
-                          <motion.div key="step-quote-cat" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4">
-                            <CategorySelector onSelect={(c) => {
-                              setLeadContext(prev => ({ ...prev, preference: c }));
-                              setMessages([{ role: "user", text: `Selected Category: ${c}` }]);
-                              setCurrentStep("QUOTE_BUSINESS_TYPE");
-                            }} />
-                          </motion.div>
-                        )}
+                      {/* ── Flow 2: Quote Business Type Selection ── */}
+                      {currentStep === "QUOTE_BUSINESS_TYPE" && (
+                        <motion.div key="step-quote-biz" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4 space-y-4">
+                          <BusinessTypeSelector onSelect={async (bt) => {
+                            setLeadContext(prev => ({ ...prev, quantity: bt }));
+                            const updatedMessages: Message[] = [...messages, { role: "user", text: `Selected Use Case: ${bt}` }];
+                            setMessages(updatedMessages);
+                            setCurrentStep("QUOTE_RECOMMENDATION");
+                            setLoading(true);
+                            try {
+                              const response = await fetch("/api/chat", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  messages: [...updatedMessages, { role: "user", text: `Recommend premium ${leadContext.preference || 'liquor'} tailored for ${bt}` }],
+                                  cart: quoteItems,
+                                  language: lang,
+                                  leadContext: { preference: leadContext.preference, quantity: bt },
+                                  flowType: "wholesale_quote"
+                                }),
+                              });
+                              const data: ChatResponse = await response.json();
+                              if (data.reply) setMessages(prev => [...prev, { role: "model", text: data.reply! }]);
+                            } catch (e) { setError("Failed to get recommendation"); } finally { setLoading(false); }
+                          }} highlightFirst={false} />
+                        </motion.div>
+                      )}
 
-                        {/* ── Flow 2: Quote Business Type Selection ── */}
-                        {currentStep === "QUOTE_BUSINESS_TYPE" && (
-                          <motion.div key="step-quote-biz" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="py-4 px-4 space-y-4">
-                            <BusinessTypeSelector onSelect={async (bt) => {
-                              setLeadContext(prev => ({ ...prev, quantity: bt }));
-                              const updatedMessages: Message[] = [...messages, { role: "user", text: `Selected Use Case: ${bt}` }];
-                              setMessages(updatedMessages);
-                              setCurrentStep("QUOTE_RECOMMENDATION");
-                              setLoading(true);
-                              try {
-                                const response = await fetch("/api/chat", {
-                                  method: "POST",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({
-                                    messages: [...updatedMessages, { role: "user", text: `Recommend premium ${leadContext.preference || 'liquor'} tailored for ${bt}` }],
-                                    cart: quoteItems,
-                                    language: lang,
-                                    leadContext: { preference: leadContext.preference, quantity: bt },
-                                    flowType: "wholesale_quote"
-                                  }),
-                                });
-                                const data: ChatResponse = await response.json();
-                                if (data.reply) setMessages(prev => [...prev, { role: "model", text: data.reply! }]);
-                              } catch (e) { setError("Failed to get recommendation"); } finally { setLoading(false); }
-                            }} highlightFirst={false} />
-                          </motion.div>
-                        )}
+                      {/* Free Chat / Active Conversation Messages */}
+                      {(currentStep === "QUOTE_RECOMMENDATION" || currentStep === "FAQ_CHAT" || currentStep === "PAYMENT_COMPLETE" || messages.length > 0) && (
+                        <div key="step-chat" className="space-y-5">
+                          {messages.map((msg, index) => (
+                            <motion.div
+                              key={`msg-${index}`}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className={`flex items-start gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                            >
+                              {msg.role === "model" && <AvatarBot />}
+                              <div className={`flex flex-col max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                                <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 px-0.5">
+                                  {msg.role === "user" ? t.userLabel : t.botLabel}
+                                </span>
+                                {msg.role === "model" && msg.text.startsWith("TOOL_RESULT_QUOTE_CARD:") ? (
+                                  <QuoteCardUI text={msg.text} lang={lang} />
+                                ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_PRODUCT_CARDS:") ? (
+                                  <ToolResultProductCards text={msg.text} onAddToCart={handleAddToCart} onSendText={handleSuggestionClickAndSubmit} lang={lang} cartCount={cart.reduce((a, c) => a + c.quantity, 0)} />
+                                ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CATEGORIES:") ? (
+                                  <ToolResultCategories text={msg.text} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
+                                ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CHECKOUT_CARD:") ? (
+                                  <ToolResultCheckoutCard text={msg.text} cart={cart} onProcessCheckout={handleProcessCheckout} lang={lang} />
+                                ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
+                                  msg.text.includes('"action":"cart_') ? (
+                                    <QuoteRenderer
+                                      text={msg.text}
+                                      onModifyQuote={() => handleSuggestionClick(lang === "zh" ? "请修改此报价单：" : lang === "en" ? "Please modify this quote: " : "Tolong ubah quote ni bosku: ")}
+                                      onWhatsAppCheckout={(products, total) => {
+                                        fetch("/api/chat", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({ action: "whatsapp_click", language: lang, cart: products, leadContext })
+                                        }).catch(() => { });
 
-                        {/* Free Chat / Active Conversation Messages */}
-                        {(currentStep === "QUOTE_RECOMMENDATION" || currentStep === "COMPARE_RESULTS" || currentStep === "FAQ_CHAT" || currentStep === "PAYMENT_COMPLETE" || messages.length > 0) && (
-                          <div key="step-chat" className="space-y-5">
-                            {messages.map((msg, index) => (
-                              <motion.div
-                                key={`msg-${index}`}
-                                initial={{ opacity: 0, y: 6 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className={`flex items-start gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                              >
-                                {msg.role === "model" && <AvatarBot />}
-                                <div className={`flex flex-col max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                                  <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 px-0.5">
-                                    {msg.role === "user" ? t.userLabel : t.botLabel}
-                                  </span>
-                                  {msg.role === "model" && msg.text.startsWith("TOOL_RESULT_QUOTE_CARD:") ? (
-                                    <QuoteCardUI text={msg.text} lang={lang} />
-                                  ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_PRODUCT_CARDS:") ? (
-                                    <ToolResultProductCards text={msg.text} onAddToCart={handleAddToCart} onSendText={handleSuggestionClickAndSubmit} lang={lang} cartCount={cart.reduce((a, c) => a + c.quantity, 0)} />
-                                  ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CATEGORIES:") ? (
-                                    <ToolResultCategories text={msg.text} onSendText={handleSuggestionClickAndSubmit} lang={lang} />
-                                  ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT_CHECKOUT_CARD:") ? (
-                                    <ToolResultCheckoutCard text={msg.text} cart={cart} onProcessCheckout={handleProcessCheckout} lang={lang} />
-                                  ) : msg.role === "model" && msg.text.startsWith("TOOL_RESULT:") ? (
-                                    msg.text.includes('"action":"cart_') ? (
-                                      <QuoteRenderer
-                                        text={msg.text}
-                                        onModifyQuote={() => handleSuggestionClick(lang === "zh" ? "请修改此报价单：" : lang === "en" ? "Please modify this quote: " : "Tolong ubah quote ni bosku: ")}
-                                        onWhatsAppCheckout={(products, total) => {
-                                          fetch("/api/chat", {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({ action: "whatsapp_click", language: lang, cart: products, leadContext })
-                                          }).catch(() => {});
-                                          
-                                          let waMsg = `🛒 *New Lead - Golden AI*\n---------------------------\n`;
-                                          products.forEach((item, idx) => {
-                                            waMsg += `• ${item.quantity}x ${item.name} (RM ${item.priceNum || item.price})\n`;
-                                          });
-                                          waMsg += `---------------------------\n💰 *TOTAL: RM ${total.toFixed(2)}*\n🌐 Language: ${lang.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
-                                          
-                                          window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
-                                        }}
-                                        lang={lang}
-                                      />
-                                    ) : (
-                                      <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} lang={lang} />
-                                    )
+                                        let waMsg = `🛒 *New Lead - Golden AI*\n---------------------------\n`;
+                                        products.forEach((item, idx) => {
+                                          waMsg += `• ${item.quantity}x ${item.name} (RM ${item.priceNum || item.price})\n`;
+                                        });
+                                        waMsg += `---------------------------\n💰 *TOTAL: RM ${total.toFixed(2)}*\n🌐 Language: ${lang.toUpperCase()}\n⏰ ${new Date().toLocaleString()}`;
+
+                                        window.open(`https://wa.me/601164073143?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
+                                      }}
+                                      lang={lang}
+                                    />
                                   ) : (
-                                    <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
-                                      <div
-                                        className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${
-                                          msg.role === "user"
-                                            ? "bg-[#fdf8e8] border border-[#d4af37]/35 text-[#1a1a1a] font-medium rounded-tr-[6px]"
-                                            : "bg-[#f5f5f0] border border-slate-200 text-[#1a1a1a] rounded-tl-[6px]"
+                                    <ToolResultRenderer text={msg.text} onAddToCart={handleAddToCart} lang={lang} />
+                                  )
+                                ) : (
+                                  <div className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} w-full`}>
+                                    <div
+                                      className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${msg.role === "user"
+                                        ? "bg-[#fdf8e8] border border-[#d4af37]/35 text-[#1a1a1a] font-medium rounded-tr-[6px]"
+                                        : "bg-[#f5f5f0] border border-slate-200 text-[#1a1a1a] rounded-tl-[6px]"
                                         }`}
-                                        style={{ overflowWrap: "break-word", wordBreak: "break-word", overflowX: "hidden" }}
-                                      >
-                                        {msg.role === "user" ? (
-                                          msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()
-                                        ) : (
-                                          <ReactMarkdown
-                                            components={{
-                                              img: ({ src, alt }) => (
-                                                <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg mt-2" />
-                                              ),
-                                              a: ({ href, children }) => (
-                                                <a href={href} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{children}</a>
-                                              ),
-                                              p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
-                                              ul: ({ children }) => <ul className="list-disc list-inside mb-1 space-y-0.5">{children}</ul>,
-                                              ol: ({ children }) => <ol className="list-decimal list-inside mb-1 space-y-0.5">{children}</ol>,
-                                              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                              code: ({ children }) => <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[12px] font-mono">{children}</code>,
-                                            }}
-                                          >
-                                            {msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()}
-                                          </ReactMarkdown>
-                                        )}
-                                      </div>
-                                      {msg.role === "model" && msg.text.includes("SHOW_SUGGESTIONS:") && (
-                                        <SuggestionChips text={msg.text} onSelect={handleSuggestionClickAndSubmit} lang={lang} />
+                                      style={{ overflowWrap: "break-word", wordBreak: "break-word", overflowX: "hidden" }}
+                                    >
+                                      {msg.role === "user" ? (
+                                        msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()
+                                      ) : (
+                                        <ReactMarkdown
+                                          components={{
+                                            img: ({ src, alt }) => (
+                                              <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg mt-2" />
+                                            ),
+                                            a: ({ href, children }) => (
+                                              <a href={href} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{children}</a>
+                                            ),
+                                            p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                                            ul: ({ children }) => <ul className="list-disc list-inside mb-1 space-y-0.5">{children}</ul>,
+                                            ol: ({ children }) => <ol className="list-decimal list-inside mb-1 space-y-0.5">{children}</ol>,
+                                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                            code: ({ children }) => <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[12px] font-mono">{children}</code>,
+                                          }}
+                                        >
+                                          {msg.text.replace(/SHOW_SUGGESTIONS:(.*)/, "").trim()}
+                                        </ReactMarkdown>
                                       )}
                                     </div>
-                                  )}
-                                </div>
-                                {msg.role === "user" && <AvatarUser />}
-                              </motion.div>
-                            ))}
-
-                            {/* Loading */}
-                            {loading && (
-                              <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5">
-                                <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5">
-                                  <Loader2 className="w-4 h-4 text-[#d4af37] animate-spin" />
-                                </div>
-                                <div className="flex flex-col items-start">
-                                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{t.botLabel}</span>
-                                  <div className="bg-[#f5f5f0] border border-slate-200 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
-                                    <span className="flex gap-1">
-                                      {[0, 1, 2].map((i) => (
-                                        <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/70 animate-bounce"
-                                          style={{ animationDelay: `${i * 0.15}s` }} />
-                                      ))}
-                                    </span>
-                                    <span className="text-[12px] text-slate-650 font-medium">{t.thinking}</span>
+                                    {msg.role === "model" && msg.text.includes("SHOW_SUGGESTIONS:") && (
+                                      <SuggestionChips text={msg.text} onSelect={handleSuggestionClickAndSubmit} lang={lang} />
+                                    )}
                                   </div>
-                                </div>
-                              </motion.div>
-                            )}
+                                )}
+                              </div>
+                              {msg.role === "user" && <AvatarUser />}
+                            </motion.div>
+                          ))}
 
-                            {/* Error */}
-                            {error && (
-                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                className="flex items-start gap-2.5 bg-rose-50 border border-rose-250 rounded-2xl px-4 py-3">
-                                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                                <div>
-                                  <p className="text-[12px] font-bold text-rose-600">{t.errorTitle}</p>
-                                  <p className="text-[11.5px] text-rose-500 mt-0.5">{error}</p>
+                          {/* Loading */}
+                          {loading && (
+                            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5">
+                                <Loader2 className="w-4 h-4 text-[#d4af37] animate-spin" />
+                              </div>
+                              <div className="flex flex-col items-start">
+                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{t.botLabel}</span>
+                                <div className="bg-[#f5f5f0] border border-slate-200 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
+                                  <span className="flex gap-1">
+                                    {[0, 1, 2].map((i) => (
+                                      <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/70 animate-bounce"
+                                        style={{ animationDelay: `${i * 0.15}s` }} />
+                                    ))}
+                                  </span>
+                                  <span className="text-[12px] text-slate-650 font-medium">{t.thinking}</span>
                                 </div>
-                              </motion.div>
-                            )}
-                            <div ref={messagesEndRef} />
+                              </div>
+                            </motion.div>
+                          )}
+
+                          {/* Error */}
+                          {error && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                              className="flex items-start gap-2.5 bg-rose-50 border border-rose-250 rounded-2xl px-4 py-3">
+                              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-[12px] font-bold text-rose-600">{t.errorTitle}</p>
+                                <p className="text-[11.5px] text-rose-500 mt-0.5">{error}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                          <div ref={messagesEndRef} />
+                        </div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+
+                  {/* ── Human Escalation Banner ── */}
+                  <div className="bg-[#fafaf8] border-t border-[#d4af37]/15 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37] animate-pulse" />
+                      <span className="text-slate-600 font-medium">Need human assistance?</span>
+                    </div>
+                    <a
+                      href="https://wa.me/601164073143?text=Hi,%20saya%20perlu%20bantuan%20dari%20tim%20sales%20untuk%20pesanan%20borong."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#d4af37] hover:text-[#b8960c] font-semibold tracking-wide transition-colors uppercase text-[10px]"
+                    >
+                      Talk to Sales
+                    </a>
+                  </div>
+
+                  {messages.length > 0 && (
+                    <div className={`shrink-0 border-t border-[#d4af37]/15 bg-white ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
+                      <form onSubmit={handleChatSubmit} className="relative flex items-center gap-2 w-full">
+                        <div className="relative flex-1">
+                          <input
+                            ref={inputRef}
+                            type="text"
+                            required
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            disabled={loading}
+                            placeholder={t.placeholder}
+                            className="w-full bg-[#fafaf8] border border-slate-200 text-[#1a1a1a] placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:border-[#d4af37] focus:bg-white transition-all disabled:opacity-50 text-[13.5px] font-medium"
+                          />
+                          <motion.button
+                            whileTap={{ scale: loading ? 1 : 0.9 }}
+                            type="submit"
+                            disabled={loading || !message.trim()}
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#d4af37] text-black rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-[#b8960c] disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                          </motion.button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+
+              {/* ── Mini Screen Product Details Overlay ── */}
+              <AnimatePresence>
+                {previewProduct && (
+                  <motion.div
+                    initial={{ y: "100%", opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: "100%", opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="absolute inset-0 z-[100] bg-white flex flex-col"
+                  >
+                    {/* Header with Close Button */}
+                    <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
+                      <h3 className="text-[14px] font-bold text-[#1a1a1a]">Product Details</h3>
+                      <button
+                        onClick={() => setPreviewProduct(null)}
+                        className="p-2 -mr-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <div className="flex-1 overflow-y-auto p-5">
+                      <div className="w-full bg-[#fafaf8] rounded-2xl flex items-center justify-center p-6 border border-[#d4af37]/10 mb-5">
+                        {previewProduct.image_url ? (
+                          <img src={previewProduct.image_url} alt={previewProduct.name} className="w-full max-w-[180px] h-auto object-contain" />
+                        ) : (
+                          <GlassWater className="w-12 h-12 text-[#d4af37]/40" />
+                        )}
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-[#b8960c]">{previewProduct.category}</span>
+                          <h2 className="text-[18px] font-black text-[#1a1a1a] leading-tight mt-1">{previewProduct.name}</h2>
+                          <div className="text-[20px] font-black text-[#1a1a1a] tracking-tight mt-2">{previewProduct.price}</div>
+                        </div>
+
+                        {previewProduct.badge && (
+                          <span className={`inline-flex items-center gap-1.5 text-[9px] tracking-wider uppercase font-bold px-3 py-1.5 rounded-full border ${previewProduct.badge === "TERHAD"
+                            ? "bg-amber-50 text-[#b8960c] border-[#b8960c]/20"
+                            : "bg-emerald-50 text-emerald-600 border-emerald-200"
+                            }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${previewProduct.badge === "TERHAD" ? "bg-[#b8960c]" : "bg-emerald-500"}`}></span>
+                            {previewProduct.badge}
+                          </span>
+                        )}
+
+                        {previewProduct.description && (
+                          <div className="pt-2 border-t border-slate-100">
+                            <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</h4>
+                            <p className="text-[13px] text-slate-655 leading-relaxed font-medium">{previewProduct.description}</p>
                           </div>
                         )}
-                      </AnimatePresence>
-                    </div>
 
-
-                    {/* ── Human Escalation Banner ── */}
-                    <div className="bg-[#fafaf8] border-t border-[#d4af37]/15 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37] animate-pulse" />
-                        <span className="text-slate-600 font-medium">Need human assistance?</span>
-                      </div>
-                      <a
-                        href="https://wa.me/601164073143?text=Hi,%20saya%20perlu%20bantuan%20dari%20tim%20sales%20untuk%20pesanan%20borong."
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#d4af37] hover:text-[#b8960c] font-semibold tracking-wide transition-colors uppercase text-[10px]"
-                      >
-                        Talk to Sales
-                      </a>
-                    </div>
-
-                    {/* ── Input Bar ── */}
-                    {messages.length > 0 && (
-                      <div className={`shrink-0 border-t border-[#d4af37]/15 bg-white ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
-                        {/* Hidden invoice file input */}
-                        <input
-                          ref={invoiceInputRef}
-                          type="file"
-                          accept="image/*,.pdf"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleInvoiceUpload(file);
-                          }}
-                        />
-                        <form onSubmit={handleChatSubmit} className="relative flex items-center gap-2">
-                          {/* Upload invoice button */}
-                          <motion.button
-                            type="button"
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => invoiceInputRef.current?.click()}
-                            disabled={invoiceUploading || loading}
-                            title={lang === "zh" ? "上传发票" : lang === "en" ? "Upload invoice" : "Upload invoice"}
-                            className="shrink-0 w-10 h-10 rounded-full bg-[#fafaf8] border border-slate-200 hover:bg-[#d4af37]/10 hover:border-[#d4af37] text-slate-500 hover:text-[#d4af37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
+                        <div className="pt-2 border-t border-slate-100 mt-4">
+                          <button
+                            onClick={() => window.open(`/product/${previewProduct.id}`, '_blank')}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#b8960c] text-[#b8960c] hover:bg-[#b8960c]/5 hover:border-[#d4af37] hover:text-[#d4af37] font-bold text-[12px] transition-all cursor-pointer active:scale-[0.98]"
                           >
-                            {invoiceUploading
-                              ? <Loader2 className="w-4 h-4 animate-spin text-[#d4af37]" />
-                              : <Paperclip className="w-4 h-4" />
-                            }
-                          </motion.button>
-
-                          <div className="relative flex-1">
-                            <input
-                              ref={inputRef}
-                              type="text"
-                              required
-                              value={message}
-                              onChange={(e) => setMessage(e.target.value)}
-                              disabled={loading || invoiceUploading}
-                              placeholder={t.placeholder}
-                              className="w-full bg-[#fafaf8] border border-slate-200 text-[#1a1a1a] placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:border-[#d4af37] focus:bg-white transition-all disabled:opacity-50 text-[13.5px] font-medium"
-                            />
-                            <motion.button
-                              whileTap={{ scale: loading ? 1 : 0.9 }}
-                              type="submit"
-                              disabled={loading || invoiceUploading || !message.trim()}
-                              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#d4af37] text-black rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-[#b8960c] disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                            </motion.button>
-                          </div>
-                        </form>
-                        <p className="text-center text-[9.5px] text-slate-500 mt-3 select-none tracking-wide font-medium">
-                          {lang === "en"
-                            ? "Upload invoice to compare savings · Golden AI"
-                            : lang === "zh"
-                            ? "上传发票比较节省 · Golden AI"
-                            : "Upload invoice untuk compare savings · Golden AI"}
-                        </p>
+                            Open Full Page <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    )}
-
-                  </div>
+                    </div>
+                  </motion.div>
                 )}
+              </AnimatePresence>
+            </div>
 
-
-                {/* ── Mini Screen Product Details Overlay ── */}
-                <AnimatePresence>
-                  {previewProduct && (
-                    <motion.div
-                      initial={{ y: "100%", opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: "100%", opacity: 0 }}
-                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                      className="absolute inset-0 z-[100] bg-white flex flex-col"
-                    >
-                      {/* Header with Close Button */}
-                      <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
-                        <h3 className="text-[14px] font-bold text-[#1a1a1a]">Product Details</h3>
-                        <button 
-                          onClick={() => setPreviewProduct(null)}
-                          className="p-2 -mr-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      
-                      {/* Scrollable Content */}
-                      <div className="flex-1 overflow-y-auto p-5">
-                        <div className="w-full bg-[#fafaf8] rounded-2xl flex items-center justify-center p-6 border border-[#d4af37]/10 mb-5">
-                          {previewProduct.image_url ? (
-                            <img src={previewProduct.image_url} alt={previewProduct.name} className="w-full max-w-[180px] h-auto object-contain" />
-                          ) : (
-                            <GlassWater className="w-12 h-12 text-[#d4af37]/40" />
-                          )}
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <span className="text-[10px] uppercase tracking-widest font-bold text-[#b8960c]">{previewProduct.category}</span>
-                            <h2 className="text-[18px] font-black text-[#1a1a1a] leading-tight mt-1">{previewProduct.name}</h2>
-                            <div className="text-[20px] font-black text-[#1a1a1a] tracking-tight mt-2">{previewProduct.price}</div>
-                          </div>
-                          
-                          {previewProduct.badge && (
-                            <span className={`inline-flex items-center gap-1.5 text-[9px] tracking-wider uppercase font-bold px-3 py-1.5 rounded-full border ${
-                              previewProduct.badge === "TERHAD"
-                                ? "bg-amber-50 text-[#b8960c] border-[#b8960c]/20"
-                                : "bg-emerald-50 text-emerald-600 border-emerald-200"
-                            }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${previewProduct.badge === "TERHAD" ? "bg-[#b8960c]" : "bg-emerald-500"}`}></span>
-                              {previewProduct.badge}
-                            </span>
-                          )}
-                          
-                          {previewProduct.description && (
-                            <div className="pt-2 border-t border-slate-100">
-                              <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</h4>
-                              <p className="text-[13px] text-slate-655 leading-relaxed font-medium">{previewProduct.description}</p>
-                            </div>
-                          )}
-                          
-                          <div className="pt-2 border-t border-slate-100 mt-4">
-                             <button 
-                               onClick={() => window.open(`/product/${previewProduct.id}`, '_blank')}
-                               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#b8960c] text-[#b8960c] hover:bg-[#b8960c]/5 hover:border-[#d4af37] hover:text-[#d4af37] font-bold text-[12px] transition-all cursor-pointer active:scale-[0.98]"
-                             >
-                               Open Full Page <ChevronRight className="w-4 h-4" /> 
-                             </button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

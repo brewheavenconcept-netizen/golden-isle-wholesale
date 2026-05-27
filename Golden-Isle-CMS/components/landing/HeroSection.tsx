@@ -53,7 +53,7 @@ export function HeroSection() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
                 aria-hidden
-                className="pointer-events-none absolute inset-y-0 right-0 w-[55%] lg:w-[52%] -z-0"
+                className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[52%] -z-0 opacity-25 sm:opacity-35 lg:opacity-100"
                 style={{
                     // Gradient mask: left edge fades to transparent so bottles
                     // dissolve into the cream background — NO visible box edge
@@ -67,9 +67,9 @@ export function HeroSection() {
                     src="/hero-bottles.png"
                     alt=""
                     fill
-                    className="object-cover object-left"
+                    className="object-cover object-right sm:object-left"
                     priority
-                    sizes="(max-width: 768px) 0vw, 55vw"
+                    sizes="(max-width: 768px) 100vw, 55vw"
                 />
             </motion.div>
 
