@@ -273,8 +273,8 @@ function AvatarBot() {
 
 function AvatarUser() {
   return (
-    <div className="w-8 h-8 rounded-full bg-[#1a2235] border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
-      <User className="w-[14px] h-[14px] text-slate-300" />
+    <div className="w-8 h-8 rounded-full bg-[#fafaf8] border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+      <User className="w-[14px] h-[14px] text-[#1a1a1a]" />
     </div>
   );
 }
@@ -375,7 +375,7 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
   try { data = JSON.parse(text.substring(12)); } catch (e) {}
 
   if (!data) return (
-    <div className="bg-slate-50 border border-slate-200 text-slate-500 text-[13px] p-4 rounded-2xl rounded-tl-[5px] shadow-sm">
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 text-[#1a1a1a] text-[13px] p-4 rounded-2xl rounded-tl-[5px] shadow-sm">
       {t.errReceipt}
     </div>
   );
@@ -384,13 +384,13 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
 
   return (
     <div className="space-y-3 w-full">
-      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">{data.summary}</div>
+      <div className="text-[13px] font-medium text-[#1a1a1a] leading-relaxed">{data.summary}</div>
       {data.products?.length > 0 ? (
-        <div className="bg-white rounded-2xl overflow-hidden shadow-md p-5 space-y-4 border border-slate-100">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="bg-[#fafaf8] rounded-2xl overflow-hidden shadow-md p-5 space-y-4 border border-[#d4af37]/20">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-[#D4AF37] animate-pulse" />
-              <span className="text-[10px] font-black text-slate-800 tracking-wider uppercase">{t.quoteTitle}</span>
+              <span className="flex h-2 w-2 rounded-full bg-[#d4af37] animate-pulse" />
+              <span className="text-[10px] font-black text-[#1a1a1a] tracking-wider uppercase">{t.quoteTitle}</span>
             </div>
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t.brandTitle}</span>
           </div>
@@ -398,30 +398,30 @@ function QuoteRenderer({ text, onModifyQuote, onWhatsAppCheckout, lang }: { text
             {data.products.map((p, idx) => (
               <div key={`quote-prod-${p.name}-${idx}`} className="flex items-start justify-between gap-3 pt-3 first:pt-0">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-black text-slate-900 truncate">{p.name}</p>
+                  <p className="text-[13px] font-black text-[#1a1a1a] truncate">{p.name}</p>
                   <p className="text-[11px] text-slate-500 mt-0.5">{p.quantity} unit × {p.price}</p>
                 </div>
-                <span className="text-[13px] font-extrabold text-slate-900 shrink-0">{p.total}</span>
+                <span className="text-[13px] font-extrabold text-[#1a1a1a] shrink-0">{p.total}</span>
               </div>
             ))}
           </div>
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t.grandTotal}</span>
-            <span className="text-[16px] font-black text-slate-900">RM {grandTotal.toFixed(2)}</span>
+            <span className="text-[16px] font-black text-[#1a1a1a]">RM {grandTotal.toFixed(2)}</span>
           </div>
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onModifyQuote}
-              className="flex-1 text-[11px] font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-full transition-all cursor-pointer">
+              className="flex-1 text-[11px] font-semibold text-[#1a1a1a] bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-full transition-all cursor-pointer">
               {t.modifyBtn}
             </button>
             <button type="button" onClick={() => onWhatsAppCheckout(data!.products, grandTotal)}
-              className="flex-1 text-[11px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-2.5 rounded-full text-center transition-all shadow-sm cursor-pointer">
+              className="flex-1 text-[11px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2.5 rounded-full text-center transition-all shadow-sm cursor-pointer">
               {t.whatsappBtn}
             </button>
           </div>
         </div>
       ) : (
-        <div className="text-[12px] text-slate-500 bg-slate-50 border border-slate-200/50 rounded-xl p-4 text-center">
+        <div className="text-[12px] text-slate-500 bg-[#fafaf8] border border-slate-200/50 rounded-xl p-4 text-center">
           {t.noQuote}
         </div>
       )}
@@ -488,7 +488,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
   const urgencyCopy = getUrgencyCopy(p.category, p.badge, lang);
 
   return (
-    <div className="bg-white border border-slate-100/80 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:border-slate-200/80 transition-all duration-300 flex flex-col w-full group">
       {p.image_url ? (
         <div className="w-full h-[200px] bg-slate-50 overflow-hidden relative">
           <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
@@ -501,7 +501,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
           </div>
         </div>
       ) : (
-        <div className="w-full h-[140px] bg-[#0f0f14] flex items-center justify-center border-b border-white/5">
+        <div className="w-full h-[140px] bg-slate-100 flex items-center justify-center border-b border-white/5">
           <GlassWater className="w-8 h-8 text-[#d4af37]/40" />
         </div>
       )}
@@ -509,12 +509,12 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
         <div className="flex items-center justify-between">
           <span className="text-[10px] uppercase tracking-widest font-semibold text-[#D4AF37]">{p.category}</span>
         </div>
-        <h4 className="text-[15px] font-semibold text-slate-900 leading-snug tracking-tight">{p.name}</h4>
+        <h4 className="text-[15px] font-semibold text-[#1a1a1a] leading-snug tracking-tight">{p.name}</h4>
         {/* Urgency copy line */}
         <p className="text-[11px] font-medium text-emerald-600 leading-snug">{urgencyCopy}</p>
-        <p className="text-[12px] text-slate-400 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
+        <p className="text-[12px] text-slate-500 line-clamp-2 leading-relaxed flex-1 font-normal">{p.description}</p>
         <div className="flex items-center justify-between mt-0.5">
-          <span className="text-[16px] font-semibold text-[#1F2937] tracking-tight">{p.price}</span>
+          <span className="text-[16px] font-semibold text-[#1a1a1a] tracking-tight">{p.price}</span>
         </div>
 
         {/* Quantity Picker (inline) */}
@@ -527,21 +527,21 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
               transition={{ duration: 0.18 }}
               className="overflow-hidden"
             >
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-3 mt-1">
-                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest text-center">
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 space-y-3 mt-1">
+                <p className="text-[10px] font-semibold text-[#1a1a1a] uppercase tracking-widest text-center">
                   {lang === "zh" ? "选择数量" : lang === "en" ? "Select Quantity" : "Pilih Kuantiti"}
                 </p>
                 <div className="flex items-center justify-center gap-4">
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedQty(q => Math.max(1, q - 1)); }}
-                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
                   >−</button>
-                  <span className="text-[20px] font-bold text-slate-900 w-8 text-center">{selectedQty}</span>
+                  <span className="text-[20px] font-bold text-[#1a1a1a] w-8 text-center">{selectedQty}</span>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedQty(q => q + 1); }}
-                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
+                    className="w-9 h-9 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[16px] transition-all cursor-pointer active:scale-95"
                   >+</button>
                 </div>
                 <div className="flex gap-2">
@@ -555,7 +555,7 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
                   <button
                     type="button"
                     onClick={handleConfirmAdd}
-                    className="flex-1 text-[11px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-2.5 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
+                    className="flex-1 text-[11px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-2.5 rounded-full transition-all cursor-pointer shadow-sm active:scale-98"
                   >
                      {lang === "zh" ? `加入 ${selectedQty} 件` : lang === "en" ? (mode === "cart" ? `Add ${selectedQty} to Cart` : `Add ${selectedQty} to Quote`) : (mode === "cart" ? `Tambah ${selectedQty} ke Troli` : `Tambah ${selectedQty} ke Quote`)}
                   </button>
@@ -568,20 +568,20 @@ function ProductCard({ p, onAddToCart, onSendText, lang, mode = "quote" }: { p: 
         {!showQtyPicker && (
           <div className="flex flex-col gap-2 mt-1">
             <button onClick={handleAddClick}
-              className={`w-full text-[12px] font-semibold tracking-wider uppercase py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] active:scale-98 cursor-pointer ${
+              className={`w-full text-[12px] font-semibold tracking-wider uppercase py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] active:scale-98 cursor-pointer ${
                 added
                   ? "bg-emerald-500 text-white"
-                  : "bg-[#1F2937] hover:bg-slate-800 text-white"
+                  : "bg-[#d4af37] hover:bg-[#b8960c] text-[#1a1a1a]"
               }`}>
               {added ? t.addedBtn : mode === "cart" ? t.addCartBtn : t.addBtn}
             </button>
             <div className="flex gap-2">
               <button onClick={() => onSendText(`More like ${p.name}`)}
-                className="flex-1 text-[11px] font-medium text-slate-650 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                className="flex-1 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
                 More Like This
               </button>
               <button onClick={() => onSendText(`Checkout`)}
-                className="flex-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-205 hover:bg-slate-50 hover:border-slate-350 py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
+                className="flex-1 text-[11px] font-medium text-[#1a1a1a] bg-white border border-slate-200 hover:bg-[#fafaf8] py-2.5 rounded-full transition-all cursor-pointer shadow-sm">
                 Checkout
               </button>
             </div>
@@ -600,14 +600,14 @@ function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "q
   try { data = JSON.parse(text.substring("TOOL_RESULT_PRODUCT_CARDS:".length)); } catch (e) {}
 
   if (!data) return (
-    <div className="text-slate-500 text-[13px] p-3.5 bg-slate-50 border border-slate-200 rounded-2xl rounded-tl-[5px] shadow-sm">
+    <div className="text-slate-600 text-[13px] p-3.5 bg-[#fafaf8] border border-slate-200 rounded-2xl rounded-tl-[5px] shadow-sm">
       {t.errProduct}
     </div>
   );
 
   return (
     <div className="space-y-3 w-full">
-      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">{data.summary}</div>
+      <div className="text-[13px] font-medium text-[#1a1a1a] leading-relaxed">{data.summary}</div>
       {data.products?.length > 0 ? (
         <div className="space-y-3">
           {data.products.map((p, idx) => (
@@ -615,7 +615,7 @@ function ToolResultProductCards({ text, onAddToCart, onSendText, lang, mode = "q
           ))}
         </div>
       ) : (
-        <div className="text-[12px] text-slate-400 bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+        <div className="text-[12px] text-slate-500 bg-[#fafaf8] border border-slate-200 rounded-xl p-4 text-center">
           {t.noProduct}
         </div>
       )}
@@ -640,13 +640,13 @@ function ToolResultCategories({ text, onSendText, lang }: { text: string; onSend
 
   return (
     <div className="space-y-3 w-full">
-      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">Here are our product categories:</div>
+      <div className="text-[13px] font-medium text-[#1a1a1a] leading-relaxed">Here are our product categories:</div>
       <div className="grid grid-cols-2 gap-2">
         {categories.map((cat, idx) => (
           <button
             key={`cat-res-${cat.label}-${idx}`}
             onClick={() => onSendText(cat.label)}
-            className="flex items-center justify-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-amber-400 hover:bg-slate-50 transition-all text-[12px] font-bold text-slate-700"
+            className="flex items-center justify-center p-3 rounded-xl bg-[#fafaf8] border border-slate-200 shadow-sm hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-[12px] font-bold text-[#1a1a1a]"
           >
             {cat.label}
           </button>
@@ -662,7 +662,7 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
 
   if (!data || !data.customer_name || !data.customer_phone) {
     return (
-      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">
+      <div className="text-[13px] font-medium text-[#1a1a1a] leading-relaxed">
         Please provide your name and phone number to proceed with checkout.
       </div>
     );
@@ -671,25 +671,25 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
   return (
-    <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex flex-col p-5 w-full text-slate-800">
-      <div className="flex items-center gap-2 pb-3 border-b border-slate-100/60">
-        <ShoppingCart className="w-4 h-4 text-[#1F2937]" />
-        <span className="text-[11px] font-semibold text-[#1F2937] uppercase tracking-wider">Checkout</span>
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex flex-col p-5 w-full text-[#1a1a1a]">
+      <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
+        <ShoppingCart className="w-4 h-4 text-[#1a1a1a]" />
+        <span className="text-[11px] font-semibold text-[#1a1a1a] uppercase tracking-wider">Checkout</span>
       </div>
       
-      <div className="py-3 text-[12px] text-slate-500 space-y-1 font-medium">
-        <p><strong className="text-slate-800 font-semibold">Name:</strong> {data.customer_name}</p>
-        <p><strong className="text-slate-800 font-semibold">Phone:</strong> {data.customer_phone}</p>
-        <p><strong className="text-slate-800 font-semibold">Total:</strong> RM {grandTotal.toFixed(2)}</p>
+      <div className="py-3 text-[12px] text-slate-650 space-y-1 font-medium">
+        <p><strong className="text-[#1a1a1a] font-semibold">Name:</strong> {data.customer_name}</p>
+        <p><strong className="text-[#1a1a1a] font-semibold">Phone:</strong> {data.customer_phone}</p>
+        <p><strong className="text-[#1a1a1a] font-semibold">Total:</strong> RM {grandTotal.toFixed(2)}</p>
       </div>
 
       <div className="pt-2 space-y-2">
         <button onClick={() => onProcessCheckout('qr', data?.customer_name || '', data?.customer_phone || '')}
-          className="w-full text-[12px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] cursor-pointer">
+          className="w-full text-[12px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.15)] cursor-pointer">
           QR Payment
         </button>
         <button onClick={() => onProcessCheckout('bank_transfer', data?.customer_name || '', data?.customer_phone || '')}
-          className="w-full text-[12px] font-semibold text-slate-700 bg-white/80 hover:bg-slate-50 py-3 rounded-full transition-all shadow-sm border border-slate-200 cursor-pointer">
+          className="w-full text-[12px] font-semibold text-[#1a1a1a] bg-white hover:bg-[#fafaf8] py-3 rounded-full transition-all shadow-sm border border-slate-200 cursor-pointer">
           Bank Transfer
         </button>
         <button onClick={() => onProcessCheckout('whatsapp', data?.customer_name || '', data?.customer_phone || '')}
@@ -709,13 +709,13 @@ function ToolResultRenderer({ text, onAddToCart, lang }: { text: string; onAddTo
   if (!data) return null;
 
   return (
-    <div className="space-y-3 w-full text-slate-800">
-      <div className="text-[13px] font-medium text-slate-700 leading-relaxed">{data.summary}</div>
+    <div className="space-y-3 w-full text-[#1a1a1a]">
+      <div className="text-[13px] font-medium text-slate-650 leading-relaxed">{data.summary}</div>
       {data.products?.length > 0 && (
         <div className="space-y-3">
           {data.products.map((p, idx) => (
-            <div key={`tool-res-item-${p.name}-${idx}`} className="bg-slate-50 border border-slate-200/50 rounded-xl p-3">
-              <p className="font-bold text-[12px] text-slate-900">{p.name}</p>
+            <div key={`tool-res-item-${p.name}-${idx}`} className="bg-[#fafaf8] border border-slate-200 rounded-xl p-3">
+              <p className="font-bold text-[12px] text-[#1a1a1a]">{p.name}</p>
               <p className="text-[11px] text-slate-500">{p.price}</p>
             </div>
           ))}
@@ -752,26 +752,26 @@ function QuoteCardUI({ text, lang }: { text: string; lang: Language }) {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col p-4 w-full text-slate-800">
-      <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-        <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-[10px] font-extrabold text-slate-800 tracking-widest uppercase">Wholesale Quote</span>
+    <div className="bg-[#fafaf8] border border-[#d4af37]/20 rounded-2xl overflow-hidden shadow-sm flex flex-col p-4 w-full text-[#1a1a1a]">
+      <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
+        <span className="flex h-2 w-2 rounded-full bg-[#d4af37] animate-pulse" />
+        <span className="text-[10px] font-extrabold text-[#1a1a1a] tracking-widest uppercase">Wholesale Quote</span>
       </div>
       <div className="space-y-2 py-3">
         {data.items.map((item, idx) => (
-          <div key={`quote-ui-item-${item.name}-${idx}`} className="flex justify-between items-center text-[12.5px] text-slate-600">
+          <div key={`quote-ui-item-${item.name}-${idx}`} className="flex justify-between items-center text-[12.5px] text-slate-655">
             <span>{item.quantity}x {item.name}</span>
-            <span className="font-bold text-slate-800">RM {item.price.toFixed(2)}</span>
+            <span className="font-bold text-[#1a1a1a]">RM {item.price.toFixed(2)}</span>
           </div>
         ))}
       </div>
-      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+      <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
         <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{t.grandTotal}</span>
-        <span className="text-[16px] font-semibold text-slate-900">RM {data.total_amount.toFixed(2)}</span>
+        <span className="text-[16px] font-semibold text-[#1a1a1a]">RM {data.total_amount.toFixed(2)}</span>
       </div>
       <div className="pt-4">
         <button onClick={handleWaClick}
-          className="block w-full text-[12px] font-semibold text-white bg-[#1F2937] hover:bg-slate-800 py-3 rounded-full text-center transition-all shadow-sm cursor-pointer">
+          className="block w-full text-[12px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3 rounded-full text-center transition-all shadow-sm cursor-pointer">
           {t.whatsappBtn}
         </button>
       </div>
@@ -811,7 +811,7 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
         <button
           key={`chip-${chip.query}-${idx}`}
           onClick={() => onSelect(chip.query)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/25 hover:bg-[#d4af37]/20 hover:border-[#d4af37]/50 transition-all text-[12px] font-medium text-[#d4af37] active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#d4af37]/8 border border-[#d4af37]/25 hover:bg-[#d4af37]/15 hover:border-[#d4af37]/45 transition-all text-[12px] font-semibold text-[#d4af37] active:scale-95 cursor-pointer"
         >
           <span>{chip.label}</span>
         </button>
@@ -838,17 +838,17 @@ function CategorySelector({ onSelect }: { onSelect: (category: string) => void }
   ];
 
   return (
-    <div className="space-y-4 w-full p-5 bg-[#111827] border border-[#d4af37]/15 rounded-3xl">
-      <div className="text-[11px] font-semibold text-[#d4af37]/60 uppercase tracking-widest text-center">Pilih Kategori / Select Category</div>
+    <div className="space-y-4 w-full p-5 bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl">
+      <div className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest text-center">Pilih Kategori / Select Category</div>
       <div className="grid grid-cols-2 gap-3">
         {categories.map((cat, idx) => (
           <button
             key={`cat-sel-${cat.name}-${idx}`}
             onClick={() => onSelect(cat.name)}
-            className="flex flex-col items-start p-4 rounded-[20px] border border-white/8 bg-[#0f0f14] hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer"
+            className="flex flex-col items-start p-4 rounded-[20px] border border-slate-200 bg-white hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer"
           >
             <span className="mb-3 group-hover:scale-105 transition-transform">{CATEGORY_ICONS[cat.name]}</span>
-            <span className="text-[13px] font-semibold text-white">{cat.name}</span>
+            <span className="text-[13px] font-semibold text-[#1a1a1a]">{cat.name}</span>
             <span className="text-[10px] text-slate-500 mt-1 leading-tight font-medium">{cat.desc}</span>
           </button>
         ))}
@@ -873,8 +873,8 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
   ];
 
   return (
-    <div className="space-y-4 w-full p-5 bg-[#111827] border border-[#d4af37]/15 rounded-3xl">
-      <div className="text-[11px] font-semibold text-[#d4af37]/60 uppercase tracking-widest text-center">Tujuan Pesanan / Usage Intent</div>
+    <div className="space-y-4 w-full p-5 bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl">
+      <div className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest text-center">Tujuan Pesanan / Usage Intent</div>
       <div className="grid grid-cols-2 gap-3">
         {types.map((t, idx) => {
           const isHighlighted = idx === 0 && highlightFirst;
@@ -889,9 +889,9 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
                   "0 0 0 rgba(212, 175, 55, 0)"
                 ],
                 borderColor: [
-                  "rgba(255,255,255,0.06)",
+                  "rgba(0,0,0,0.06)",
                   "rgba(212, 175, 55, 0.5)",
-                  "rgba(255,255,255,0.06)"
+                  "rgba(0,0,0,0.06)"
                 ]
               } : undefined}
               transition={isHighlighted ? {
@@ -899,10 +899,10 @@ function BusinessTypeSelector({ onSelect, highlightFirst }: { onSelect: (type: s
                 duration: 2.2,
                 ease: "easeInOut"
               } : undefined}
-              className={`flex flex-col items-start p-4 rounded-[20px] bg-[#0f0f14] border border-white/8 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer relative ${isHighlighted ? "overflow-visible" : "overflow-hidden"}`}
+              className={`flex flex-col items-start p-4 rounded-[20px] bg-white border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left group active:scale-98 cursor-pointer relative ${isHighlighted ? "overflow-visible" : "overflow-hidden"}`}
             >
               <span className="mb-2 group-hover:scale-105 transition-transform">{BIZTYPE_ICONS[t.name]}</span>
-              <span className="text-[13px] font-semibold text-white leading-tight">{t.name}</span>
+              <span className="text-[13px] font-semibold text-[#1a1a1a] leading-tight">{t.name}</span>
               <span className="text-[10px] text-slate-500 mt-1 leading-tight font-medium">{t.desc}</span>
               {isHighlighted && (
                 <div className="absolute -bottom-14 right-2 z-50 pointer-events-none">
@@ -959,24 +959,24 @@ function ProgressTracker({ step, flowType }: { step: ChatStep; flowType: FlowTyp
   const activeIdx = (config?.activeMap as any)?.[step] ?? 0;
 
   return (
-    <div className="bg-white/50 backdrop-blur-md px-6 py-2.5 border-b border-slate-100 flex items-center justify-between select-none shrink-0">
+    <div className="bg-[#ffffff] px-6 py-2.5 border-b border-[#d4af37]/10 flex items-center justify-between select-none shrink-0">
       <div className="flex items-center justify-between w-full relative">
-        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-100 -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-250 -translate-y-1/2 z-0" />
         <div
           className="absolute top-1/2 left-0 h-[2px] bg-[#D4AF37] -translate-y-1/2 z-0 transition-all duration-500 ease-out"
           style={{ width: `${(activeIdx / Math.max(stages.length - 1, 1)) * 100}%` }}
         />
         {stages.map((stage, idx) => (
-          <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-white px-2 first:pl-0 last:pr-0">
+          <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-[#ffffff] px-2 first:pl-0 last:pr-0">
             <span className={`h-2.5 w-2.5 rounded-full border-2 transition-all duration-300 ${
               idx === activeIdx
                 ? "bg-[#D4AF37] border-[#D4AF37] scale-110 shadow-[0_0_6px_rgba(212,175,55,0.4)]"
                 : idx < activeIdx
-                  ? "bg-[#1F2937] border-[#1F2937]"
+                  ? "bg-[#D4AF37] border-[#D4AF37]"
                   : "bg-white border-slate-200"
             }`} />
             <span className={`text-[9px] tracking-wide font-medium mt-1.5 transition-colors duration-300 ${
-              idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-slate-700" : "text-slate-400"
+              idx === activeIdx ? "text-[#D4AF37] font-semibold" : idx < activeIdx ? "text-[#1a1a1a]" : "text-slate-400"
             }`}>
               {stage}
             </span>
@@ -994,56 +994,56 @@ function QuoteReviewView({ cart, onBack, onCheckout, onRemove, onUpdateQty, lang
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
   return (
-    <div className="flex flex-col h-full bg-white/80 backdrop-blur-md text-slate-800 p-6 space-y-5">
+    <div className="flex flex-col h-full bg-[#ffffff] text-[#1a1a1a] p-6 space-y-5">
       <div className="flex items-center gap-3 shrink-0">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-800 transition">
+        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-[#1a1a1a] transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h3 className="text-[16px] font-semibold tracking-tight text-slate-900">Your Wholesale Quote</h3>
+        <h3 className="text-[16px] font-semibold tracking-tight text-[#1a1a1a]">Your Wholesale Quote</h3>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4 pr-1 min-h-0">
         {cart.length > 0 ? (
           cart.map((item, idx) => (
-            <div key={`cart-item-${item.name}-${idx}`} className="bg-white border border-slate-100 rounded-[20px] p-4 flex gap-4 items-center shadow-[0_4px_20px_-2px_rgba(0,0,0,0.01)]">
+            <div key={`cart-item-${item.name}-${idx}`} className="bg-[#fafaf8] border border-slate-200 rounded-[20px] p-4 flex gap-4 items-center shadow-[0_4px_20px_-2px_rgba(0,0,0,0.01)]">
               {item.image_url && (
-                <div className="w-12 h-12 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-100">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-200">
                   <img src={item.image_url} className="w-full h-full object-cover" alt={item.name} />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-slate-900 truncate">{item.name}</p>
-                <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{item.price}</p>
+                <p className="text-[13px] font-semibold text-[#1a1a1a] truncate">{item.name}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 font-medium">{item.price}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => onUpdateQty(item.name, Math.max(1, item.quantity - 1))} className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200/60 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[14px]">-</button>
-                <span className="text-[12px] font-semibold w-6 text-center text-slate-800">{item.quantity}</span>
-                <button onClick={() => onUpdateQty(item.name, item.quantity + 1)} className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200/60 hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[14px]">+</button>
+                <button onClick={() => onUpdateQty(item.name, Math.max(1, item.quantity - 1))} className="w-7 h-7 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px]">-</button>
+                <span className="text-[12px] font-semibold w-6 text-center text-[#1a1a1a]">{item.quantity}</span>
+                <button onClick={() => onUpdateQty(item.name, item.quantity + 1)} className="w-7 h-7 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-[#1a1a1a] flex items-center justify-center font-bold text-[14px]">+</button>
               </div>
-              <button onClick={() => onRemove(item.name)} className="p-2 text-rose-500 hover:bg-rose-550/10 rounded-full transition ml-1">
+              <button onClick={() => onRemove(item.name)} className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-full transition ml-1">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           ))
         ) : (
-          <div className="h-40 flex items-center justify-center text-[12px] text-slate-400 font-medium">
+          <div className="h-40 flex items-center justify-center text-[12px] text-slate-555 font-medium">
             Your quote is empty. Let's find some premium options.
           </div>
         )}
       </div>
 
       {cart.length > 0 && (
-        <div className="border-t border-slate-100 pt-4 space-y-4 shrink-0">
-          <div className="flex justify-between items-center text-[12.5px] text-slate-400 font-medium">
+        <div className="border-t border-slate-200 pt-4 space-y-4 shrink-0">
+          <div className="flex justify-between items-center text-[12.5px] text-slate-555 font-medium">
             <span>Subtotal</span>
-            <span className="font-semibold text-slate-850">RM {grandTotal.toFixed(2)}</span>
+            <span className="font-semibold text-[#1a1a1a]">RM {grandTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[13px] font-semibold text-slate-405 uppercase tracking-wider">Total</span>
-            <span className="text-[20px] font-semibold text-slate-900">RM {grandTotal.toFixed(2)}</span>
+            <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wider">Total</span>
+            <span className="text-[20px] font-semibold text-[#1a1a1a]">RM {grandTotal.toFixed(2)}</span>
           </div>
           <button onClick={onCheckout}
-            className="w-full text-[12px] font-semibold tracking-wider uppercase text-white bg-[#1F2937] hover:bg-slate-800 py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] active:scale-98 cursor-pointer">
+            className="w-full text-[12px] font-semibold tracking-wider uppercase text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.25)] active:scale-98 cursor-pointer">
             {proceedLabel ?? "Proceed to Checkout"}
           </button>
         </div>
@@ -1066,46 +1066,46 @@ function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; o
   };
 
   return (
-    <div className="flex flex-col h-full bg-white/80 backdrop-blur-md text-slate-800 p-6 space-y-5">
+    <div className="flex flex-col h-full bg-[#ffffff] text-[#1a1a1a] p-6 space-y-5">
       <div className="flex items-center gap-3 shrink-0">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-800 transition">
+        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-[#1a1a1a] transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h3 className="text-[16px] font-semibold tracking-tight text-slate-900">Wholesale Registration</h3>
+        <h3 className="text-[16px] font-semibold tracking-tight text-[#1a1a1a]">Wholesale Registration</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between min-h-0">
         <div className="space-y-4 overflow-y-auto pr-1">
-          <p className="text-[12px] text-slate-400 leading-relaxed font-normal">
+          <p className="text-[12px] text-slate-555 leading-relaxed font-normal">
             Please enter your B2B wholesale details to generate the official purchase quote and payment reference.
           </p>
           <div className="space-y-2">
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Full Name</label>
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Full Name</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Eddy Rahman"
-              className="w-full bg-slate-50/50 border border-slate-200/85 rounded-xl p-3.5 text-[13px] text-slate-900 outline-none focus:bg-white focus:border-slate-350 transition shadow-inner"
+              className="w-full bg-[#fafaf8] border border-slate-200 rounded-xl p-3.5 text-[13px] text-[#1a1a1a] outline-none focus:bg-white focus:border-[#d4af37] transition shadow-inner"
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Phone Number</label>
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Phone Number</label>
             <input
               type="tel"
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. +60123456789"
-              className="w-full bg-slate-50/50 border border-slate-200/85 rounded-xl p-3.5 text-[13px] text-slate-900 outline-none focus:bg-white focus:border-slate-350 transition shadow-inner"
+              className="w-full bg-[#fafaf8] border border-slate-200 rounded-xl p-3.5 text-[13px] text-[#1a1a1a] outline-none focus:bg-white focus:border-[#d4af37] transition shadow-inner"
             />
           </div>
         </div>
 
         <button type="submit"
           disabled={!name.trim() || !phone.trim()}
-          className="w-full text-[12px] font-semibold tracking-wider uppercase text-white bg-[#1F2937] hover:bg-slate-800 py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shrink-0 cursor-pointer">
+          className="w-full text-[12px] font-semibold tracking-wider uppercase text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.25)] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shrink-0 cursor-pointer">
           Continue to Payment
         </button>
       </form>
@@ -1119,50 +1119,50 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
   return (
-    <div className="flex flex-col h-full bg-[#FFFFFF]/90 backdrop-blur-md text-slate-800 p-5 space-y-6">
+    <div className="flex flex-col h-full bg-[#ffffff] text-[#1a1a1a] p-5 space-y-6">
       <div className="flex items-center gap-3 shrink-0">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-800 transition">
+        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-[#1a1a1a] transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h3 className="text-[16px] font-black tracking-tight text-slate-900">Select Payment Mode</h3>
+        <h3 className="text-[16px] font-black tracking-tight text-[#1a1a1a]">Select Payment Mode</h3>
       </div>
 
       <div className="space-y-4 flex-1 overflow-y-auto pr-1 min-h-0">
-        <p className="text-[12px] text-slate-500 leading-relaxed font-medium">
+        <p className="text-[12px] text-slate-555 leading-relaxed font-medium">
           Choose your preferred method to complete payment of **RM {grandTotal.toFixed(2)}**.
         </p>
 
         <div className="space-y-3 pt-2">
           <button
             onClick={() => onProcessCheckout('qr', name, phone)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#111827] border border-white/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#d4af37]/15 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-[#d4af37]" />
               </div>
               <div>
-                <span className="text-[13px] font-bold text-white block">DuitNow QR</span>
+                <span className="text-[13px] font-bold text-[#1a1a1a] block">DuitNow QR</span>
                 <span className="text-[10px] text-slate-500">Instant validation, automatic credit</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-600" />
+            <ChevronRight className="w-4 h-4 text-slate-500" />
           </button>
 
           <button
             onClick={() => onProcessCheckout('bank_transfer', name, phone)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#111827] border border-white/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#d4af37]/15 flex items-center justify-center">
                 <Building2 className="w-4 h-4 text-[#d4af37]" />
               </div>
               <div>
-                <span className="text-[13px] font-bold text-white block">Bank Transfer</span>
+                <span className="text-[13px] font-bold text-[#1a1a1a] block">Bank Transfer</span>
                 <span className="text-[10px] text-slate-500">Manual upload, bank transaction slip</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-600" />
+            <ChevronRight className="w-4 h-4 text-slate-500" />
           </button>
 
           <button
@@ -1171,14 +1171,14 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-black" />
+                <MessageSquare className="w-4 h-4 text-[#1a1a1a]" />
               </div>
               <div>
-                <span className="text-[13px] font-bold text-black block">Talk to Human Sales</span>
-                <span className="text-[10px] text-black/60">Support chat, manual order checkout</span>
+                <span className="text-[13px] font-bold text-[#1a1a1a] block">Talk to Human Sales</span>
+                <span className="text-[10px] text-[#1a1a1a]/60">Support chat, manual order checkout</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-black/60" />
+            <ChevronRight className="w-4 h-4 text-[#1a1a1a]/60" />
           </button>
         </div>
       </div>
@@ -1207,8 +1207,8 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
     <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
       <div className="flex items-start gap-2.5">
         <AvatarBot />
-        <div className="bg-[#111827] border border-white/10 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%]">
-          <p className="text-[13.5px] text-slate-200 leading-relaxed">{t.menuGreeting}</p>
+        <div className="bg-[#f5f5f0] border border-[#d4af37]/15 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%]">
+          <p className="text-[13.5px] text-[#1a1a1a] leading-relaxed">{t.menuGreeting}</p>
         </div>
       </div>
       <div className="space-y-2.5 pb-4">
@@ -1218,16 +1218,16 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             onClick={() => onSelect(opt.flow)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#111827] border border-white/8 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group"
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37]/45 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group"
           >
             <div className="w-9 h-9 rounded-xl bg-[#d4af37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
               {MENU_ICONS[opt.flow]}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-white leading-tight">{opt.label}</p>
+              <p className="text-[13px] font-semibold text-[#1a1a1a] leading-tight">{opt.label}</p>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{opt.desc}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-[#d4af37] transition-colors" />
+            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#d4af37] transition-colors" />
           </motion.button>
         ))}
         <motion.button
@@ -1326,12 +1326,12 @@ function CompareUploadView({ lang, onUpload, uploading }: { lang: Language; onUp
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="h-full flex flex-col items-center justify-center px-6 py-8 space-y-6 text-center">
-      <div className="w-20 h-20 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center shadow-sm">
-        <FileText className="w-9 h-9 text-[#D4AF37]" />
+      <div className="w-20 h-20 rounded-full bg-[#fafaf8] border border-[#d4af37]/20 flex items-center justify-center shadow-sm">
+        <FileText className="w-9 h-9 text-[#d4af37]" />
       </div>
       <div className="space-y-2 max-w-[280px]">
-        <h3 className="text-[17px] font-semibold text-slate-900 tracking-tight">{t.compareUploadTitle}</h3>
-        <p className="text-[12.5px] text-slate-400 leading-relaxed">{t.compareUploadDesc}</p>
+        <h3 className="text-[17px] font-semibold text-[#1a1a1a] tracking-tight">{t.compareUploadTitle}</h3>
+        <p className="text-[12.5px] text-slate-500 leading-relaxed">{t.compareUploadDesc}</p>
       </div>
       <div className="w-full max-w-[280px] space-y-3">
         <input
@@ -1347,7 +1347,7 @@ function CompareUploadView({ lang, onUpload, uploading }: { lang: Language; onUp
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-full bg-[#1F2937] hover:bg-slate-800 text-white text-[12px] font-semibold tracking-wider uppercase transition-all shadow-[0_4px_12px_rgba(31,41,55,0.15)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-full bg-[#d4af37] hover:bg-[#b8960c] text-[#1a1a1a] text-[12px] font-semibold tracking-wider uppercase transition-all shadow-[0_4px_12px_rgba(212,175,55,0.25)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
         >
           {uploading ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> {lang === "zh" ? "分析中..." : lang === "en" ? "Analysing..." : "Sedang analisa..."}</>
@@ -1372,7 +1372,7 @@ function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void
         <CheckCircle2 className="w-9 h-9 text-[#d4af37]" />
       </div>
       <div className="space-y-2">
-        <h3 className="text-[17px] font-semibold text-white">
+        <h3 className="text-[17px] font-semibold text-[#1a1a1a]">
           {lang === "zh" ? "报价已发送！" : lang === "en" ? "Quote Sent!" : "Sebut Harga Dihantar!"}
         </h3>
         <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-[250px]">
@@ -1386,7 +1386,7 @@ function QuoteHandoffView({ lang, onBack }: { lang: Language; onBack: () => void
       <div className="flex flex-col gap-2 w-full max-w-[260px]">
         <button
           onClick={onBack}
-          className="w-full text-[12px] font-semibold text-black bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all cursor-pointer"
+          className="w-full text-[12px] font-semibold text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all cursor-pointer"
         >
           {lang === "zh" ? "返回主菜单" : lang === "en" ? "Back to Main Menu" : "Kembali ke Menu Utama"}
         </button>
@@ -2107,12 +2107,12 @@ export default function ChatWidget() {
             whileTap={{ scale: 0.95 }}
             aria-label="Open Golden AI chat"
             style={{ zIndex: 9999 }}
-            className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-[#0f0f11] border border-[#d4af37]/40 hover:border-[#d4af37]/80 text-white flex items-center justify-center shadow-[0_8px_32px_rgba(212,175,55,0.18)] cursor-pointer transition-all"
+            className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-white border border-[#d4af37]/70 hover:border-[#d4af37] text-[#d4af37] flex items-center justify-center shadow-[0_8px_32px_rgba(212,175,55,0.15)] cursor-pointer transition-all"
           >
             <Sparkles className="w-5 h-5 text-[#d4af37]" />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#d4af37] border-2 border-[#0f0f11] animate-pulse" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
             {cart.length > 0 && (
-              <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#d4af37] text-black text-[9px] font-bold flex items-center justify-center shadow-sm">
+              <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#d4af37] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center shadow-sm">
                 {cart.reduce((a, c) => a + c.quantity, 0)}
               </span>
             )}
@@ -2148,13 +2148,13 @@ export default function ChatWidget() {
             style={{
               zIndex: 9998,
               fontFamily: "var(--font-inter), var(--font-dm-sans), sans-serif",
-              background: "#0a0a0f",
+              background: "#ffffff",
               backdropFilter: "blur(24px)",
-              border: "1px solid rgba(212,175,55,0.18)",
-              boxShadow: "0 24px 80px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.06), 0 0 60px rgba(212,175,55,0.04)"
+              border: "1px solid rgba(212,175,55,0.3)",
+              boxShadow: "0 24px 80px -12px rgba(0,0,0,0.15), 0 0 0 1px rgba(212,175,55,0.12), 0 0 60px rgba(212,175,55,0.06)"
             }}
             className={`
-              fixed flex flex-col overflow-hidden text-slate-100
+              fixed flex flex-col overflow-hidden text-[#1a1a1a]
               ${isMobile
                 // Mobile: full screen, slides up from bottom
                 ? "inset-0 rounded-none"
@@ -2165,7 +2165,7 @@ export default function ChatWidget() {
           >
 
             {/* ── Header ── */}
-            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/10 bg-black/20 backdrop-blur-md ${
+            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/20 bg-white ${
               isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
             }`}>
               <div className="flex items-center gap-3">
@@ -2227,7 +2227,7 @@ export default function ChatWidget() {
                           break;
                       }
                     }}
-                    className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-[#d4af37]/10 transition-all cursor-pointer"
+                    className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-slate-100 transition-all cursor-pointer"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
@@ -2236,8 +2236,8 @@ export default function ChatWidget() {
                   <Sparkles className="w-4 h-4 text-[#d4af37]" />
                 </div>
                 <div>
-                  <h2 className="text-[15px] font-semibold text-white tracking-tight leading-none">Golden AI</h2>
-                  <p className="text-[10px] text-[#d4af37]/60 font-medium mt-1 tracking-widest uppercase">Premium Concierge</p>
+                  <h2 className="text-[15px] font-semibold text-[#1a1a1a] tracking-tight leading-none">Golden AI</h2>
+                  <p className="text-[10px] text-[#d4af37] font-semibold mt-1 tracking-widest uppercase">Premium Concierge</p>
                 </div>
               </div>
 
@@ -2255,13 +2255,13 @@ export default function ChatWidget() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <div className="flex items-center gap-1.5 text-[10px] font-medium text-[#d4af37]/70 bg-[#d4af37]/10 border border-[#d4af37]/20 px-2.5 py-1 rounded-full">
+                <div className="flex items-center gap-1.5 text-[10px] font-medium text-[#d4af37] bg-[#d4af37]/8 border border-[#d4af37]/20 px-2.5 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse" />
                   Online
                 </div>
                 {!isMobile && (
                   <button type="button" onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/10 transition-all">
+                    className="p-1.5 rounded-xl text-slate-500 hover:text-[#1a1a1a] hover:bg-slate-100 transition-all">
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -2355,36 +2355,36 @@ export default function ChatWidget() {
                             className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
                           >
                             <div className="relative">
-                              <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center">
+                              <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center">
                                 <Sparkles className="w-10 h-10 text-[#d4af37]" />
                               </div>
-                              <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-[#0a0a0f] animate-pulse" />
+                              <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
                             </div>
 
                             <div className="space-y-3 max-w-[320px]">
-                              <h3 className="text-[20px] font-semibold text-white tracking-tight leading-snug">
+                              <h3 className="text-[20px] font-semibold text-[#1a1a1a] tracking-tight leading-snug">
                                 {lang === "zh" ? "为活动或餐厅采购？" : lang === "en" ? "Stocking up for an event or restaurant?" : "Boss nak stok untuk event atau restoran?"}
                               </h3>
                               <p className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest leading-none">
                                 Golden AI · Premium B2B Concierge
                               </p>
-                              <p className="text-[13px] text-slate-500 leading-relaxed font-normal">
+                              <p className="text-[13px] text-slate-600 leading-relaxed font-normal">
                                 {lang === "zh" ? "请先选择您的语言" : lang === "en" ? "Please select your language first" : "Pilih bahasa dulu, then sy terus recommend produk terbaik untuk boss."}
                               </p>
                             </div>
 
-                            <div className="w-full max-w-[290px] bg-[#111827] border border-[#d4af37]/15 rounded-3xl p-5 space-y-4">
-                              <p className="text-[9px] font-semibold text-[#d4af37]/50 uppercase tracking-widest flex items-center justify-center gap-1.5">
+                            <div className="w-full max-w-[290px] bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl p-5 space-y-4">
+                              <p className="text-[9px] font-semibold text-[#d4af37] uppercase tracking-widest flex items-center justify-center gap-1.5">
                                 <Globe className="w-3 h-3" /> Choose Your Language / Pilih Bahasa
                               </p>
                               <div className="flex flex-col gap-2">
-                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
                                   <span>English</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Start</span>
                                 </button>
-                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
                                   <span>Bahasa Melayu</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Mula</span>
                                 </button>
-                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-white/10 bg-[#0f0f14] hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-white transition-all cursor-pointer flex items-center justify-between active:scale-98">
+                                <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
                                   <span>中文 / 华语</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">开始</span>
                                 </button>
                               </div>
@@ -2485,8 +2485,8 @@ export default function ChatWidget() {
                                       <div
                                         className={`rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed whitespace-pre-wrap inline-block ${
                                           msg.role === "user"
-                                            ? "bg-[#d4af37]/15 border border-[#d4af37]/25 text-white font-medium rounded-tr-[6px]"
-                                            : "bg-[#111827] border border-white/8 text-slate-200 rounded-tl-[6px]"
+                                            ? "bg-[#fdf8e8] border border-[#d4af37]/35 text-[#1a1a1a] font-medium rounded-tr-[6px]"
+                                            : "bg-[#f5f5f0] border border-slate-200 text-[#1a1a1a] rounded-tl-[6px]"
                                         }`}
                                         style={{ overflowWrap: "break-word", wordBreak: "break-word", overflowX: "hidden" }}
                                       >
@@ -2530,14 +2530,14 @@ export default function ChatWidget() {
                                 </div>
                                 <div className="flex flex-col items-start">
                                   <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{t.botLabel}</span>
-                                  <div className="bg-[#111827] border border-white/8 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
+                                  <div className="bg-[#f5f5f0] border border-slate-200 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
                                     <span className="flex gap-1">
                                       {[0, 1, 2].map((i) => (
-                                        <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/60 animate-bounce"
+                                        <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/70 animate-bounce"
                                           style={{ animationDelay: `${i * 0.15}s` }} />
                                       ))}
                                     </span>
-                                    <span className="text-[12px] text-slate-500 font-medium">{t.thinking}</span>
+                                    <span className="text-[12px] text-slate-650 font-medium">{t.thinking}</span>
                                   </div>
                                 </div>
                               </motion.div>
@@ -2568,18 +2568,18 @@ export default function ChatWidget() {
                         animate={{ scale: 1, opacity: 1 }}
                         whileHover={{ scale: 1.05 }}
                         onClick={() => setCurrentStep("QUOTE_REVIEW")}
-                        className="absolute bottom-24 right-6 z-50 flex items-center gap-2 px-4.5 py-3 rounded-full bg-[#1F2937] text-white font-semibold text-[12px] tracking-wider uppercase shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:bg-slate-800 transition-all border border-slate-700/10 cursor-pointer"
+                        className="absolute bottom-24 right-6 z-50 flex items-center gap-2 px-4.5 py-3 rounded-full bg-[#d4af37] text-[#1a1a1a] font-semibold text-[12px] tracking-wider uppercase shadow-[0_12px_32px_rgba(212,175,55,0.25)] hover:bg-[#b8960c] transition-all border border-[#d4af37]/20 cursor-pointer"
                       >
-                        <ShoppingCart className="w-4 h-4 text-white" />
+                        <ShoppingCart className="w-4 h-4 text-[#1a1a1a]" />
                         <span>Quote ({cart.reduce((a, c) => a + c.quantity, 0)})</span>
                       </motion.button>
                     )}
 
                     {/* ── Human Escalation Banner ── */}
-                    <div className="bg-black/30 border-t border-[#d4af37]/10 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
+                    <div className="bg-[#fafaf8] border-t border-[#d4af37]/15 px-6 py-2.5 flex items-center justify-between text-[11px] shrink-0 select-none">
                       <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
-                        <span className="text-slate-500 font-medium">Need human assistance?</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37] animate-pulse" />
+                        <span className="text-slate-600 font-medium">Need human assistance?</span>
                       </div>
                       <a
                         href="https://wa.me/601164073143?text=Hi,%20saya%20perlu%20bantuan%20dari%20tim%20sales%20untuk%20pesanan%20borong."
@@ -2593,7 +2593,7 @@ export default function ChatWidget() {
 
                     {/* ── Input Bar ── */}
                     {messages.length > 0 && (
-                      <div className={`shrink-0 border-t border-[#d4af37]/10 bg-black/20 backdrop-blur-md ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
+                      <div className={`shrink-0 border-t border-[#d4af37]/15 bg-white ${isMobile ? "px-5 py-4 pb-8" : "px-6 py-4"}`}>
                         {/* Hidden invoice file input */}
                         <input
                           ref={invoiceInputRef}
@@ -2613,7 +2613,7 @@ export default function ChatWidget() {
                             onClick={() => invoiceInputRef.current?.click()}
                             disabled={invoiceUploading || loading}
                             title={lang === "zh" ? "上传发票" : lang === "en" ? "Upload invoice" : "Upload invoice"}
-                            className="shrink-0 w-10 h-10 rounded-full bg-[#111827] border border-white/10 hover:bg-[#d4af37]/10 hover:border-[#d4af37]/40 text-slate-500 hover:text-[#d4af37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
+                            className="shrink-0 w-10 h-10 rounded-full bg-[#fafaf8] border border-slate-200 hover:bg-[#d4af37]/10 hover:border-[#d4af37] text-slate-500 hover:text-[#d4af37] flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
                           >
                             {invoiceUploading
                               ? <Loader2 className="w-4 h-4 animate-spin text-[#d4af37]" />
@@ -2630,7 +2630,7 @@ export default function ChatWidget() {
                               onChange={(e) => setMessage(e.target.value)}
                               disabled={loading || invoiceUploading}
                               placeholder={t.placeholder}
-                              className="w-full bg-[#111827] border border-white/10 text-white placeholder:text-slate-600 pl-5 pr-14 py-3.5 rounded-full outline-none focus:border-[#d4af37]/40 focus:bg-[#1a1a2e] transition-all disabled:opacity-50 text-[13.5px] font-medium"
+                              className="w-full bg-[#fafaf8] border border-slate-200 text-[#1a1a1a] placeholder:text-slate-400 pl-5 pr-14 py-3.5 rounded-full outline-none focus:border-[#d4af37] focus:bg-white transition-all disabled:opacity-50 text-[13.5px] font-medium"
                             />
                             <motion.button
                               whileTap={{ scale: loading ? 1 : 0.9 }}
@@ -2642,7 +2642,7 @@ export default function ChatWidget() {
                             </motion.button>
                           </div>
                         </form>
-                        <p className="text-center text-[9.5px] text-slate-600 mt-3 select-none tracking-wide font-medium">
+                        <p className="text-center text-[9.5px] text-slate-500 mt-3 select-none tracking-wide font-medium">
                           {lang === "en"
                             ? "Upload invoice to compare savings · Golden AI"
                             : lang === "zh"
