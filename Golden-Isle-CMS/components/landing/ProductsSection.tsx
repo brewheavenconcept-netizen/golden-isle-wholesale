@@ -152,7 +152,7 @@ export default function ProductsSection() {
                                 to { opacity: 1; transform: translateY(0); }
                             }
                         `}} />
-                        <div className="flex gap-6 overflow-x-auto pb-6 mb-8 md:justify-center no-scrollbar px-1 border-b border-[#1f1f1f] items-end">
+                        <div className="flex gap-6 overflow-x-auto pb-6 mb-10 md:justify-center no-scrollbar px-1 border-b border-[#e8e4dd] items-end">
                             {categories.map((cat, index) => {
                                 const count = products.filter(p => p.category === cat).length;
                                 const isActive = selectedCategory === cat;
@@ -162,37 +162,37 @@ export default function ProductsSection() {
 
                                 if (cat === 'Whisky') {
                                     btnStyle = isActive
-                                        ? 'bg-[#92400e] text-white shadow-md shadow-[#92400e]/30 border border-transparent font-bold'
-                                        : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#92400e]/50 hover:bg-amber-50';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
+                                        ? 'bg-gradient-to-r from-[#92400e] to-[#b8960c] text-white shadow-lg shadow-[#92400e]/15 border border-transparent font-bold hover:scale-[1.02]'
+                                        : 'bg-white/60 backdrop-blur-xs text-[#6b6b6b] border border-[#e8e4dd] hover:border-[#92400e]/40 hover:text-[#92400e] hover:bg-[#92400e]/5';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white border border-white/10' : 'bg-[#faf9f6] text-[#6b6b6b] border border-[#e8e4dd]';
                                 } else if (cat === 'Wine') {
                                     btnStyle = isActive
-                                        ? 'bg-[#722F37] text-white shadow-md shadow-[#722F37]/30 border border-transparent font-bold'
-                                        : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#722F37]/50 hover:bg-red-50';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
+                                        ? 'bg-gradient-to-r from-[#722F37] to-[#990011] text-white shadow-lg shadow-[#722F37]/15 border border-transparent font-bold hover:scale-[1.02]'
+                                        : 'bg-white/60 backdrop-blur-xs text-[#6b6b6b] border border-[#e8e4dd] hover:border-[#722F37]/40 hover:text-[#722F37] hover:bg-[#722F37]/5';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white border border-white/10' : 'bg-[#faf9f6] text-[#6b6b6b] border border-[#e8e4dd]';
                                 } else if (cat === 'Craft Beer') {
                                     btnStyle = isActive
-                                        ? 'bg-[#B8860B] text-white shadow-md shadow-[#B8860B]/30 border border-transparent font-bold'
-                                        : 'bg-white text-[#1a1a2e] border border-gray-200 hover:border-[#B8860B]/50 hover:bg-yellow-50';
-                                    badgeStyle = isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600';
+                                        ? 'bg-gradient-to-r from-[#B8860B] to-[#d4af37] text-white shadow-lg shadow-[#B8860B]/15 border border-transparent font-bold hover:scale-[1.02]'
+                                        : 'bg-white/60 backdrop-blur-xs text-[#6b6b6b] border border-[#e8e4dd] hover:border-[#B8860B]/40 hover:text-[#B8860B] hover:bg-[#B8860B]/5';
+                                    badgeStyle = isActive ? 'bg-white/20 text-white border border-white/10' : 'bg-[#faf9f6] text-[#6b6b6b] border border-[#e8e4dd]';
                                 }
 
                                 // Beverage SVG icons per category
-                                const categoryIcon = getCategoryIcon(cat, 48);
+                                const categoryIcon = getCategoryIcon(cat, 52);
 
                                 return (
-                                    <div key={`${cat}-${index}`} className="flex flex-col items-center gap-2">
+                                    <div key={`${cat}-${index}`} className="flex flex-col items-center gap-3">
                                         {categoryIcon && (
-                                            <div className={`transition-all duration-300 ${isActive ? 'scale-110 opacity-100' : 'scale-95 opacity-55 hover:opacity-90 hover:scale-100'}`}>
+                                            <div className={`transition-all duration-500 ${isActive ? 'scale-115 -translate-y-1 filter drop-shadow-[0_8px_16px_rgba(212,175,55,0.25)] opacity-100' : 'scale-95 opacity-40 hover:opacity-85 hover:scale-100'}`}>
                                                 {categoryIcon}
                                             </div>
                                         )}
                                         <button suppressHydrationWarning
                                             onClick={() => setSelectedCategory(cat)}
-                                            className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-sm whitespace-nowrap transition-all duration-300 ${btnStyle}`}
+                                            className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-[13px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 ease-out cursor-pointer active:scale-95 ${btnStyle}`}
                                         >
                                             <span>{cat}</span>
-                                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${badgeStyle}`}>
+                                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${badgeStyle}`}>
                                                 {count}
                                             </span>
                                         </button>
