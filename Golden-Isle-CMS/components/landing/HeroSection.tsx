@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown, CheckCircle2, GlassWater, Wine } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import PremiumBottle3D from "@/components/ui/PremiumBottle3D";
 import { getWhatsAppLink } from '@/lib/config';
 import { useState, useEffect } from "react";
 
@@ -63,13 +64,11 @@ export function HeroSection() {
                         "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 18%, rgba(0,0,0,0.85) 38%, black 55%)",
                 }}
             >
-                <Image
+                <PremiumBottle3D
                     src="/hero-bottles.png"
-                    alt=""
-                    fill
-                    className="object-cover object-right sm:object-left"
-                    priority
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    alt="Premium Wholesale Bottles"
+                    className="w-full h-full"
+                    imageClassName="object-cover object-right sm:object-left"
                 />
             </motion.div>
 
