@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
+import GlowingOrb from "./GlowingOrb";
 import {
   Send,
   Loader2,
@@ -2230,7 +2231,7 @@ export default function ChatWidget() {
             style={{ zIndex: 9999 }}
             className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-white border border-[#d4af37]/70 hover:border-[#d4af37] text-[#d4af37] flex items-center justify-center shadow-[0_8px_32px_rgba(212,175,55,0.15)] cursor-pointer transition-all"
           >
-            <Sparkles className="w-5 h-5 text-[#d4af37]" />
+            <GlowingOrb size={56} />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
             {cart.length > 0 && (
               <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#d4af37] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center shadow-sm">
@@ -2388,8 +2389,8 @@ export default function ChatWidget() {
                     <X className="w-5 h-5" />
                   </button>
                 )}
-                <div className="w-9 h-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center border border-[#d4af37]/30">
-                  <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                <div className="w-9 h-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center border border-[#d4af37]/30 overflow-hidden">
+                  <GlowingOrb size={36} />
                 </div>
                 <div>
                   <h2 className="text-[15px] font-semibold text-[#1a1a1a] tracking-tight leading-none">Golden AI</h2>
@@ -2518,8 +2519,8 @@ export default function ChatWidget() {
                           className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
                         >
                           <div className="relative">
-                            <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center">
-                              <Sparkles className="w-10 h-10 text-[#d4af37]" />
+                            <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center overflow-hidden">
+                              <GlowingOrb size={80} />
                             </div>
                             <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
                           </div>
