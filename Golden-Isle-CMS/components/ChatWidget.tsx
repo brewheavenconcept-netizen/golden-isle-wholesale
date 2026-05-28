@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
@@ -36,6 +36,8 @@ import {
   Truck,
   Wallet,
   MessageCircle,
+  Mic,
+  Orbit,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePublicStore } from "@/hooks/usePublicStore";
@@ -1332,63 +1334,124 @@ function appendSuggestionsIfMissing(reply: string, lang: Language): string {
 
 // ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
 
-const MENU_ICONS: Record<string, React.ReactNode> = {
-  browse_products: <ShoppingBag className="w-5 h-5 text-[#1a1a1a]" />,
-  wholesale_quote: <LayoutGrid className="w-5 h-5 text-[#1a1a1a]" />,
-  delivery_coverage: <Package className="w-5 h-5 text-[#1a1a1a]" />,
-  ask_question: <MessageSquare className="w-5 h-5 text-[#1a1a1a]" />,
-};
-
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
-  const t = TRANSLATIONS[lang] as any;
-  const options = [
-    { label: t.menuBrowse, desc: t.menuBrowseDesc, flow: "browse_products" as const },
-    { label: t.menuFAQ, desc: t.menuFAQDesc, flow: "ask_question" as const },
-    { label: t.menuDelivery, desc: t.menuDeliveryDesc, flow: "delivery_coverage" as const },
-    { label: t.menuQuote, desc: t.menuQuoteDesc, flow: "wholesale_quote" as const },
-  ];
+  const getGreetingData = () => {
+    const hr = new Date().getHours();
+    if (lang === "zh") {
+      const greeting = hr < 12 ? "早上好。" : hr < 18 ? "下午好。" : "晚上好。";
+      return { greeting, sub: "老板，今天我们来采购和同步什么呢？" };
+    }
+    if (lang === "ms") {
+      const greeting = hr < 12 ? "Selamat pagi." : hr < 14 ? "Selamat tengah hari." : hr < 19 ? "Selamat petang." : "Selamat malam.";
+      return { greeting, sub: "Apa kita mahu source & sync hari ini bosku?" };
+    }
+    // Default English
+    const greeting = hr < 12 ? "Good morning." : hr < 18 ? "Good afternoon." : "Good evening.";
+    return { greeting, sub: "What would you like to source & sync today, boss?" };
+  };
+
+  const { greeting, sub } = getGreetingData();
+
   return (
-    <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
-      <div className="flex items-start gap-2.5">
-        <AvatarBot />
-        <div className="bg-[#fafaf9] border border-slate-200/80 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%] shadow-sm">
-          <p className="text-[13.5px] text-[#1a1a1a] leading-relaxed">{t.menuGreeting}</p>
+    <div className="h-full flex flex-col justify-between overflow-y-auto px-5 py-6 space-y-6">
+      
+      {/* Spatial UI Header */}
+      <header className="pt-2 px-1 flex flex-col gap-5 relative select-none shrink-0">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-1">
+            {/* 2026 Tech Details */}
+            <div className="flex items-center gap-1.5 font-mono text-[9.5px] text-fuchsia-600/90 tracking-[0.25em] uppercase font-bold">
+              <Orbit size={11} className="animate-[spin_4s_linear_infinite] text-fuchsia-500" />
+              <span>Golden.AI v26.4</span>
+            </div>
+            <h1 className="text-3xl font-light tracking-tighter text-gray-900 mt-2">
+              {greeting}
+            </h1>
+          </div>
+          
+          {/* Holographic Avatar with Gradient Aura */}
+          <div className="relative group cursor-pointer shrink-0">
+            <div className="absolute -inset-1.5 bg-gradient-to-tr from-fuchsia-500 via-yellow-400 to-violet-500 rounded-full blur-md opacity-40 group-hover:opacity-75 transition duration-500 animate-[spin_6s_linear_infinite]" />
+            <div className="relative w-12 h-12 bg-white/70 backdrop-blur-xl border border-white/85 rounded-full flex items-center justify-center overflow-hidden shadow-sm">
+              <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-500/20 via-yellow-400/20 to-violet-500/20" />
+              <div className="relative w-7 h-7 rounded-full bg-white/85 border border-fuchsia-100 flex items-center justify-center shadow-inner">
+                <Sparkles size={13} className="text-fuchsia-500" />
+              </div>
+              <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#2DD4BF] rounded-full border-2 border-white shadow-[0_0_8px_rgba(45,212,191,0.6)] z-10" />
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="space-y-2.5 pb-4">
-        {options.map((opt) => (
-          <motion.button
-            key={opt.flow}
-            onClick={() => onSelect(opt.flow)}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-black/20 hover:bg-slate-100 transition-all text-left cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.005)]"
-          >
-            <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-slate-200 transition-colors">
-              {MENU_ICONS[opt.flow]}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-[#1a1a1a] leading-tight">{opt.label}</p>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{opt.desc}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-black transition-colors" />
-          </motion.button>
-        ))}
-        <motion.button
-          onClick={onTalkToSales}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-all text-left cursor-pointer group shadow-md"
+
+        <p className="text-[15.5px] text-slate-500 font-light leading-relaxed">
+          {sub.split("source & sync").map((part, index, arr) => (
+            <React.Fragment key={index}>
+              {part}
+              {index < arr.length - 1 && <span className="text-gray-955 font-semibold">source & sync</span>}
+            </React.Fragment>
+          ))}
+        </p>
+      </header>
+
+      {/* Main Interface Grid */}
+      <div className="flex-1 flex flex-col justify-center gap-3.5 pb-4 select-none">
+        
+        {/* Action 1: Neural Chat (Primary) */}
+        <button
+          onClick={() => onSelect("ask_question")}
+          className="group relative w-full p-px rounded-[28px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-            <Phone className="w-5 h-5 text-white" />
+          {/* Animated Glowing Border */}
+          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-400/50 via-yellow-400/50 to-violet-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          
+          {/* Inner Glass Card */}
+          <div className="relative bg-white/70 backdrop-blur-2xl rounded-[28px] p-5.5 flex items-center gap-4.5 border border-white group-hover:bg-white/90 transition-colors">
+            
+            {/* Dynamic Icon Center */}
+            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center border border-white shadow-inner overflow-hidden shrink-0">
+               <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-400/20 to-yellow-400/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+               <Sparkles size={20} className="text-fuchsia-500 relative z-10 animate-pulse" strokeWidth={1.5} />
+            </div>
+
+            <div className="flex-1 text-left min-w-0">
+              <h3 className="text-[15px] font-bold text-gray-900 mb-0.5 group-hover:text-fuchsia-600 transition-colors">Ask Golden AI</h3>
+              <p className="text-[11.5px] text-slate-500 font-semibold truncate">Auto-quote & inventory sync</p>
+            </div>
+
+            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center group-hover:translate-x-1 transition-transform border border-slate-100 shadow-sm shrink-0">
+              <ChevronRight size={14} className="text-slate-400 group-hover:text-fuchsia-500" />
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-white leading-tight">{t.menuSales}</p>
-            <p className="text-[11px] text-white/75 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
-        </motion.button>
+        </button>
+
+        <div className="grid grid-cols-2 gap-3.5">
+          {/* Action 2: Catalog */}
+          <button
+            onClick={() => onSelect("browse_products")}
+            className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
+          >
+            <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
+              <Globe size={18} className="text-slate-400 group-hover:text-fuchsia-500 transition-colors" strokeWidth={1.5} />
+              <div>
+                <h4 className="text-[13.5px] font-bold text-gray-800">Catalog</h4>
+                <p className="text-[10.5px] text-slate-500 mt-0.5 font-semibold">Browse globals</p>
+              </div>
+            </div>
+          </button>
+
+          {/* Action 3: Human Concierge */}
+          <button
+            onClick={onTalkToSales}
+            className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
+          >
+            <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
+              <Mic size={18} className="text-slate-400 group-hover:text-fuchsia-500 transition-colors" strokeWidth={1.5} />
+              <div>
+                <h4 className="text-[13.5px] font-bold text-gray-800">Talk to Sales</h4>
+                <p className="text-[10.5px] text-slate-500 mt-0.5 font-semibold">Human link</p>
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -2360,10 +2423,10 @@ export default function ChatWidget() {
             style={{
               zIndex: 9998,
               fontFamily: "var(--font-inter), var(--font-dm-sans), sans-serif",
-              background: "#ffffff",
+              background: "#F4F4F7",
               backdropFilter: "blur(24px)",
-              border: "1px solid rgba(212,175,55,0.3)",
-              boxShadow: "0 24px 80px -12px rgba(0,0,0,0.15), 0 0 0 1px rgba(212,175,55,0.12), 0 0 60px rgba(212,175,55,0.06)"
+              border: "1px solid rgba(212,175,55,0.25)",
+              boxShadow: "0 24px 80px -12px rgba(212,175,55,0.15), 0 0 0 1px rgba(212,175,55,0.08), 0 0 60px rgba(124,58,237,0.04)"
             }}
             className={`
               fixed flex flex-col overflow-hidden text-[#1a1a1a]
@@ -2375,9 +2438,18 @@ export default function ChatWidget() {
               }
             `}
           >
+            {/* Ambient Spatial Glows & Pattern for 2026 Futurist UI */}
+            <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-fuchsia-400/10 rounded-full blur-[80px] animate-pulse duration-[4000ms] pointer-events-none" />
+            <div className="absolute bottom-1/4 right-1/4 w-[24rem] h-[24rem] bg-violet-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-300/10 rounded-full blur-[80px] pointer-events-none" />
+            
+            {/* Grain/Noise overlay */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-multiply pointer-events-none" />
+            {/* Tech data grid lines */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_15%,transparent_100%)] pointer-events-none" />
 
             {/* ── Header ── */}
-            <div className={`flex items-center justify-between shrink-0 border-b border-slate-100 bg-white ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
+            <div className={`flex items-center justify-between shrink-0 border-b border-slate-100 bg-white/40 backdrop-blur-md ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
               }`}>
               <div className="flex items-center gap-3">
                 {currentStep !== "START" ? (
