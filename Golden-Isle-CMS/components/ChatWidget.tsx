@@ -259,8 +259,8 @@ const TRANSLATIONS = {
 
 function AvatarBot() {
   return (
-    <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-      <Bot className="w-[14px] h-[14px] text-[#d4af37]" />
+    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#1a1a1a] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+      <Bot className="w-[14px] h-[14px] text-white" />
     </div>
   );
 }
@@ -1261,11 +1261,11 @@ const CONCIERGE_CARDS = [
 ];
 
 const CONCIERGE_ICONS: Record<string, React.ReactNode> = {
-  truck: <Truck className="w-5 h-5 text-[#d4af37]" />,
-  sparkles: <Sparkles className="w-5 h-5 text-[#d4af37]" />,
-  wallet: <Wallet className="w-5 h-5 text-[#d4af37]" />,
-  package: <Package className="w-5 h-5 text-[#d4af37]" />,
-  "message-circle": <MessageCircle className="w-5 h-5 text-[#d4af37]" />
+  truck: <Truck className="w-5 h-5 text-[#1a1a1a]" />,
+  sparkles: <Sparkles className="w-5 h-5 text-[#1a1a1a]" />,
+  wallet: <Wallet className="w-5 h-5 text-[#1a1a1a]" />,
+  package: <Package className="w-5 h-5 text-[#1a1a1a]" />,
+  "message-circle": <MessageCircle className="w-5 h-5 text-[#1a1a1a]" />
 };
 
 function ConciergeEntryView({ onSelect }: { onSelect: (card: typeof CONCIERGE_CARDS[0]) => void }) {
@@ -1274,7 +1274,7 @@ function ConciergeEntryView({ onSelect }: { onSelect: (card: typeof CONCIERGE_CA
       {/* Bot Greeting */}
       <div className="flex items-start gap-2.5">
         <AvatarBot />
-        <div className="bg-[#f5f5f0] border border-[#d4af37]/15 rounded-3xl rounded-tl-[6px] px-4 py-3.5 max-w-[85%] shadow-sm">
+        <div className="bg-[#fafaf9] border border-slate-200/80 rounded-3xl rounded-tl-[6px] px-4 py-3.5 max-w-[85%] shadow-sm">
           <p className="text-[13.5px] text-[#1a1a1a] leading-relaxed font-semibold">
             👋 Hi! Need quick answers before placing your order?
             <span className="text-slate-500 text-[12px] font-normal mt-1.5 block leading-normal">
@@ -1292,16 +1292,16 @@ function ConciergeEntryView({ onSelect }: { onSelect: (card: typeof CONCIERGE_CA
             onClick={() => onSelect(card)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37]/35 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.01)]"
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-black/20 hover:bg-slate-100 transition-all text-left cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.005)]"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-slate-200 transition-colors">
               {CONCIERGE_ICONS[card.icon]}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13.5px] font-bold text-[#1a1a1a] leading-tight">{card.title}</p>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-tight font-medium">{card.subtitle}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#d4af37] transition-colors" />
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-black transition-colors" />
           </motion.button>
         ))}
       </div>
@@ -1333,10 +1333,10 @@ function appendSuggestionsIfMissing(reply: string, lang: Language): string {
 // ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
-  browse_products: <ShoppingBag className="w-5 h-5 text-[#d4af37]" />,
-  wholesale_quote: <LayoutGrid className="w-5 h-5 text-[#d4af37]" />,
-  delivery_coverage: <Package className="w-5 h-5 text-[#d4af37]" />,
-  ask_question: <MessageSquare className="w-5 h-5 text-[#d4af37]" />,
+  browse_products: <ShoppingBag className="w-5 h-5 text-[#1a1a1a]" />,
+  wholesale_quote: <LayoutGrid className="w-5 h-5 text-[#1a1a1a]" />,
+  delivery_coverage: <Package className="w-5 h-5 text-[#1a1a1a]" />,
+  ask_question: <MessageSquare className="w-5 h-5 text-[#1a1a1a]" />,
 };
 
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
@@ -1351,7 +1351,7 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
     <div className="h-full overflow-y-auto px-5 py-6 space-y-5">
       <div className="flex items-start gap-2.5">
         <AvatarBot />
-        <div className="bg-[#f5f5f0] border border-[#d4af37]/15 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%]">
+        <div className="bg-[#fafaf9] border border-slate-200/80 rounded-2xl rounded-tl-[6px] px-4 py-3 max-w-[85%] shadow-sm">
           <p className="text-[13.5px] text-[#1a1a1a] leading-relaxed">{t.menuGreeting}</p>
         </div>
       </div>
@@ -1362,32 +1362,32 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             onClick={() => onSelect(opt.flow)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37]/45 hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer group"
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-black/20 hover:bg-slate-100 transition-all text-left cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.005)]"
           >
-            <div className="w-9 h-9 rounded-xl bg-[#d4af37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-slate-200 transition-colors">
               {MENU_ICONS[opt.flow]}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-[#1a1a1a] leading-tight">{opt.label}</p>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{opt.desc}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#d4af37] transition-colors" />
+            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-black transition-colors" />
           </motion.button>
         ))}
         <motion.button
           onClick={onTalkToSales}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#d4af37] hover:bg-[#b8960c] transition-all text-left cursor-pointer group"
+          className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-all text-left cursor-pointer group shadow-md"
         >
-          <div className="w-9 h-9 rounded-xl bg-black/10 flex items-center justify-center shrink-0">
-            <Phone className="w-5 h-5 text-black" />
+          <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <Phone className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-black leading-tight">{t.menuSales}</p>
-            <p className="text-[11px] text-black/60 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
+            <p className="text-[13px] font-semibold text-white leading-tight">{t.menuSales}</p>
+            <p className="text-[11px] text-white/75 mt-0.5 leading-tight">{t.menuSalesDesc}</p>
           </div>
-          <ChevronRight className="w-4 h-4 text-black/50" />
+          <ChevronRight className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
         </motion.button>
       </div>
     </div>
@@ -1511,6 +1511,14 @@ export default function ChatWidget() {
     return () => window.removeEventListener('showProductDetails', handler);
   }, []);
   const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowTooltip(false);
+    }
+  }, [isOpen]);
+
   const [onboardingSeen, setOnboardingSeen] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [leadContext, setLeadContext] = useState({ budget: "", preference: "", quantity: "" });
@@ -2217,31 +2225,110 @@ export default function ChatWidget() {
       exit: { opacity: 0, y: 20, scale: 0.96 },
     };
 
+  const getTooltipText = () => {
+    switch (lang) {
+      case "zh":
+        return {
+          label: "Golden AI • 智能销售助理",
+          title: "您好！我是 Golden AI 👋",
+          desc: "随时问我任何问题！我会即时为您解答。"
+        };
+      case "ms":
+        return {
+          label: "Golden AI • Pembantu Jualan AI",
+          title: "Hi! Saya Golden AI 👋",
+          desc: "Tanya apa-apa soalan saja, saya sedia membantu boss!"
+        };
+      default:
+        return {
+          label: "Golden AI • AI Sales Assistant",
+          title: "Hi! I'm Golden AI 👋",
+          desc: "Feel free to ask me any question! I'm here to help."
+        };
+    }
+  };
+  const tooltipText = getTooltipText();
+
   return (
     <>
       {/* ── Floating Trigger Bubble ── */}
       <AnimatePresence>
         {!isOpen && (
-          <motion.button
-            key="chat-trigger-bubble"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Open Golden AI chat"
-            style={{ zIndex: 9999 }}
-            className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-white border border-[#d4af37]/70 hover:border-[#d4af37] text-[#d4af37] flex items-center justify-center shadow-[0_8px_32px_rgba(212,175,55,0.15)] cursor-pointer transition-all"
-          >
-            <GlowingOrb size={56} />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#d4af37] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center shadow-sm">
-                {cart.reduce((a, c) => a + c.quantity, 0)}
-              </span>
+          <>
+            {/* Elegant Floating Prompt Tooltip */}
+            {showTooltip && (
+              <motion.div
+                key="chat-prompt-tooltip"
+                initial={{ opacity: 0, x: 15, scale: 0.92, y: 0 }}
+                animate={{ opacity: 1, x: 0, scale: 1, y: [0, -4, 0] }}
+                exit={{ opacity: 0, x: 15, scale: 0.92 }}
+                transition={{
+                  opacity: { delay: 0.5, duration: 0.4 },
+                  x: { delay: 0.5, duration: 0.4 },
+                  scale: { delay: 0.5, duration: 0.4 },
+                  y: {
+                    repeat: Infinity,
+                    duration: 3,
+                    ease: "easeInOut"
+                  }
+                }}
+                onClick={() => setIsOpen(true)}
+                style={{ zIndex: 9999 }}
+                className="fixed bottom-[26px] right-20 sm:right-[88px] mr-2 z-[9999] flex flex-col p-4 rounded-2xl bg-white border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.005)] max-w-[270px] sm:max-w-xs text-left select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+              >
+                {/* Absolute Close Button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTooltip(false);
+                  }}
+                  className="absolute top-2.5 right-2.5 text-slate-400 hover:text-black p-1 rounded-md hover:bg-slate-50 transition-all cursor-pointer shrink-0"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Tag label with small gold bullet */}
+                <div className="flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-widest text-[#d4af37]">
+                  <span className="w-1 h-1 rounded-full bg-[#d4af37] animate-pulse" />
+                  <span>{tooltipText.label}</span>
+                </div>
+
+                <div className="mt-2 space-y-1 pr-2">
+                  <h4 className="text-[14px] font-extrabold text-[#1a1a1a] tracking-tight leading-tight group-hover:text-slate-800">
+                    {tooltipText.title}
+                  </h4>
+                  <p className="text-[11.5px] text-slate-500 font-medium leading-relaxed">
+                    {tooltipText.desc}
+                  </p>
+                </div>
+
+                {/* Subtle speech bubble beak */}
+                <div className="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-r border-t border-slate-100 rotate-45" />
+              </motion.div>
             )}
-          </motion.button>
+
+            <motion.button
+              key="chat-trigger-bubble"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={() => setIsOpen(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Open Golden AI chat"
+              style={{ zIndex: 9999 }}
+              className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 rounded-full bg-white border border-slate-200 hover:border-black/35 text-[#1a1a1a] flex items-center justify-center shadow-lg cursor-pointer transition-all"
+            >
+              <GlowingOrb size={56} />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[#1a1a1a] text-white text-[9.5px] font-bold flex items-center justify-center shadow-md">
+                  {cart.reduce((a, c) => a + c.quantity, 0)}
+                </span>
+              )}
+            </motion.button>
+          </>
         )}
       </AnimatePresence>
 
@@ -2290,7 +2377,7 @@ export default function ChatWidget() {
           >
 
             {/* ── Header ── */}
-            <div className={`flex items-center justify-between shrink-0 border-b border-[#d4af37]/20 bg-white ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
+            <div className={`flex items-center justify-between shrink-0 border-b border-slate-100 bg-white ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
               }`}>
               <div className="flex items-center gap-3">
                 {currentStep !== "START" ? (
@@ -2392,12 +2479,12 @@ export default function ChatWidget() {
                     <X className="w-5 h-5" />
                   </button>
                 )}
-                <div className="w-9 h-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center border border-[#d4af37]/30 overflow-hidden">
+                <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
                   <GlowingOrb size={36} />
                 </div>
                 <div>
                   <h2 className="text-[15px] font-semibold text-[#1a1a1a] tracking-tight leading-none">Golden AI</h2>
-                  <p className="text-[10px] text-[#d4af37] font-semibold mt-1 tracking-widest uppercase">Premium Concierge</p>
+                  <p className="text-[9.5px] text-slate-400 font-semibold mt-1 tracking-widest uppercase">Premium Concierge</p>
                 </div>
               </div>
 
@@ -2415,8 +2502,8 @@ export default function ChatWidget() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <div className="flex items-center gap-1.5 text-[10px] font-medium text-[#d4af37] bg-[#d4af37]/8 border border-[#d4af37]/20 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200/50 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Online
                 </div>
                 {!isMobile && (
@@ -2522,17 +2609,17 @@ export default function ChatWidget() {
                           className="h-full flex flex-col items-center justify-center text-center px-6 py-6 space-y-6"
                         >
                           <div className="relative">
-                            <div className="w-20 h-20 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/35 flex items-center justify-center overflow-hidden">
+                            <div className="w-20 h-20 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
                               <GlowingOrb size={80} />
                             </div>
-                            <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#d4af37] border-2 border-white animate-pulse" />
+                            <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
                           </div>
 
                           <div className="space-y-3 max-w-[320px]">
                             <h3 className="text-[20px] font-semibold text-[#1a1a1a] tracking-tight leading-snug">
                               {lang === "zh" ? "为活动或餐厅采购？" : lang === "en" ? "Stocking up for an event or restaurant?" : "Boss nak stok untuk event atau restoran?"}
                             </h3>
-                            <p className="text-[11px] font-semibold text-[#d4af37] uppercase tracking-widest leading-none">
+                            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none">
                               Golden AI · Premium B2B Concierge
                             </p>
                             <p className="text-[13px] text-slate-600 leading-relaxed font-normal">
@@ -2540,19 +2627,19 @@ export default function ChatWidget() {
                             </p>
                           </div>
 
-                          <div className="w-full max-w-[290px] bg-[#fafaf8] border border-[#d4af37]/20 rounded-3xl p-5 space-y-4">
-                            <p className="text-[9px] font-semibold text-[#d4af37] uppercase tracking-widest flex items-center justify-center gap-1.5">
+                          <div className="w-full max-w-[290px] bg-[#fafaf8] border border-slate-200 rounded-3xl p-5 space-y-4 shadow-[0_2px_8px_rgba(0,0,0,0.005)]">
+                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
                               <Globe className="w-3 h-3" /> Choose Your Language / Pilih Bahasa
                             </p>
                             <div className="flex flex-col gap-2">
-                              <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                <span>English</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Start</span>
+                              <button type="button" onClick={() => handleLanguageSelect("en")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-black/35 hover:bg-slate-50 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98 group">
+                                <span>English</span><span className="text-[9px] text-slate-400 group-hover:text-black font-semibold uppercase tracking-wider">Start</span>
                               </button>
-                              <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                <span>Bahasa Melayu</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">Mula</span>
+                              <button type="button" onClick={() => handleLanguageSelect("ms")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-black/35 hover:bg-slate-50 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98 group">
+                                <span>Bahasa Melayu</span><span className="text-[9px] text-slate-400 group-hover:text-black font-semibold uppercase tracking-wider">Mula</span>
                               </button>
-                              <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-[#d4af37]/50 hover:bg-[#d4af37]/8 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98">
-                                <span>中文 / 华语</span><span className="text-[9px] text-[#d4af37] font-semibold uppercase tracking-wider">开始</span>
+                              <button type="button" onClick={() => handleLanguageSelect("zh")} className="w-full py-3 px-5 rounded-full border border-slate-200 bg-white hover:border-black/35 hover:bg-slate-50 text-[13px] font-semibold text-[#1a1a1a] transition-all cursor-pointer flex items-center justify-between active:scale-98 group">
+                                <span>中文 / 华语</span><span className="text-[9px] text-slate-400 group-hover:text-black font-semibold uppercase tracking-wider">开始</span>
                               </button>
                             </div>
                           </div>
