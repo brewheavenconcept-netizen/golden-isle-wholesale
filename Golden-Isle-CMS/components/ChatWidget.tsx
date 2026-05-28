@@ -269,8 +269,8 @@ function AvatarBot() {
 
 function AvatarUser() {
   return (
-    <div className="w-8 h-8 rounded-full bg-[#fafaf8] border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
-      <User className="w-[14px] h-[14px] text-[#1a1a1a]" />
+    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#d4af37]/10 via-[#d4af37]/5 to-[#d4af37]/20 border border-[#d4af37]/45 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(212,175,55,0.12)]">
+      <User className="w-[14px] h-[14px] text-[#1a1a1a]" strokeWidth={2.5} />
     </div>
   );
 }
@@ -812,7 +812,7 @@ function SuggestionChips({ text, onSelect, lang }: { text: string; onSelect: (op
         <button
           key={`chip-${chip.query}-${idx}`}
           onClick={() => onSelect(chip.query)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#d4af37]/8 border border-[#d4af37]/25 hover:bg-[#d4af37]/15 hover:border-[#d4af37]/45 transition-all text-[12px] font-semibold text-[#d4af37] active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#fafaf9] border border-[#d4af37]/25 hover:bg-[#d4af37]/5 hover:border-[#d4af37]/50 transition-all text-[12px] font-semibold text-[#1a1a1a] shadow-[0_2px_6px_rgba(0,0,0,0.015)] active:scale-95 cursor-pointer"
         >
           <span>{chip.label}</span>
         </button>
