@@ -3,7 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
-import GlowingOrb from "./GlowingOrb";
+import dynamic from "next/dynamic";
+
+const GlowingOrb = dynamic(() => import("./GlowingOrb"), { ssr: false });
+
 import {
   Send,
   Loader2,
