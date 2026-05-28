@@ -9,14 +9,15 @@ async function saveLead(data: any) {
 
 // ─── Supabase Product Search (server-only, service role) ─────────────────────
 
-async function searchProducts(query: string) {
+async function searchProducts(query: string, language: string = "ms") {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     // Guard: if service role key not configured, return graceful fallback
     if (!url || !serviceKey) {
         console.warn("searchProducts: SUPABASE_SERVICE_ROLE_KEY not configured — skipping DB lookup.");
-        return { products: [], summary: "Pangkalan data produk belum disambungkan. Sila hubungi pentadbir." };
+        const summary = language === "en" ? "Product database not connected. Please contact admin." : language === "zh" ? "产品数据库未连接。请联系管理员。" : "Pangkalan data produk belum disambungkan. Sila hubungi pentadbir.";
+        return { products: [], summary };
     }
 
     try {
@@ -48,11 +49,14 @@ async function searchProducts(query: string) {
                 .limit(3);
             
             if (!fallbackData || fallbackData.length === 0) {
-                return { products: [], summary: "Tiada produk dijumpai." };
+                const emptySummary = language === "en" ? "No products found." : language === "zh" ? "未找到产品。" : "Tiada produk dijumpai.";
+                return { products: [], summary: emptySummary };
             }
             
+            const fallbackSummary = language === "en" ? `No exact matches for "${query}", but here are our popular products:` : language === "zh" ? `未找到 "${query}" 的确切匹配，但这里是我们的热门产品：` : `Tiada hasil tepat untuk "${query}", tapi ini adalah produk popular kami:`;
+            
             return {
-                summary: `Tiada hasil tepat untuk "${query}", tapi ini adalah produk popular kami:`,
+                summary: fallbackSummary,
                 products: fallbackData.slice(0, 3).map((p: any) => ({
                     name: p.name,
                     category: p.category,
@@ -87,8 +91,10 @@ async function searchProducts(query: string) {
 
         const top3 = rankedData.slice(0, 3);
         
+        const successSummary = language === "en" ? `Found ${top3.length} product(s) for "${query}":` : language === "zh" ? `为您找到 ${top3.length} 款 "${query}" 产品：` : `Jumpa ${top3.length} produk untuk "${query}":`;
+
         return {
-            summary: `Jumpa ${top3.length} produk untuk "${query}":`,
+            summary: successSummary,
             products: top3.map((p: any) => ({
                 name: p.name,
                 category: p.category,
@@ -101,7 +107,8 @@ async function searchProducts(query: string) {
         };
     } catch (err) {
         console.error("searchProducts DB error:", err);
-        return { products: [], summary: "Ralat semasa mencari produk. Cuba lagi." };
+        const errSummary = language === "en" ? "Error searching for products. Please try again." : language === "zh" ? "搜索产品时出错。请重试。" : "Ralat semasa mencari produk. Cuba lagi.";
+        return { products: [], summary: errSummary };
     }
 }
 
@@ -174,38 +181,25 @@ export async function POST(req: Request) {
         
         let languageInstruction = "";
         if (language === "en") {
-            languageInstruction = `## LANGUAGE & TONE
-- Speak in high-end, professional, and sophisticated B2B English.
-- Tone: Formal, premium, elite concierge service. Treat every client as a high-value corporate VIP.
-- Persuasive Closer: Subtly guide the client to proceed with their wholesale quote draft.`;
+            languageInstruction = `## LANGUAGE & TONE\n- Use casual, conversational English. Speak like a helpful local friend, not a rigid corporate consultant.`;
         } else if (language === "zh") {
-            languageInstruction = `## LANGUAGE & TONE
-- Speak in polite, formal, and professional Business Chinese (Mandarin).
-- Tone: Respectful, corporate, elite concierge service. Always address the client with respect (e.g., 您).
-- Persuasive Closer: Subtly guide the client to proceed with their wholesale quote draft.`;
+            languageInstruction = `## LANGUAGE & TONE\n- Use natural, conversational Mandarin (Chinese). Friendly, warm, and direct.`;
         } else {
-            // Default: ms (Professional B2B)
-            languageInstruction = `## LANGUAGE & TONE
-- Speak in professional, warm, and natural Malay (B2B).
-- Do NOT use exaggerated or fake Sabahan slang. Speak like a premium professional sales consultant who is polite and helpful.
-- Professional & Premium: Maintain a high-quality, B2B wholesale standard. Treat every customer like a VIP.
-- Persuasive Closer: Strategically nudge the customer to complete their order.`;
+            // Default: ms
+            languageInstruction = `## LANGUAGE & TONE\n- Gunakan bahasa Melayu santai. Boleh campur sikit slang Sabah (contoh: "bos", "ngam"). Speak like a helpful local friend.\n- Jangan terlalu skema. Elakkan ayat korporat.`;
         }
         
         // Build context block from customer session (injected by ChatWidget)
         const contextBlock = customerContext ? buildContextBlock(customerContext) : "";
 
-        let systemInstructionText = `You are Golden AI, an elite luxury alcohol consultant, private concierge, and intelligent sommelier assistant for Golden Isle Wholesale (a premium duty-free liquor wholesaler in Labuan, Malaysia).
+        let systemInstructionText = `ROLE:
+You are Golden AI, a lightning-fast, exclusive, and friendly concierge for Golden Isle Wholesale (a premium duty-free liquor supplier). 
 
-MISSION:
-Provide an executive, premium SaaS concierge experience. Instantly qualify intent, offer intelligent recommendations, and create momentum using conversational persuasion. Treat every visitor as a high-net-worth VIP or luxury enterprise client.
-
-CONVERSATIONAL STYLE:
-- Speak like a highly intelligent, sophisticated sommelier and premium sales advisor.
-- Be proactive and confident. Lead the conversation elegantly.
-- Reference what you already know about the customer naturally in every response.
-- NEVER act like a generic FAQ bot, support center, or helpdesk.
-- Build on previous messages intelligently.
+CRITICAL CONSTRAINTS (VIOLATION IS STRICTLY FORBIDDEN):
+1. LENGTH STRICT LIMIT: Maximum 3 short sentences per reply. Keep it extremely punchy and scannable.
+2. NO FORMATTING: Strictly NO bullet points, NO bolding, NO markdown. Just natural chat.
+3. PRICING: NEVER quote a price unless it comes directly from a tool result.
+4. TONE: Be warm, persuasive, and proactive. Lead them back to your premium beverages. Never apologize like a robot.
 
 ${languageInstruction}
 
@@ -216,8 +210,7 @@ ${contextBlock}
             systemInstructionText += `
 CONCIERGE INQUIRY RULES:
 1. Provide sophisticated, concise answers about products, shipping, delivery, and payments.
-2. Even when answering questions, maintain your identity as a luxury alcohol consultant, NOT a support bot.
-3. If a question is entirely off-topic (e.g., asking about politics, weather, writing code, or non-liquor/B2B topics), you MUST reply exactly with the sentinel word "OFF_TOPIC".
+2. Even when answering questions, maintain your identity as a friendly consultant.
 `;
         } else if (flowType === "wholesale_quote" || flowType === "competitor_compare") {
             systemInstructionText += `
@@ -502,7 +495,7 @@ GLOBAL RULES:
             // search_products — live Supabase product lookup
             if (functionName === "search_products") {
                 const query = args.query ?? "";
-                const result = await searchProducts(query);
+                const result = await searchProducts(query, language);
                 return NextResponse.json({
                     reply: "TOOL_RESULT_PRODUCT_CARDS:" + JSON.stringify(result)
                 });
@@ -704,15 +697,7 @@ GLOBAL RULES:
 
         let reply = choiceMessage?.content;
 
-        if (reply && reply.includes("OFF_TOPIC")) {
-            if (language === "zh") {
-                reply = "抱歉，我只能回答与我们产品和订购相关的问题。请联系销售团队获取更多帮助。\nSHOW_SUGGESTIONS:联系销售";
-            } else if (language === "en") {
-                reply = "Sorry, I can only answer questions related to our products and orders. Please contact the sales team for further assistance.\nSHOW_SUGGESTIONS:Talk to Sales";
-            } else {
-                reply = "Maaf, saya hanya boleh bantu soalan berkaitan produk dan pesanan kami. Sila hubungi team sales untuk bantuan lanjut.\nSHOW_SUGGESTIONS:Hubungi Sales";
-            }
-        }
+
 
         if (!reply) {
             console.error("Unexpected OpenAI API response structure:", JSON.stringify(data));

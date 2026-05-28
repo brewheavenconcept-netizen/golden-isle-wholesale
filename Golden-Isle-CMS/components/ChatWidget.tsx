@@ -1312,6 +1312,7 @@ function ConciergeEntryView({ onSelect }: { onSelect: (card: typeof CONCIERGE_CA
 }
 
 function appendSuggestionsIfMissing(reply: string, lang: Language): string {
+  if (reply.startsWith("TOOL_RESULT")) return reply;
   if (reply.includes("SHOW_SUGGESTIONS:")) return reply;
 
   const q = reply.toLowerCase();
