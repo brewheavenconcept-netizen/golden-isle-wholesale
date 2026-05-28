@@ -952,9 +952,9 @@ function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; fl
   const activeIdx = (config?.activeMap as any)?.[step] ?? 0;
 
   return (
-    <div className="bg-[#ffffff] px-6 py-2.5 border-b border-[#d4af37]/10 flex items-center justify-between select-none shrink-0">
+    <div className="bg-white/40 backdrop-blur-md px-6 py-2.5 border-b border-[#d4af37]/10 flex items-center justify-between select-none shrink-0">
       <div className="flex items-center justify-between w-full relative">
-        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-250 -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-200/60 -translate-y-1/2 z-0" />
         <div
           className="absolute top-1/2 left-0 h-[2px] bg-[#D4AF37] -translate-y-1/2 z-0 transition-all duration-500 ease-out"
           style={{ width: `${(activeIdx / Math.max(stages.length - 1, 1)) * 100}%` }}
@@ -962,7 +962,7 @@ function ProgressTracker({ step, flowType, cartCount = 0 }: { step: ChatStep; fl
         {stages.map((stage, idx) => {
           const isCartStage = stage.toLowerCase() === "cart" || stage.toLowerCase() === "quote";
           return (
-            <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-[#ffffff] px-2 first:pl-0 last:pr-0">
+            <div key={`stage-${stage}-${idx}`} className="flex flex-col items-center relative z-10 bg-transparent px-2 first:pl-0 last:pr-0">
               {isCartStage ? (
                 <div className="relative">
                   <motion.div
