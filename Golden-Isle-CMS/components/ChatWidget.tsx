@@ -261,8 +261,8 @@ const TRANSLATIONS = {
 
 function AvatarBot() {
   return (
-    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#1a1a1a] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-      <Bot className="w-[14px] h-[14px] text-white" />
+    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-sm flex items-center justify-center bg-transparent">
+      <GlowingOrb size={32} />
     </div>
   );
 }
@@ -1332,22 +1332,67 @@ function appendSuggestionsIfMissing(reply: string, lang: Language): string {
   return `${reply}\nSHOW_SUGGESTIONS:${suggestions.join(",")}`;
 }
 
-// ─── GreetingMenuView — Main Intent Menu ──────────────────────────────────────
+function TypingText({ text, speed = 25 }: { text: string; speed?: number }) {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    let startLength = 0;
+    
+    if (text.startsWith("What") || text.startsWith("Apa")) {
+      const spaceIdx = text.indexOf(" ");
+      startLength = spaceIdx > 0 ? spaceIdx : 0;
+    } else {
+      startLength = Math.min(text.length, 2);
+    }
+    
+    const firstPart = text.substring(0, startLength);
+    const restPart = text.substring(startLength);
+    
+    setDisplayedText(firstPart);
+    
+    let current = firstPart;
+    let i = 0;
+    
+    if (!restPart) {
+      setDisplayedText(text);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      if (i < restPart.length) {
+        current += restPart.charAt(i);
+        setDisplayedText(current);
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return (
+    <span>
+      {displayedText}
+      <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-fuchsia-500/80 animate-[pulse_0.8s_infinite] align-middle" />
+    </span>
+  );
+}
 
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
   const getGreetingData = () => {
     const hr = new Date().getHours();
     if (lang === "zh") {
       const greeting = hr < 12 ? "早上好。" : hr < 18 ? "下午好。" : "晚上好。";
-      return { greeting, sub: "老板，今天我们来采购和同步什么呢？" };
+      return { greeting, sub: "今天 Golden AI 能为您提供什么帮助呢？" };
     }
     if (lang === "ms") {
       const greeting = hr < 12 ? "Selamat pagi." : hr < 14 ? "Selamat tengah hari." : hr < 19 ? "Selamat petang." : "Selamat malam.";
-      return { greeting, sub: "Apa kita mahu source & sync hari ini bosku?" };
+      return { greeting, sub: "Bagaimanakah Golden AI dapat membantu anda hari ini?" };
     }
     // Default English
     const greeting = hr < 12 ? "Good morning." : hr < 18 ? "Good afternoon." : "Good evening.";
-    return { greeting, sub: "What would you like to source & sync today, boss?" };
+    return { greeting, sub: "How can Golden AI assist you today?" };
   };
 
   const { greeting, sub } = getGreetingData();
@@ -1356,39 +1401,17 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
     <div className="h-full flex flex-col justify-between overflow-y-auto px-5 py-6 space-y-6">
       
       {/* Spatial UI Header */}
-      <header className="pt-2 px-1 flex flex-col gap-5 relative select-none shrink-0">
+      <header className="pt-2 px-1 flex flex-col gap-3 relative select-none shrink-0">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
-            {/* 2026 Tech Details */}
-            <div className="flex items-center gap-1.5 font-mono text-[9.5px] text-fuchsia-600/90 tracking-[0.25em] uppercase font-bold">
-              <Orbit size={11} className="animate-[spin_4s_linear_infinite] text-fuchsia-500" />
-              <span>Golden.AI v26.4</span>
-            </div>
-            <h1 className="text-3xl font-light tracking-tighter text-gray-900 mt-2">
-              {greeting}
+            <h1 className="text-3xl font-light tracking-tighter text-gray-900 mt-2 flex items-center gap-1.5">
+              {greeting} <span className="text-[#d4af37] font-normal animate-[pulse_3s_infinite]">✨</span>
             </h1>
-          </div>
-          
-          {/* Holographic Avatar with Gradient Aura */}
-          <div className="relative group cursor-pointer shrink-0">
-            <div className="absolute -inset-1.5 bg-gradient-to-tr from-fuchsia-500 via-yellow-400 to-violet-500 rounded-full blur-md opacity-40 group-hover:opacity-75 transition duration-500 animate-[spin_6s_linear_infinite]" />
-            <div className="relative w-12 h-12 bg-white/70 backdrop-blur-xl border border-white/85 rounded-full flex items-center justify-center overflow-hidden shadow-sm">
-              <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-500/20 via-yellow-400/20 to-violet-500/20" />
-              <div className="relative w-7 h-7 rounded-full bg-white/85 border border-fuchsia-100 flex items-center justify-center shadow-inner">
-                <Sparkles size={13} className="text-fuchsia-500" />
-              </div>
-              <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#2DD4BF] rounded-full border-2 border-white shadow-[0_0_8px_rgba(45,212,191,0.6)] z-10" />
-            </div>
           </div>
         </div>
 
-        <p className="text-[15.5px] text-slate-500 font-light leading-relaxed">
-          {sub.split("source & sync").map((part, index, arr) => (
-            <React.Fragment key={index}>
-              {part}
-              {index < arr.length - 1 && <span className="text-gray-955 font-semibold">source & sync</span>}
-            </React.Fragment>
-          ))}
+        <p className="text-[15.5px] text-slate-500 font-light leading-relaxed min-h-[44px]">
+          <TypingText text={sub} speed={25} />
         </p>
       </header>
 
@@ -1406,34 +1429,40 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
           {/* Inner Glass Card */}
           <div className="relative bg-white/70 backdrop-blur-2xl rounded-[28px] p-5.5 flex items-center gap-4.5 border border-white group-hover:bg-white/90 transition-colors">
             
-            {/* Dynamic Icon Center */}
-            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-fuchsia-50 to-violet-50 flex items-center justify-center border border-white shadow-inner overflow-hidden shrink-0">
-               <div className="absolute inset-0 bg-gradient-to-tr from-fuchsia-400/20 to-yellow-400/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-               <Sparkles size={20} className="text-fuchsia-500 relative z-10 animate-pulse" strokeWidth={1.5} />
+            {/* Dynamic Glowing Orb Animation */}
+            <div className="shrink-0 flex items-center justify-center w-12 h-12 bg-transparent rounded-full overflow-hidden">
+               <GlowingOrb size={46} />
             </div>
 
             <div className="flex-1 text-left min-w-0">
-              <h3 className="text-[15px] font-bold text-gray-900 mb-0.5 group-hover:text-fuchsia-600 transition-colors">Ask Golden AI</h3>
-              <p className="text-[11.5px] text-slate-500 font-semibold truncate">Auto-quote & inventory sync</p>
+              <h3 className="text-[15.5px] font-bold text-gray-900 mb-0.5 group-hover:text-fuchsia-600 transition-colors flex items-center gap-1">
+                {lang === "zh" ? "咨询 Golden AI" : lang === "ms" ? "Tanya Golden AI" : "Ask Golden AI"}
+                <span className="text-[#d4af37]">✨</span>
+              </h3>
+              <p className="text-[11.5px] text-slate-400 font-medium">
+                {lang === "zh" ? "即时获取批发报价" : lang === "ms" ? "Sebutharga borong segera" : "Instant wholesale quotes"}
+              </p>
             </div>
 
-            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center group-hover:translate-x-1 transition-transform border border-slate-100 shadow-sm shrink-0">
-              <ChevronRight size={14} className="text-slate-400 group-hover:text-fuchsia-500" />
+            <div className="w-7 h-7 rounded-full bg-[#fafaf9] flex items-center justify-center group-hover:scale-105 transition-transform border border-slate-100/80 shadow-sm shrink-0">
+              <ChevronRight size={14} className="text-[#d4af37]" />
             </div>
           </div>
         </button>
 
         <div className="grid grid-cols-2 gap-3.5">
-          {/* Action 2: Catalog */}
+          {/* Action 2: Browse Product */}
           <button
             onClick={() => onSelect("browse_products")}
             className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
           >
             <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
-              <Globe size={18} className="text-slate-400 group-hover:text-fuchsia-500 transition-colors" strokeWidth={1.5} />
+              <LayoutGrid size={18} className="text-[#d4af37]" strokeWidth={1.5} />
               <div>
-                <h4 className="text-[13.5px] font-bold text-gray-800">Catalog</h4>
-                <p className="text-[10.5px] text-slate-500 mt-0.5 font-semibold">Browse globals</p>
+                <h4 className="text-[13.5px] font-bold text-gray-800">Browse Product</h4>
+                <p className="text-[10.5px] text-slate-400 mt-0.5 font-semibold">
+                  {lang === "zh" ? "浏览产品目录" : lang === "ms" ? "Teroka katalog" : "Explore catalog"}
+                </p>
               </div>
             </div>
           </button>
@@ -1444,15 +1473,25 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
           >
             <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
-              <Mic size={18} className="text-slate-400 group-hover:text-fuchsia-500 transition-colors" strokeWidth={1.5} />
+              <Mic size={18} className="text-[#d4af37]" strokeWidth={1.5} />
               <div>
                 <h4 className="text-[13.5px] font-bold text-gray-800">Talk to Sales</h4>
-                <p className="text-[10.5px] text-slate-500 mt-0.5 font-semibold">Human link</p>
+                <p className="text-[10.5px] text-slate-400 mt-0.5 font-semibold">
+                  {lang === "zh" ? "联系销售团队" : lang === "ms" ? "Hubungi jualan" : "Human link"}
+                </p>
               </div>
             </div>
           </button>
         </div>
       </div>
+
+      {/* Secure Trust Footer */}
+      <footer className="pt-2 pb-0.5 flex items-center justify-center gap-1.5 text-[8.5px] font-bold tracking-[0.25em] text-slate-400 uppercase select-none shrink-0 border-t border-slate-100/10">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-2.5 h-2.5 text-slate-400/80 mr-0.5">
+          <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clipRule="evenodd" />
+        </svg>
+        <span>Secure • Private • Trusted</span>
+      </footer>
     </div>
   );
 }
@@ -2574,9 +2613,14 @@ export default function ChatWidget() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <div className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200/50 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Online
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 select-none px-1.5 py-1">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.8)]"></span>
+                  </span>
+                  <span className="tracking-wider uppercase text-[9.5px]">
+                    {lang === "zh" ? "在线" : lang === "ms" ? "Aktif" : "Online"}
+                  </span>
                 </div>
                 {!isMobile && (
                   <button type="button" onClick={() => setIsOpen(false)}
