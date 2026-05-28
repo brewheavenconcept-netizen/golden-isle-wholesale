@@ -54,7 +54,7 @@ export function HeroSection() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
                 aria-hidden
-                className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[52%] -z-0 opacity-25 sm:opacity-35 lg:opacity-100"
+                className="absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[52%] -z-0 opacity-25 sm:opacity-35 lg:opacity-100"
                 style={{
                     // Gradient mask: left edge fades to transparent so bottles
                     // dissolve into the cream background — NO visible box edge
