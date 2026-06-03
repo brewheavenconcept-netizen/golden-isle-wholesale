@@ -2466,7 +2466,7 @@ export default function ChatWidget() {
                 }}
                 onClick={() => setIsOpen(true)}
                 style={{ zIndex: 9999 }}
-                className="fixed bottom-[26px] right-20 sm:right-[88px] mr-2 z-[9999] flex flex-col p-4 rounded-2xl bg-white border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.005)] max-w-[270px] sm:max-w-xs text-left select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                className="hidden sm:flex fixed bottom-[26px] right-20 sm:right-[88px] mr-2 z-[9999] flex-col p-4 rounded-2xl bg-white border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.005)] max-w-[270px] sm:max-w-xs text-left select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
               >
                 {/* Absolute Close Button */}
                 <button
