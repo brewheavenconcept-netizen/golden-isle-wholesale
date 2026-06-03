@@ -118,19 +118,26 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
                         {/* Logo — click 5x to access admin */}
-                        <div onClick={handleLogoClick} className="flex-shrink-0 flex items-center gap-3 cursor-pointer select-none">
+                        <div onClick={handleLogoClick} className="flex-shrink-0 flex items-center gap-2.5 cursor-pointer select-none">
                             <img 
                                 src="https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/logo_crest.png" 
-                                alt="Golden Isle Logo" 
-                                className="h-11 w-auto object-contain"
+                                alt="Golden Isle Emblem" 
+                                style={{ height: "44px" }}
+                                className="w-auto object-contain"
                             />
-                            <div className="flex flex-col">
-                                <span className="font-display font-extrabold text-lg tracking-wider text-[#1a1a1a] leading-none">
-                                    GOLDEN ISLE
-                                </span>
-                                <span className="text-[9px] uppercase font-black tracking-[0.25em] text-[#b8960c] mt-0.5">
-                                    WHOLESALE
-                                </span>
+                            <div className="flex flex-col justify-center gap-1">
+                                <img 
+                                    src="https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/logo_brand_text.png" 
+                                    alt="GOLDEN ISLE" 
+                                    style={{ height: "17px" }}
+                                    className="w-auto object-contain block"
+                                />
+                                <img 
+                                    src="https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/logo_wholesale_text.png" 
+                                    alt="WHOLESALE" 
+                                    style={{ height: "11px" }}
+                                    className="w-auto object-contain block"
+                                />
                             </div>
                         </div>
 
