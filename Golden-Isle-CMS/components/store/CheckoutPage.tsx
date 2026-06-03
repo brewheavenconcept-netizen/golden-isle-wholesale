@@ -22,8 +22,25 @@ export default function CheckoutPage() {
 
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [notes, setNotes] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+
+    const validatePhone = (value: string) => {
+        const cleaned = value.replace(/[^0-9+]/g, "");
+        if (!cleaned) return "Nombor telefon diperlukan";
+        const regex = /^(\+?6?01)[0-9]{7,9}$/;
+        if (!regex.test(cleaned)) {
+            return "Format nombor salah. Contoh: +60123456789 atau 0123456789";
+        }
+        return "";
+    };
+
+    const handlePhoneChange = (val: string) => {
+        setPhone(val);
+        setPhoneError(validatePhone(val));
+    };
 
     const [stockError, setStockError] = useState<string | null>(null);
     const [products, setProducts] = useState<any[]>([]);
@@ -103,6 +120,19 @@ export default function CheckoutPage() {
             return;
         }
 
+        const phoneErr = validatePhone(phone);
+        if (phoneErr) {
+            toast.error(phoneErr);
+            setPhoneError(phoneErr);
+            return;
+        }
+
+        // Normalize phone number to 601XXXXXXXX for standard WhatsApp / database storage
+        let normalizedPhone = phone.replace(/[^0-9]/g, "");
+        if (normalizedPhone.startsWith("0")) {
+            normalizedPhone = "6" + normalizedPhone;
+        }
+
         if (!method) {
             toast.error('Please select a payment method');
             return;
@@ -118,7 +148,7 @@ export default function CheckoutPage() {
             const newOrder: Order = {
                 id: `ORD-${Date.now()}`,
                 customer_name: fullName,
-                customer_phone: phone,
+                customer_phone: normalizedPhone,
                 delivery_address: address,
                 customer_notes: notes,
                 items: cart.map(item => ({
@@ -146,6 +176,34 @@ export default function CheckoutPage() {
             }
 
             clearCart();
+
+            // 🔔 Trigger Telegram + Google Sheets + Email notification
+            try {
+                const cartItems = cart.map(item => ({
+                    name: item.product.name,
+                    category: (item.product as any).category || 'Beverage',
+                    price: `RM ${item.product.price.toFixed(2)}`,
+                    priceNum: item.product.price,
+                    quantity: item.qty,
+                    total: `RM ${(item.product.price * item.qty).toFixed(2)}`
+                }));
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'order_created',
+                        orderId: newOrder.id,
+                        name: fullName,
+                        phone,
+                        email: email || null,
+                        language: 'en',
+                        cart: cartItems,
+                        timestamp: newOrder.created_at
+                    })
+                }).catch(err => console.warn('Notification error:', err));
+            } catch (e) {
+                console.warn('Could not trigger notifications:', e);
+            }
 
 
 
@@ -291,14 +349,29 @@ export default function CheckoutPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number / WhatsApp <span className="text-red-500">*</span></label>
                                 <input
                                     required
                                     type="tel"
                                     value={phone}
-                                    onChange={e => setPhone(e.target.value)}
+                                    onChange={e => handlePhoneChange(e.target.value)}
+                                    className={`w-full border ${phoneError ? 'border-rose-400 focus:ring-rose-500' : 'border-slate-300 focus:ring-blue-500'} rounded-lg p-3 text-sm outline-none text-slate-900`}
+                                    placeholder="e.g. +60123456789"
+                                />
+                                {phoneError && (
+                                    <p className="text-xs text-rose-500 mt-1 font-medium">{phoneError}</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Email Address <span className="text-xs text-slate-400 font-normal">(untuk terima PDF Invois)</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
                                     className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
-                                    placeholder="e.g. 012-3456789"
+                                    placeholder="e.g. customer@email.com"
                                 />
                             </div>
                             <div>

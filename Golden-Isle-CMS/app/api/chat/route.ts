@@ -1,10 +1,506 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { buildContextBlock } from "@/lib/contextBuilder";
+import { generateInvoicePdf } from "@/lib/pdfGenerator";
+// Note: Resend is imported dynamically below to avoid build errors when key is missing
 
 async function saveLead(data: any) {
-    // TODO: replace with Google Sheets webhook URL
-    console.log("Saving lead to Google Sheets:", data);
+    console.log("Processing lead capture:", data);
+    
+    const googleWebhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+    const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+    const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+
+    // Hitung kuantiti total, jumlah harga, dan kategori produk daripada cart (jika ada)
+    let totalQty = 0;
+    let totalAmount = 0;
+    const categoriesSet = new Set<string>();
+
+    if (data.cart && Array.isArray(data.cart)) {
+        data.cart.forEach((item: any) => {
+            const qty = Number(item.quantity) || 0;
+            totalQty += qty;
+            
+            const priceNum = item.priceNum || parseFloat((item.price || "0").replace(/[^0-9.]/g, ""));
+            if (!isNaN(priceNum)) {
+                totalAmount += priceNum * qty;
+            }
+            
+            if (item.category) {
+                categoriesSet.add(item.category);
+            }
+        });
+    }
+
+    // Sediakan nilai muktamad (fallback kepada pengiraan cart jika data asal kosong)
+    const finalQuantity = data.quantity || (totalQty > 0 ? totalQty : "");
+    const finalBudget = data.budget || (totalAmount > 0 ? `RM ${totalAmount.toFixed(2)}` : "");
+    const categoriesArray = Array.from(categoriesSet);
+    const finalPreference = data.preference || (categoriesArray.length > 0 ? categoriesArray.join(", ") : "");
+
+    // Gabungkan dalam satu payload dengan semua variasi nama kunci (keys) untuk Google Sheets
+    const payload = {
+        ...data,
+        quantity: finalQuantity,
+        kuantiti: finalQuantity,
+        budget: finalBudget,
+        bajet: finalBudget,
+        preference: finalPreference,
+        minat_produk: finalPreference,
+        minatProduk: finalPreference
+    };
+
+    // Sediakan janji-janji (promises) untuk diproses serentak
+    const tasks = [];
+
+    // 1. Tembak Google Sheets Webhook
+    if (googleWebhookUrl) {
+        tasks.push(
+            fetch(googleWebhookUrl, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (res.ok) console.log("✅ Lead successfully sent to Google Sheets!");
+                else console.warn("⚠️ Google Sheets Webhook returned error status:", res.status);
+            })
+            .catch(err => console.error("❌ Failed to send lead to Google Sheets:", err))
+        );
+    } else {
+        console.log("ℹ️ GOOGLE_SHEET_WEBHOOK_URL not configured — skipping Google Sheets update.");
+    }
+
+    // Bina pautan PDF invois dan WhatsApp (untuk order_created)
+    // Fix: guna parentheses untuk elak operator precedence bug (|| vs ternary)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    const invoiceUrl = `${appUrl}/api/invoice/${payload.orderId}`;
+    
+    // Pautan WhatsApp ringkas untuk admin Telegram (elak URL panjang yang break Markdown parser)
+    const customerPhone = payload.phone ? payload.phone.replace(/[^0-9]/g, "") : "";
+    // Nota: guna link ringkas wa.me sahaja — URL pre-filled yang panjang boleh break Telegram Markdown
+    const whatsappLink = customerPhone ? `https://wa.me/${customerPhone}` : null;
+
+    // 2. Tembak Telegram Bot API untuk alert instant
+    if (telegramBotToken && telegramChatId) {
+        // Susun format mesej Telegram yang cantik
+        let messageText = "";
+        if (payload.action === "order_created") {
+            messageText = `🎉 *[GOLDEN ISLE - NEW ORDER SUCCESS!]* 💰\n\n`;
+            messageText += `🆔 *Order ID:* \`${payload.orderId}\`\n`;
+            messageText += `👤 *Pelanggan:* \`${payload.name || "Anonymous"}\` (${payload.phone || "No Phone"})\n`;
+            messageText += `🌐 *Bahasa:* \`${payload.language?.toUpperCase() || "MS"}\`\n`;
+            if (payload.quantity) messageText += `📦 *Jumlah Kuantiti:* \`${payload.quantity} unit\`\n`;
+            messageText += `\n📄 *PDF Invoice:* ${invoiceUrl}\n`;
+            if (whatsappLink) messageText += `💬 *Hubungi Pelanggan:* [Klik WhatsApp](${whatsappLink})\n`;
+        } else {
+            messageText = `🍻 *[GOLDEN ISLE - NEW LEAD]* 🚨\n\n`;
+            messageText += `👤 *Status:* \`${payload.action === "whatsapp_click" ? "📞 Klik WhatsApp" : "🛒 Tambah Troli"}\`\n`;
+            messageText += `🌐 *Bahasa:* \`${payload.language?.toUpperCase() || "MS"}\`\n`;
+            
+            if (payload.budget) messageText += `💰 *Budget:* \`${payload.budget}\`\n`;
+            if (payload.quantity) messageText += `📦 *Kuantiti:* \`${payload.quantity}\`\n`;
+            if (payload.preference) messageText += `⭐ *Minat:* \`${payload.preference}\`\n`;
+        }
+        
+        if (payload.cart && payload.cart.length > 0) {
+            messageText += `\n*🛒 Draf Troli (Sebut Harga):*\n`;
+            payload.cart.forEach((item: any) => {
+                messageText += `- ${item.quantity}x ${item.name} (${item.price || item.total})\n`;
+            });
+            
+            messageText += `\n💵 *Jumlah Draf:* *RM ${totalAmount.toFixed(2)}*\n`;
+        }
+
+        messageText += `\n⏰ *Waktu:* _${new Date(payload.timestamp || Date.now()).toLocaleString("en-MY", { timeZone: "Asia/Kuala_Lumpur" })}_`;
+
+        const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+        
+        tasks.push(
+            fetch(telegramUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: telegramChatId,
+                    text: messageText,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(res => {
+                if (res.ok) console.log("✅ Lead notification sent to Telegram!");
+                else console.warn("⚠️ Telegram API returned error status:", res.status);
+            })
+            .catch(err => console.error("❌ Failed to send Telegram alert:", err))
+        );
+
+        // 3. Tambahan: Jika order baru berjaya dibina, jana PDF Sebut Harga & hantar terus ke Telegram
+        if (payload.action === "order_created") {
+            tasks.push(
+                generateInvoicePdf(payload)
+                    .then(async (pdfBuffer) => {
+                        const telegramDocUrl = `https://api.telegram.org/bot${telegramBotToken}/sendDocument`;
+                        const formData = new FormData();
+                        
+                        // Buat file PDF dari buffer memory menggunakan class File
+                        const file = new File([new Uint8Array(pdfBuffer)], `Quotation_${payload.orderId}.pdf`, { type: "application/pdf" });
+                        formData.append("chat_id", telegramChatId);
+                        formData.append("document", file);
+                        formData.append("caption", `📄 Fail PDF Sebut Harga rasmi untuk Order ID: ${payload.orderId}`);
+
+                        const res = await fetch(telegramDocUrl, {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        if (res.ok) {
+                            console.log("✅ PDF Quotation successfully sent to Telegram!");
+                        } else {
+                            const errBody = await res.text();
+                            console.warn("⚠️ Telegram sendDocument returned error status:", res.status, errBody);
+                            const fs = require("fs");
+                            const path = require("path");
+                            const logPath = path.join(process.cwd(), "scripts", "debug_log.txt");
+                            fs.appendFileSync(logPath, `[${new Date().toISOString()}] sendDocument Failed (Status ${res.status}): ${errBody}\n\n`);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("❌ Failed to generate or send PDF to Telegram:", err);
+                        try {
+                            const fs = require("fs");
+                            const path = require("path");
+                            const logPath = path.join(process.cwd(), "scripts", "debug_log.txt");
+                            fs.appendFileSync(logPath, `[${new Date().toISOString()}] PDF Generation/Send Error: ${err.message}\n${err.stack}\n\n`);
+                        } catch (e) {}
+                    })
+            );
+
+            // 3b. Hantar email ke pelanggan via Resend (jika email & API key ada)
+            const resendApiKey = process.env.RESEND_API_KEY;
+            const customerEmail = payload.email || payload.customerEmail || null;
+
+            if (resendApiKey && customerEmail) {
+                // Bina baris jadual untuk item troli secara dinamik
+                let cartRowsHtml = "";
+                if (payload.cart && Array.isArray(payload.cart) && payload.cart.length > 0) {
+                    cartRowsHtml = payload.cart.map((item: any) => {
+                        const itemQty = item.quantity || 1;
+                        const itemName = item.name || "Produk";
+                        const itemCategory = item.category || "Beverage";
+                        const priceVal = item.priceNum || parseFloat((item.price || "0").replace(/[^0-9.]/g, ""));
+                        const totalVal = (priceVal * itemQty).toFixed(2);
+                        
+                        // Prioritize real image_url from frontend/DB if available, resolving relative paths
+                        let productImgUrl = "";
+                        if (item.image_url) {
+                            if (item.image_url.startsWith("http")) {
+                                productImgUrl = item.image_url;
+                            } else {
+                                const base = appUrl.endsWith("/") ? appUrl.slice(0, -1) : appUrl;
+                                const path = item.image_url.startsWith("/") ? item.image_url : `/${item.image_url}`;
+                                productImgUrl = `${base}${path}`;
+                            }
+                        }
+
+                        // If URL resolves to localhost, it's unreachable by external email servers — clear it
+                        if (productImgUrl.includes("localhost") || productImgUrl.includes("127.0.0.1")) {
+                            productImgUrl = "";
+                        }
+
+                        // Fallback to category-based icons if no image_url resolved
+                        if (!productImgUrl) {
+                            productImgUrl = "https://img.icons8.com/fluency/96/beer.png";
+                            const cat = itemCategory.toLowerCase();
+                            const nameLower = itemName.toLowerCase();
+                            if (cat.includes("whisky") || cat.includes("whiskey") || nameLower.includes("macallan") || nameLower.includes("blue label") || nameLower.includes("glenfiddich") || nameLower.includes("yamazaki")) {
+                                productImgUrl = "https://img.icons8.com/fluency/96/whiskey-bottle.png";
+                            } else if (cat.includes("wine") || nameLower.includes("penfolds") || nameLower.includes("lafite")) {
+                                productImgUrl = "https://img.icons8.com/fluency/96/wine-bottle.png";
+                            } else if (cat.includes("beer") || nameLower.includes("duvel") || nameLower.includes("brewdog")) {
+                                productImgUrl = "https://img.icons8.com/fluency/96/beer-bottle.png";
+                            }
+                        }
+
+                        return `
+                            <tr>
+                                <td style="padding:16px 0;border-bottom:1px solid #E5E7EB;text-align:left;vertical-align:middle;">
+                                    <table border="0" cellpadding="0" cellspacing="0">
+                                      <tr>
+                                        <td style="width:48px;padding-right:12px;vertical-align:middle;">
+                                          <img src="${productImgUrl}" alt="" width="48" height="48" style="width:48px;height:48px;object-fit:contain;border-radius:8px;border:1px solid #E5E7EB;display:block;background-color:#F8FAFC;" />
+                                        </td>
+                                        <td style="vertical-align:middle;">
+                                          <div style="font-size:16px;font-weight:600;color:#0F172A;line-height:1.3;font-family:'Inter',sans-serif;">${itemName}</div>
+                                          <div style="font-size:13px;color:#64748B;margin-top:2px;font-family:'Inter',sans-serif;">${itemCategory}</div>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:16px 8px;border-bottom:1px solid #E5E7EB;font-size:15px;color:#64748B;text-align:center;vertical-align:middle;font-weight:500;font-family:'Inter',sans-serif;width:80px;">
+                                    ${itemQty}
+                                </td>
+                                <td align="right" style="padding:16px 0;border-bottom:1px solid #E5E7EB;font-size:15px;font-weight:700;color:#0F172A;vertical-align:middle;font-family:'Inter',sans-serif;width:110px;">
+                                    RM${totalVal}
+                                </td>
+                            </tr>
+                        `;
+                    }).join("");
+                }
+
+                const orderDateStr = new Date(payload.timestamp || Date.now()).toLocaleDateString("en-MY", {
+                    timeZone: "Asia/Kuala_Lumpur",
+                    dateStyle: "medium"
+                });
+
+                const taxRate = 0.08;
+                const taxAmount = totalAmount * taxRate;
+                const grandTotal = totalAmount + taxAmount;
+
+                const dueDateStr = new Date((payload.timestamp ? new Date(payload.timestamp) : new Date()).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString("en-MY", {
+                    timeZone: "Asia/Kuala_Lumpur",
+                    dateStyle: "medium"
+                });
+
+                const confirmationUrl = `${appUrl}/order-confirmation?orderId=${payload.orderId}`;
+                const adminWhatsapp = "601164073143";
+                const waSupportLink = `https://wa.me/${adminWhatsapp}?text=Salam%20Golden%20Isle%20Wholesale%2C%20saya%20ingin%20rujuk%20Order%20ID%3A%20${payload.orderId}`;
+
+                tasks.push(
+                    generateInvoicePdf(payload)
+                        .then(async (pdfBuffer) => {
+                            const emailRes = await fetch("https://api.resend.com/emails", {
+                                method: "POST",
+                                headers: {
+                                    "Authorization": `Bearer ${resendApiKey}`,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    from: process.env.RESEND_FROM_EMAIL || "Golden Isle Wholesale <onboarding@resend.dev>",
+                                    to: [customerEmail],
+                                    subject: `[Golden Isle] Official Quotation #${payload.orderId}`,
+                                    html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>[Golden Isle] Official Quotation #${payload.orderId}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #F8FAFC;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media only screen and (max-width: 680px) {
+    .container {
+      width: 100% !important;
+      border-radius: 0px !important;
+      border: none !important;
+    }
+    .container-td {
+      padding: 16px !important;
+    }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#F8FAFC;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F8FAFC;padding:48px 16px;">
+<tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="640" class="container" style="max-width:640px;width:100%;background-color:#FFFFFF;border-radius:24px;border:1px solid #E5E7EB;box-shadow:0 1px 3px rgba(0,0,0,0.02),0 8px 24px rgba(0,0,0,0.03);overflow:hidden;border-collapse:separate;">
+<tr><td class="container-td" style="padding:32px;">
+
+<!-- HEADER -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="vertical-align:middle;padding-bottom:16px;border-bottom:1px solid #F1F5F9;">
+      <div style="font-size:12px;font-weight:800;color:#0F172A;letter-spacing:0.08em;text-transform:uppercase;line-height:1.2;font-family:'Inter',sans-serif;">GOLDEN ISLE WHOLESALE</div>
+      <div style="font-size:13px;font-weight:500;color:#64748B;margin-top:4px;font-family:'Inter',sans-serif;">Quotation #${payload.orderId}</div>
+    </td>
+  </tr>
+</table>
+<div style="height:24px;line-height:24px;font-size:24px;">&nbsp;</div>
+
+<!-- HERO AMOUNT CARD -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F8FAFC;border:1px solid #E5E7EB;border-radius:20px;border-collapse:separate;">
+  <tr>
+    <td style="padding:32px;text-align:center;vertical-align:middle;">
+      <div style="font-size:14px;font-weight:500;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;font-family:'Inter',sans-serif;">Amount Due</div>
+      <div style="font-size:48px;font-weight:800;color:#0F172A;letter-spacing:-0.03em;line-height:1.0;margin-bottom:12px;font-family:'Inter',sans-serif;">RM ${grandTotal.toFixed(2)}</div>
+      
+      <!-- Payment Methods -->
+      <div style="font-size:12px;color:#64748B;font-family:'Inter',sans-serif;margin-bottom:16px;font-weight:500;">
+        ✓ FPX &nbsp;&bull;&nbsp; ✓ DuitNow &nbsp;&bull;&nbsp; ✓ Credit Card
+      </div>
+      
+      <!-- Status Timeline -->
+      <div style="display:inline-block;padding-top:16px;border-top:1px solid #E5E7EB;width:100%;max-width:440px;font-size:11px;font-family:'Inter',sans-serif;color:#64748B;">
+        <span style="color:#059669;font-weight:700;">✓ Generated</span> &nbsp;&bull;&nbsp; 
+        <span style="color:#D97706;font-weight:700;">● Awaiting Payment</span> &nbsp;&bull;&nbsp; 
+        <span>○ Processing</span> &nbsp;&bull;&nbsp; 
+        <span>○ Delivered</span>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<!-- GREETING SECTION -->
+<div style="margin-top:32px;font-size:15px;color:#0F172A;line-height:1.6;font-family:'Inter',sans-serif;margin-bottom:24px;">
+  Hi ${payload.name ? payload.name.split(" ")[0] : "Customer"},<br/><br/>
+  Your quotation is ready.
+</div>
+
+<!-- DOCUMENT METADATA INFO -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;border-collapse:separate;">
+  <tr>
+    <td style="padding:0 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <!-- Customer Row -->
+        <tr>
+          <td width="35%" style="width:35%;height:44px;vertical-align:middle;border-bottom:1px solid #F1F5F9;font-size:13px;font-weight:500;color:#64748B;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:0.05em;">Customer</td>
+          <td width="65%" style="width:65%;height:44px;vertical-align:middle;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:600;color:#0F172A;font-family:'Inter',sans-serif;text-align:right;">${payload.name || "Customer"}</td>
+        </tr>
+        <!-- Issued Row -->
+        <tr>
+          <td width="35%" style="width:35%;height:44px;vertical-align:middle;border-bottom:1px solid #F1F5F9;font-size:13px;font-weight:500;color:#64748B;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:0.05em;">Issued</td>
+          <td width="65%" style="width:65%;height:44px;vertical-align:middle;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:600;color:#0F172A;font-family:'Inter',sans-serif;text-align:right;">${orderDateStr}</td>
+        </tr>
+        <!-- Due Date Row -->
+        <tr>
+          <td width="35%" style="width:35%;height:44px;vertical-align:middle;font-size:13px;font-weight:500;color:#64748B;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:0.05em;">Payment Due</td>
+          <td width="65%" style="width:65%;height:44px;vertical-align:middle;font-size:14px;font-weight:600;color:#EF4444;font-family:'Inter',sans-serif;text-align:right;">${dueDateStr}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- ORDER SUMMARY -->
+<div style="margin-top:32px;font-size:16px;font-weight:700;color:#0F172A;margin-bottom:12px;font-family:'Inter',sans-serif;">Order Summary</div>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;border-collapse:separate;">
+  <tr>
+    <td style="padding:24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1.5px solid #E5E7EB;">
+            <th style="padding:0 0 10px 0;text-align:left;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;font-family:'Inter',sans-serif;">Product</th>
+            <th style="padding:0 8px 10px 8px;text-align:center;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;width:80px;font-family:'Inter',sans-serif;">Qty</th>
+            <th style="padding:0 0 10px 0;text-align:right;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;width:110px;font-family:'Inter',sans-serif;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cartRowsHtml}
+          
+          <!-- Pricing Summary Inline -->
+          <tr>
+            <td colspan="2" style="padding:16px 0 8px 0;text-align:right;font-size:13px;color:#64748B;font-family:'Inter',sans-serif;">Subtotal</td>
+            <td style="padding:16px 0 8px 0;text-align:right;font-size:13px;font-weight:600;color:#0F172A;font-family:'Inter',sans-serif;">RM ${totalAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:4px 0 12px 0;text-align:right;font-size:13px;color:#64748B;font-family:'Inter',sans-serif;">SST (8%)</td>
+            <td style="padding:4px 0 12px 0;text-align:right;font-size:13px;font-weight:600;color:#0F172A;font-family:'Inter',sans-serif;">RM ${taxAmount.toFixed(2)}</td>
+          </tr>
+          <tr style="border-top:1.5px solid #E5E7EB;">
+            <td colspan="2" style="padding:16px 0 0 0;text-align:right;font-size:14px;font-weight:700;color:#0F172A;font-family:'Inter',sans-serif;">Total Due</td>
+            <td style="padding:16px 0 0 0;text-align:right;font-size:16px;font-weight:800;color:#2563EB;font-family:'Inter',sans-serif;">RM ${grandTotal.toFixed(2)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- ACTIONS -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:32px;">
+  <tr>
+    <td align="center" style="height:50px;background-color:#2563EB;border-radius:8px;vertical-align:middle;">
+      <a href="${confirmationUrl}" target="_blank" style="display:block;width:100%;height:50px;line-height:50px;color:#FFFFFF;font-size:14px;font-weight:600;text-decoration:none;text-align:center;font-family:'Inter',sans-serif;box-sizing:border-box;">Pay Invoice</a>
+    </td>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:12px;">
+  <tr>
+    <td align="center" style="height:50px;background-color:#FFFFFF;border:1px solid #D1D5DB;border-radius:8px;vertical-align:middle;">
+      <a href="${invoiceUrl}" target="_blank" style="display:block;width:100%;height:48px;line-height:48px;color:#374151;font-size:14px;font-weight:600;text-decoration:none;text-align:center;font-family:'Inter',sans-serif;box-sizing:border-box;">Download PDF</a>
+    </td>
+  </tr>
+</table>
+
+<!-- HELP CARD -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:24px;background-color:#F8FAFC;border:1px solid #E5E7EB;border-radius:16px;border-collapse:separate;">
+  <tr>
+    <td style="padding:20px;vertical-align:middle;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle;font-family:'Inter',sans-serif;">
+            <div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:2px;">Need help with your quotation?</div>
+            <div style="font-size:12px;color:#64748B;line-height:1.4;">Contact our customer support if you need any assistance.</div>
+          </td>
+          <td align="right" style="vertical-align:middle;padding-left:16px;width:150px;white-space:nowrap;">
+            <a href="${waSupportLink}" target="_blank" style="display:inline-block;background-color:#25D366;border:1px solid #1ead57;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;color:#FFFFFF;text-decoration:none;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,0.08);font-family:'Inter',sans-serif;vertical-align:middle;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="16" height="16" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;display:inline-block;border:none;filter:brightness(0) invert(1);" alt="WhatsApp" />WhatsApp Support
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- FOOTER -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:40px;text-align:center;">
+  <tr>
+    <td style="text-align:center;font-family:'Inter',sans-serif;">
+      <div style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:4px;">Golden Isle Wholesale</div>
+      <div style="font-size:13px;color:#64748B;margin-bottom:12px;">Labuan FT, Malaysia &bull; <a href="mailto:${customerEmail}" style="color:#2563EB;text-decoration:none;font-weight:500;">Contact Us</a></div>
+      <div style="font-size:11px;color:#94A3B8;line-height:1.5;max-width:440px;margin:0 auto;">This email is generated automatically. Please ignore if you did not request any quotes or orders from us.</div>
+    </td>
+  </tr>
+</table>
+
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
+                                    attachments: [{
+                                        filename: `Quotation_${payload.orderId}.pdf`,
+                                        content: Buffer.from(pdfBuffer).toString("base64")
+                                    }]
+                                })
+                            });
+                            if (emailRes.ok) console.log(`✅ Invoice email sent to ${customerEmail}!`);
+                            else console.warn("⚠️ Resend email error:", await emailRes.text());
+                        })
+                        .catch(err => console.error("❌ Email send failed:", err))
+                );
+            } else if (resendApiKey && !customerEmail) {
+                console.log("ℹ️ No customer email found — skipping Resend email.");
+            } else {
+                console.log("ℹ️ RESEND_API_KEY not configured — skipping email notification.");
+            }
+        }
+    } else {
+        console.log("ℹ️ TELEGRAM_BOT_TOKEN / CHAT_ID not configured — skipping Telegram notification.");
+    }
+
+    // Jalankan semua task serentak dan tunggu sehingga selesai
+    if (tasks.length > 0) {
+        await Promise.all(tasks);
+        console.log("⚡ All lead integrations completed.");
+    }
+
+    // Pulangkan links yang berguna untuk frontend
+    return {
+        invoiceUrl,
+        whatsappLink
+    };
 }
 
 // ─── Supabase Product Search (server-only, service role) ─────────────────────
@@ -174,6 +670,20 @@ export async function POST(req: Request) {
                 budget: leadContext.budget || "",
                 quantity: leadContext.quantity || "",
                 preference: leadContext.preference || "",
+                timestamp: new Date().toISOString()
+            });
+            return NextResponse.json({ success: true });
+        }
+
+        if (action === "order_created") {
+            await saveLead({
+                action: "order_created",
+                language,
+                cart,
+                orderId: body.orderId,
+                name: body.name,
+                phone: body.phone,
+                email: body.email,
                 timestamp: new Date().toISOString()
             });
             return NextResponse.json({ success: true });
@@ -440,7 +950,8 @@ GLOBAL RULES:
                                     type: "object",
                                     properties: {
                                         customer_name: { type: "string", description: "Nama pelanggan (jika ada)" },
-                                        customer_phone: { type: "string", description: "Nombor telefon pelanggan (jika ada)" }
+                                        customer_phone: { type: "string", description: "Nombor telefon pelanggan (jika ada)" },
+                                        customer_email: { type: "string", description: "Email pelanggan (jika ada)" }
                                     }
                                 }
                             }

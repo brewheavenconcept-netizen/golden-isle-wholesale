@@ -657,9 +657,11 @@ function ToolResultCategories({ text, onSendText, lang }: { text: string; onSend
   );
 }
 
-function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text: string; cart: CartItem[]; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string) => void; lang: Language }) {
-  let data: { customer_name?: string; customer_phone?: string } | null = null;
+function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text: string; cart: CartItem[]; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string, email?: string) => void; lang: Language }) {
+  let data: { customer_name?: string; customer_phone?: string; customer_email?: string } | null = null;
   try { data = JSON.parse(text.substring("TOOL_RESULT_CHECKOUT_CARD:".length)); } catch (e) { }
+
+  const [emailInput, setEmailInput] = useState(data?.customer_email || "");
 
   if (!data || !data.customer_name || !data.customer_phone) {
     return (
@@ -683,17 +685,30 @@ function ToolResultCheckoutCard({ text, cart, onProcessCheckout, lang }: { text:
         <p><strong className="text-[#1a1a1a] font-semibold">Phone:</strong> {data.customer_phone}</p>
         <p><strong className="text-[#1a1a1a] font-semibold">Total:</strong> RM {grandTotal.toFixed(2)}</p>
       </div>
+      
+      <div className="pb-3">
+        <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+          Email Address <span className="text-[9px] text-slate-400 normal-case font-normal">(optional - for PDF Receipt)</span>
+        </label>
+        <input
+          type="email"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          placeholder="e.g. customer@email.com"
+          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-[12px] text-[#1a1a1a] outline-none focus:border-[#d4af37] transition shadow-inner"
+        />
+      </div>
 
-      <div className="pt-2 space-y-2">
-        <button onClick={() => onProcessCheckout('qr', data?.customer_name || '', data?.customer_phone || '')}
+      <div className="pt-2 space-y-2 border-t border-slate-200">
+        <button onClick={() => onProcessCheckout('qr', data?.customer_name || '', data?.customer_phone || '', emailInput)}
           className="w-full text-[12px] font-semibold text-white bg-[#b8960c] hover:bg-[#d4af37] py-3 rounded-full transition-all shadow-[0_4px_12px_rgba(184,150,12,0.15)] active:scale-[0.98] cursor-pointer">
           QR Payment
         </button>
-        <button onClick={() => onProcessCheckout('bank_transfer', data?.customer_name || '', data?.customer_phone || '')}
+        <button onClick={() => onProcessCheckout('bank_transfer', data?.customer_name || '', data?.customer_phone || '', emailInput)}
           className="w-full text-[12px] font-semibold text-[#1a1a1a] bg-white hover:bg-[#fafaf8] py-3 rounded-full transition-all shadow-sm border border-slate-200 cursor-pointer">
           Bank Transfer
         </button>
-        <button onClick={() => onProcessCheckout('whatsapp', data?.customer_name || '', data?.customer_phone || '')}
+        <button onClick={() => onProcessCheckout('whatsapp', data?.customer_name || '', data?.customer_phone || '', emailInput)}
           className="w-full text-[12px] font-semibold text-emerald-600 bg-white border border-slate-200 hover:bg-emerald-50/20 py-3 rounded-full transition-all shadow-sm cursor-pointer">
           Talk to Human Agent
         </button>
@@ -1085,14 +1100,53 @@ function QuoteReviewView({ cart, onBack, onCheckout, onRemove, onUpdateQty, lang
 
 // ─── Checkout Details View ───────────────────────────────────────────────────
 
-function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; onSubmit: (name: string, phone: string) => void; lang: Language }) {
+function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; onSubmit: (name: string, phone: string, email: string) => void; lang: Language }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhone = (value: string) => {
+    // Strip everything except digits and plus sign
+    const cleaned = value.replace(/[^0-9+]/g, "");
+    if (!cleaned) {
+      return lang === "zh" ? "请输入手机号码" : lang === "en" ? "Phone number is required" : "Nombor telefon diperlukan";
+    }
+    
+    // Malaysian mobile numbers check:
+    // Raw regex: starts with +601, 601, or 01, followed by 7-9 digits
+    const regex = /^(\+?6?01)[0-9]{7,9}$/;
+    if (!regex.test(cleaned)) {
+      return lang === "zh" 
+        ? "格式错误。例如: +60123456789" 
+        : lang === "en" 
+          ? "Invalid format. E.g., +60123456789 or 0123456789" 
+          : "Format nombor salah. Contoh: +60123456789 atau 0123456789";
+    }
+    return "";
+  };
+
+  const handlePhoneChange = (val: string) => {
+    setPhone(val);
+    const error = validatePhone(val);
+    setPhoneError(error);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const error = validatePhone(phone);
+    if (error) {
+      setPhoneError(error);
+      return;
+    }
+
     if (name.trim() && phone.trim()) {
-      onSubmit(name, phone);
+      // Normalize number format to 601XXXXXXXX
+      let cleaned = phone.replace(/[^0-9]/g, "");
+      if (cleaned.startsWith("0")) {
+        cleaned = "6" + cleaned; // 012... -> 6012...
+      }
+      onSubmit(name, cleaned, email.trim());
     }
   };
 
@@ -1122,20 +1176,37 @@ function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; o
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Phone Number</label>
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Phone Number / WhatsApp</label>
             <input
               type="tel"
               required
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => handlePhoneChange(e.target.value)}
               placeholder="e.g. +60123456789"
+              className={`w-full bg-[#fafaf8] border ${phoneError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-[#d4af37]'} rounded-xl p-3.5 text-[13px] text-[#1a1a1a] outline-none focus:bg-white transition shadow-inner`}
+            />
+            {phoneError && (
+              <span className="text-[11px] text-rose-500 font-medium block mt-1 px-1">
+                {phoneError}
+              </span>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Email Address <span className="text-[9px] text-slate-400 normal-case font-normal">(untuk terima PDF Invois — optional)</span>
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. customer@email.com"
               className="w-full bg-[#fafaf8] border border-slate-200 rounded-xl p-3.5 text-[13px] text-[#1a1a1a] outline-none focus:bg-white focus:border-[#d4af37] transition shadow-inner"
             />
           </div>
         </div>
 
         <button type="submit"
-          disabled={!name.trim() || !phone.trim()}
+          disabled={!name.trim() || !phone.trim() || !!phoneError}
           className="w-full text-[12px] font-semibold tracking-wider uppercase text-[#1a1a1a] bg-[#d4af37] hover:bg-[#b8960c] py-3.5 rounded-full transition-all shadow-[0_4px_12px_rgba(212,175,55,0.25)] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shrink-0 cursor-pointer">
           Continue to Payment
         </button>
@@ -1146,7 +1217,7 @@ function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; o
 
 // ─── Payment Selection View ──────────────────────────────────────────────────
 
-function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, lang }: { cart: CartItem[]; name: string; phone: string; onBack: () => void; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string) => void; lang: Language }) {
+function PaymentSelectionView({ cart, name, phone, email, onBack, onProcessCheckout, lang }: { cart: CartItem[]; name: string; phone: string; email?: string; onBack: () => void; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string, email?: string) => void; lang: Language }) {
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
   return (
@@ -1165,7 +1236,7 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
 
         <div className="space-y-3 pt-2">
           <button
-            onClick={() => onProcessCheckout('qr', name, phone)}
+            onClick={() => onProcessCheckout('qr', name, phone, email)}
             className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
@@ -1181,7 +1252,7 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
           </button>
 
           <button
-            onClick={() => onProcessCheckout('bank_transfer', name, phone)}
+            onClick={() => onProcessCheckout('bank_transfer', name, phone, email)}
             className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
@@ -1197,7 +1268,7 @@ function PaymentSelectionView({ cart, name, phone, onBack, onProcessCheckout, la
           </button>
 
           <button
-            onClick={() => onProcessCheckout('whatsapp', name, phone)}
+            onClick={() => onProcessCheckout('whatsapp', name, phone, email)}
             className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#d4af37] hover:bg-[#b8960c] transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
@@ -1637,6 +1708,7 @@ export default function ChatWidget() {
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [conciergeStep, setConciergeStep] = useState<string>("ENTRY");
 
   // ── Customer Context — tracks everything we learn, injected into LLM
@@ -1716,7 +1788,7 @@ export default function ChatWidget() {
 
   // ── handleProcessCheckout ───────────────────────────────────────────────────
 
-  const handleProcessCheckout = async (method: 'qr' | 'bank_transfer' | 'whatsapp', customerName: string, customerPhone: string) => {
+  const handleProcessCheckout = async (method: 'qr' | 'bank_transfer' | 'whatsapp', customerName: string, customerPhone: string, customerEmail?: string) => {
     if (method === 'whatsapp') {
       let waMsg = `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
       cart.forEach((item) => {
@@ -1772,8 +1844,25 @@ export default function ChatWidget() {
       const result = await createOrderWithStockCheck(newOrder, targetStoreId);
 
       if ('error' in result) {
-        throw new Error(result.error);
+        setError(result.error);
+        setLoading(false);
+        return;
       }
+
+      // Trigger order created alert in background
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "order_created",
+          language: lang,
+          cart,
+          orderId,
+          name: customerName,
+          phone: customerPhone,
+          email: customerEmail
+        })
+      }).catch((e) => console.error("Failed to send order notification:", e));
 
       // Clear standard cart and local storage chatbot cart
       clearCart();
@@ -2695,9 +2784,10 @@ export default function ChatWidget() {
                 <CheckoutDetailsView
                   lang={lang}
                   onBack={() => setCurrentStep("CART_REVIEW")}
-                  onSubmit={(name, phone) => {
+                  onSubmit={(name, phone, email) => {
                     setCustomerName(name);
                     setCustomerPhone(phone);
+                    setCustomerEmail(email);
                     setCurrentStep("PAYMENT_SELECTION");
                   }}
                 />
@@ -2706,6 +2796,7 @@ export default function ChatWidget() {
                   cart={cart}
                   name={customerName}
                   phone={customerPhone}
+                  email={customerEmail}
                   lang={lang}
                   onBack={() => setCurrentStep("CHECKOUT_DETAILS")}
                   onProcessCheckout={handleProcessCheckout}
