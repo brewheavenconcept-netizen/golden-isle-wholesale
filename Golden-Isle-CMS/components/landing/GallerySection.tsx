@@ -5,12 +5,12 @@ import { Instagram } from "lucide-react";
 import Link from "next/link";
 
 const photos = [
-    "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80",
-    "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80",
-    "https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&q=80",
-    "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&q=80",
-    "https://images.unsplash.com/photo-1594372365401-3b5ff14eaaed?w=400&q=80",
-    "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&q=80"
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_whisky.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_wine.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_beer.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_loading.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_barrels.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_shipment.png"
 ];
 
 const staggerContainer: Variants = {
