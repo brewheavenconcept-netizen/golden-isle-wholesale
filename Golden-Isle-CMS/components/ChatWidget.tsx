@@ -1915,7 +1915,14 @@ export default function ChatWidget() {
       if (savedMessages) setMessages(JSON.parse(savedMessages));
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedLang && ["ms", "en", "zh"].includes(savedLang)) setLang(savedLang);
-      if (savedStep) setCurrentStep(savedStep);
+      if (savedStep) {
+        if (savedStep === "START") {
+          setCurrentStep("FAQ_CHAT");
+          setFlowType("ask_question");
+        } else {
+          setCurrentStep(savedStep);
+        }
+      }
       if (savedName) setCustomerName(savedName);
       if (savedPhone) setCustomerPhone(savedPhone);
       setOnboardingSeen(seenOnboarding === "true");
