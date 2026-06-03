@@ -1583,17 +1583,54 @@ function TypingText({ text, speed = 25 }: { text: string; speed?: number }) {
 function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; onSelect: (flow: Exclude<FlowType, null>) => void; onTalkToSales: () => void }) {
   const getGreetingData = () => {
     const hr = new Date().getHours();
+    
+    // Time zones and hours definition:
+    // Morning: 5:00 - 11:59 (5 <= hr < 12)
+    // Afternoon: 12:00 - 16:59 (12 <= hr < 17)
+    // Evening: 17:00 - 20:59 (17 <= hr < 21)
+    // Night / Late Night: 21:00 - 4:59 (hr >= 21 || hr < 5)
+
     if (lang === "zh") {
-      const greeting = hr < 12 ? "早上好。" : hr < 18 ? "下午好。" : "晚上好。";
-      return { greeting, sub: "今天 Golden AI 能为您提供什么帮助呢？" };
+      let greeting = "早上好。";
+      if (hr >= 12 && hr < 17) greeting = "下午好。";
+      else if (hr >= 17 && hr < 21) greeting = "傍晚好。";
+      else if (hr >= 21 || hr < 5) {
+        greeting = hr >= 0 && hr < 5 ? "深夜好。" : "晚上好。";
+      }
+      return { 
+        greeting, 
+        sub: hr >= 0 && hr < 5 
+          ? "深夜了，还在忙着采购吗？💼" 
+          : "今天 Golden AI 能为您提供什么帮助呢？" 
+      };
     }
+    
     if (lang === "ms") {
-      const greeting = hr < 12 ? "Selamat pagi." : hr < 14 ? "Selamat tengah hari." : hr < 19 ? "Selamat petang." : "Selamat malam.";
-      return { greeting, sub: "Bagaimanakah Golden AI dapat membantu anda hari ini?" };
+      let greeting = "Selamat pagi.";
+      if (hr >= 12 && hr < 14) greeting = "Selamat tengah hari.";
+      else if (hr >= 14 && hr < 19) greeting = "Selamat petang.";
+      else if (hr >= 19 || hr < 5) greeting = "Selamat malam.";
+      
+      return { 
+        greeting, 
+        sub: hr >= 0 && hr < 5 
+          ? "Lama tak jumpa boss, masih kerja kuat malam-malam? 🔥" 
+          : "Bagaimanakah Golden AI dapat membantu boss hari ini?" 
+      };
     }
+    
     // Default English
-    const greeting = hr < 12 ? "Good morning." : hr < 18 ? "Good afternoon." : "Good evening.";
-    return { greeting, sub: "How can Golden AI assist you today?" };
+    let greeting = "Good morning.";
+    if (hr >= 12 && hr < 17) greeting = "Good afternoon.";
+    else if (hr >= 17 && hr < 21) greeting = "Good evening.";
+    else if (hr >= 21 || hr < 5) greeting = "Good night.";
+    
+    return { 
+      greeting, 
+      sub: hr >= 0 && hr < 5 
+        ? "Burning the midnight oil? How can Golden AI help you tonight? 🦉" 
+        : "How can Golden AI assist you today?" 
+    };
   };
 
   const { greeting, sub } = getGreetingData();
