@@ -10,18 +10,12 @@ export function Footer() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12 border-b border-white/5 pb-12">
                     <div className="col-span-1 lg:col-span-2">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#d4af37] to-[#b8960c] flex items-center justify-center shadow-md">
-                                <GlassWater className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-display font-bold text-lg tracking-tight text-white leading-tight">
-                                    Golden Isle
-                                </span>
-                                <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#b8960c]">
-                                    Wholesale
-                                </span>
-                            </div>
+                        <div className="mb-6">
+                            <img 
+                                src="https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/logo.png" 
+                                alt="Golden Isle Wholesale Logo" 
+                                className="h-16 w-auto object-contain rounded-xl"
+                            />
                         </div>
                         <p className="text-sm max-w-sm mb-6 leading-relaxed text-slate-400">
                             Premium duty-free wholesale beverages. <br />

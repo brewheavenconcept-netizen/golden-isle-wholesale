@@ -118,18 +118,12 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
                         {/* Logo — click 5x to access admin */}
-                        <div onClick={handleLogoClick} className="flex-shrink-0 flex items-center gap-3 cursor-pointer select-none">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#d4af37] to-[#b8960c] flex items-center justify-center shadow-md">
-                                <GlassWater className="w-6 h-6 text-white" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-display font-bold text-xl tracking-tight text-[#1a1a1a] leading-tight">
-                                    Golden Isle
-                                </span>
-                                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#b8960c]">
-                                    Wholesale
-                                </span>
-                            </div>
+                        <div onClick={handleLogoClick} className="flex-shrink-0 flex items-center cursor-pointer select-none">
+                            <img 
+                                src="https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/logo.png" 
+                                alt="Golden Isle Wholesale Logo" 
+                                className="h-14 md:h-16 w-auto object-contain rounded-lg"
+                            />
                         </div>
 
                         {/* Desktop Navigation */}

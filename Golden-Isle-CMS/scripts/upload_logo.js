@@ -16,7 +16,7 @@ try {
   const supabaseUrl = supabaseUrlMatch[1].trim();
   const serviceRole = serviceRoleMatch[1].trim();
   
-  const fileLocation = "C:\\Users\\eddyr\\.gemini\\antigravity-ide\\brain\\b5cb8dd3-b6c8-4b2d-b604-c1bda5f923e0\\golden_isle_logo_1780470044555.png";
+  const fileLocation = "C:\\Users\\eddyr\\.gemini\\antigravity-ide\\brain\\b5cb8dd3-b6c8-4b2d-b604-c1bda5f923e0\\media__1780477471125.png";
   
   if (!fs.existsSync(fileLocation)) {
     console.error("Generated logo file does not exist at path:", fileLocation);
