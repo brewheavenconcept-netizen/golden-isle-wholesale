@@ -275,6 +275,135 @@ function AvatarUser() {
   );
 }
 
+function SmartLoader({ lang }: { lang: Language }) {
+  const [stepIndex, setStepIndex] = useState(0);
+
+  const steps = {
+    ms: [
+      "Menganalisis keperluan borong boss...",
+      "Menyemak inventori bebas cukai...",
+      "Mengira margin diskaun B2B...",
+      "Sedang membuat cadangan terbaik..."
+    ],
+    en: [
+      "Analyzing your B2B requirements...",
+      "Scanning duty-free catalog...",
+      "Optimizing wholesale price margins...",
+      "Curating the best wholesale options..."
+    ],
+    zh: [
+      "正在分析您的批发采购需求...",
+      "正在扫描免税商品实时库存...",
+      "正在优化 B2B 批发价格利润...",
+      "正在定制专属最佳批发方案..."
+    ]
+  };
+
+  const currentSteps = steps[lang] || steps.en;
+
+  useEffect(() => {
+    setStepIndex(0);
+    const interval = setInterval(() => {
+      setStepIndex((prev) => (prev < currentSteps.length - 1 ? prev + 1 : prev));
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [lang, currentSteps.length]);
+
+  return (
+    <div className="bg-white/85 backdrop-blur-md border border-[#d4af37]/25 rounded-[22px] rounded-tl-[6px] overflow-hidden shadow-md min-w-[260px] max-w-full flex flex-col divide-y divide-slate-100/80">
+      {/* CSS Keyframes for shimmer animation */}
+      <style>{`
+        @keyframes customShimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: customShimmer 2.2s infinite;
+        }
+      `}</style>
+
+      {/* Top Section: Smart Status Bar */}
+      <div className="p-4 flex flex-col gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Animated Custom Outer Ring with Pulsing Inner Dot */}
+          <div className="relative flex items-center justify-center w-3.5 h-3.5 shrink-0">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-[#d4af37]/35 animate-ping" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#d4af37]" />
+          </div>
+          
+          {/* Dynamic progress bar steps indicator */}
+          <div className="flex gap-1.5 items-center flex-1">
+            {currentSteps.map((_, idx) => (
+              <div
+                key={`step-indicator-${idx}`}
+                className="h-1 flex-1 rounded-full bg-slate-200/60 overflow-hidden relative"
+              >
+                <motion.div
+                  initial={{ width: "0%" }}
+                  animate={{ width: idx <= stepIndex ? "100%" : "0%" }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                  className="h-full bg-gradient-to-r from-[#b8960c] to-[#d4af37]"
+                />
+              </div>
+            ))}
+          </div>
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1 select-none">
+            {stepIndex + 1}/{currentSteps.length}
+          </span>
+        </div>
+
+        {/* Slide & Fade text container (without truncation, allowing wrap) */}
+        <div className="relative overflow-hidden min-h-[18px] flex items-center">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={`step-text-${stepIndex}`}
+              initial={{ y: 8, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -8, opacity: 0 }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              className="text-[12.5px] text-[#1a1a1a] font-semibold leading-relaxed select-none block w-full"
+            >
+              {currentSteps[stepIndex]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Bottom Section: Shimmering Product Card skeleton */}
+      <div className="relative p-3.5 bg-white/40 flex flex-col gap-3 select-none pointer-events-none overflow-hidden">
+        {/* Shimmer overlay animation across the skeleton */}
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/50 to-transparent" 
+             style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%)' }} />
+        
+        <div className="flex flex-row gap-3">
+          {/* Image Skeleton Column (Left) */}
+          <div className="w-[32%] bg-slate-100/70 h-[92px] rounded-xl flex items-center justify-center p-2 border border-[#d4af37]/15 relative overflow-hidden animate-pulse shrink-0">
+            <div className="w-6 h-12 bg-slate-200/80 rounded-sm" />
+          </div>
+
+          {/* Content Skeleton Column (Right) */}
+          <div className="flex-1 flex flex-col gap-1.5 animate-pulse min-w-0">
+            {/* Category tag skeleton */}
+            <div className="h-1.5 w-12 bg-slate-200/80 rounded" />
+            {/* Title lines skeleton */}
+            <div className="h-3 w-32 bg-slate-200/90 rounded mt-0.5" />
+            <div className="h-2 w-20 bg-slate-200/70 rounded" />
+            
+            {/* Price skeleton */}
+            <div className="h-3.5 w-14 bg-slate-200/90 rounded mt-1.5" />
+          </div>
+        </div>
+
+        {/* Action Button Skeletons */}
+        <div className="flex gap-2 w-full animate-pulse mt-1">
+          <div className="h-8 flex-1 bg-slate-200/80 rounded-lg" />
+          <div className="h-8 flex-1 bg-slate-200/50 rounded-lg" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OnboardingPointer() {
   return (
     <div className="relative flex flex-col items-center justify-center pointer-events-none">
@@ -2471,24 +2600,33 @@ export default function ChatWidget() {
                 }}
                 onClick={() => setIsOpen(true)}
                 style={{ zIndex: 9999 }}
-                className="flex fixed bottom-[30px] right-20 sm:right-[88px] mr-2 z-[9999] items-center gap-2.5 py-2 pl-3.5 pr-8 rounded-full bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
+                className="flex fixed bottom-[30px] right-20 sm:right-[88px] mr-2 z-[9999] items-center gap-3 py-3 pl-4.5 pr-10 rounded-2xl bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
               >
-                {/* Absolute Close Button inside the pill on the right */}
+                {/* Absolute Close Button inside the card on the top right */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowTooltip(false);
                   }}
-                  className="absolute right-2 text-slate-400 hover:text-black p-0.5 rounded-full hover:bg-slate-50 transition-all cursor-pointer shrink-0"
+                  className="absolute right-2 top-2 text-slate-400 hover:text-black p-0.5 rounded-full hover:bg-slate-50 transition-all cursor-pointer shrink-0"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
 
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[12.5px] font-extrabold text-[#1a1a1a] tracking-tight">Golden AI</span>
-                  <span className="text-[11px] text-slate-400 font-semibold">Online 👋</span>
+                <div className="flex flex-col text-left justify-center shrink-0">
+                  {/* Top Line: Golden AI */}
+                  <span className="text-[13px] font-black text-[#1a1a1a] leading-none">Golden AI</span>
+                  
+                  {/* Bottom Line: Glowing Lamp + Ready to Assist */}
+                  <div className="flex items-center gap-1.5 mt-2.5 leading-none">
+                    {/* Blinking Glowing Green Lamp */}
+                    <div className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span>
+                    </div>
+                    <span className="text-[10.5px] text-slate-500 font-semibold tracking-wide">Ready to Assist</span>
+                  </div>
                 </div>
 
                 {/* Subtle speech bubble beak */}
@@ -2982,20 +3120,10 @@ export default function ChatWidget() {
                           {/* Loading */}
                           {loading && (
                             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center shrink-0 mt-0.5">
-                                <Loader2 className="w-4 h-4 text-[#d4af37] animate-spin" />
-                              </div>
-                              <div className="flex flex-col items-start">
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{t.botLabel}</span>
-                                <div className="bg-[#f5f5f0] border border-slate-200 rounded-2xl rounded-tl-[6px] px-4 py-3 flex items-center gap-2.5">
-                                  <span className="flex gap-1">
-                                    {[0, 1, 2].map((i) => (
-                                      <span key={`loading-dot-${i}`} className="w-1.5 h-1.5 rounded-full bg-[#d4af37]/70 animate-bounce"
-                                        style={{ animationDelay: `${i * 0.15}s` }} />
-                                    ))}
-                                  </span>
-                                  <span className="text-[12px] text-slate-650 font-medium">{t.thinking}</span>
-                                </div>
+                              <AvatarBot />
+                              <div className="flex flex-col items-start max-w-[85%]">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-0.5">{t.botLabel}</span>
+                                <SmartLoader lang={lang} />
                               </div>
                             </motion.div>
                           )}
