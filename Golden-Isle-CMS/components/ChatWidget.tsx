@@ -2466,7 +2466,7 @@ export default function ChatWidget() {
                 }}
                 onClick={() => setIsOpen(true)}
                 style={{ zIndex: 9999 }}
-                className="hidden sm:flex fixed bottom-[30px] right-20 sm:right-[88px] mr-2 z-[9999] items-center gap-2.5 py-2 pl-3.5 pr-8 rounded-full bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
+                className="flex fixed bottom-[30px] right-20 sm:right-[88px] mr-2 z-[9999] items-center gap-2.5 py-2 pl-3.5 pr-8 rounded-full bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
               >
                 {/* Absolute Close Button inside the pill on the right */}
                 <button
