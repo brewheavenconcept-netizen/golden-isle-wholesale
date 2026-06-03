@@ -1831,8 +1831,8 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [lang, setLang] = useState<Language>("ms");
   const [isMobile, setIsMobile] = useState(false);
-  const [currentStep, setCurrentStep] = useState<ChatStep>("MAIN_MENU");
-  const [flowType, setFlowType] = useState<FlowType>(null);
+  const [currentStep, setCurrentStep] = useState<ChatStep>("FAQ_CHAT");
+  const [flowType, setFlowType] = useState<FlowType>("ask_question");
   const [browseCategory, setBrowseCategory] = useState<string>("");
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
@@ -2261,8 +2261,9 @@ export default function ChatWidget() {
     setCart([]);
     setQuoteItems([]);
     setError(null);
-    setCurrentStep("MAIN_MENU");
-    setFlowType(null);
+    setCurrentStep("FAQ_CHAT");
+    setFlowType("ask_question");
+    setConciergeStep("ENTRY");
     setBrowseCategory("");
     setCustomerName("");
     setCustomerPhone("");
