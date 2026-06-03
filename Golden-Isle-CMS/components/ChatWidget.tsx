@@ -1749,6 +1749,7 @@ export default function ChatWidget() {
       if (savedMessages) setMessages(JSON.parse(savedMessages));
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedLang && ["ms", "en", "zh"].includes(savedLang)) setLang(savedLang);
+      if (savedStep) setCurrentStep(savedStep);
       if (savedName) setCustomerName(savedName);
       if (savedPhone) setCustomerPhone(savedPhone);
       setOnboardingSeen(seenOnboarding === "true");
@@ -1773,6 +1774,10 @@ export default function ChatWidget() {
       localStorage.setItem("golden_ai_phone", customerPhone);
     } catch (e) { }
   }, [customerName, customerPhone]);
+
+  useEffect(() => {
+    try { localStorage.setItem("golden_ai_step", currentStep); } catch (e) { }
+  }, [currentStep]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -2336,8 +2341,8 @@ export default function ChatWidget() {
 
     // ── LLM ROUTE (API call for genuine free text) ────────────────────────────
 
-    if (currentStep !== "START") {
-      setCurrentStep("START");
+    if (currentStep !== "START" && currentStep !== "FAQ_CHAT") {
+      setCurrentStep("FAQ_CHAT");
     }
 
     const newMsg: Message = { role: "user", text: trimmedMessage };
