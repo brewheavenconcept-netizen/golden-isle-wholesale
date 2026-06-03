@@ -2806,13 +2806,16 @@ export default function ChatWidget() {
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-slate-100 transition-all cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  // Only show left close button on mobile, desktop has the right close button
+                  isMobile && (
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="p-1.5 -ml-1 rounded-xl text-slate-500 hover:text-[#d4af37] hover:bg-slate-100 transition-all cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )
                 )}
                 <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
                   <GlowingOrb size={36} />
