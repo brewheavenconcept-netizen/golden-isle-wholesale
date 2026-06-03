@@ -1831,7 +1831,7 @@ export default function ChatWidget() {
   const [error, setError] = useState<string | null>(null);
   const [lang, setLang] = useState<Language>("ms");
   const [isMobile, setIsMobile] = useState(false);
-  const [currentStep, setCurrentStep] = useState<ChatStep>("START");
+  const [currentStep, setCurrentStep] = useState<ChatStep>("MAIN_MENU");
   const [flowType, setFlowType] = useState<FlowType>(null);
   const [browseCategory, setBrowseCategory] = useState<string>("");
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
@@ -2261,7 +2261,7 @@ export default function ChatWidget() {
     setCart([]);
     setQuoteItems([]);
     setError(null);
-    setCurrentStep("START");
+    setCurrentStep("MAIN_MENU");
     setFlowType(null);
     setBrowseCategory("");
     setCustomerName("");
@@ -2715,14 +2715,11 @@ export default function ChatWidget() {
             <div className={`flex items-center justify-between shrink-0 border-b border-slate-100 bg-white/40 backdrop-blur-md ${isMobile ? "px-5 py-4 pt-12" : "px-6 py-4"
               }`}>
               <div className="flex items-center gap-3">
-                {currentStep !== "START" ? (
+                {currentStep !== "MAIN_MENU" && currentStep !== "START" ? (
                   <button
                     type="button"
                     onClick={() => {
                       switch (currentStep) {
-                        case "MAIN_MENU":
-                          setCurrentStep("START");
-                          break;
                         case "BROWSE_CATEGORY":
                           setCurrentStep("MAIN_MENU");
                           setFlowType(null);
