@@ -2466,37 +2466,28 @@ export default function ChatWidget() {
                 }}
                 onClick={() => setIsOpen(true)}
                 style={{ zIndex: 9999 }}
-                className="hidden sm:flex fixed bottom-[26px] right-20 sm:right-[88px] mr-2 z-[9999] flex-col p-4 rounded-2xl bg-white border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.005)] max-w-[270px] sm:max-w-xs text-left select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                className="hidden sm:flex fixed bottom-[30px] right-20 sm:right-[88px] mr-2 z-[9999] items-center gap-2.5 py-2 pl-3.5 pr-8 rounded-full bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] select-none pointer-events-auto cursor-pointer group transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
               >
-                {/* Absolute Close Button */}
+                {/* Absolute Close Button inside the pill on the right */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowTooltip(false);
                   }}
-                  className="absolute top-2.5 right-2.5 text-slate-400 hover:text-black p-1 rounded-md hover:bg-slate-50 transition-all cursor-pointer shrink-0"
+                  className="absolute right-2 text-slate-400 hover:text-black p-0.5 rounded-full hover:bg-slate-50 transition-all cursor-pointer shrink-0"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
 
-                {/* Tag label with small gold bullet */}
-                <div className="flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-widest text-[#d4af37]">
-                  <span className="w-1 h-1 rounded-full bg-[#d4af37] animate-pulse" />
-                  <span>{tooltipText.label}</span>
-                </div>
-
-                <div className="mt-2 space-y-1 pr-2">
-                  <h4 className="text-[14px] font-extrabold text-[#1a1a1a] tracking-tight leading-tight group-hover:text-slate-800">
-                    {tooltipText.title}
-                  </h4>
-                  <p className="text-[11.5px] text-slate-500 font-medium leading-relaxed">
-                    {tooltipText.desc}
-                  </p>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[12.5px] font-extrabold text-[#1a1a1a] tracking-tight">Golden AI</span>
+                  <span className="text-[11px] text-slate-400 font-semibold">Online 👋</span>
                 </div>
 
                 {/* Subtle speech bubble beak */}
-                <div className="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-r border-t border-slate-100 rotate-45" />
+                <div className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-white border-r border-t border-slate-100 rotate-45" />
               </motion.div>
             )}
 
