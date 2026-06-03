@@ -5,22 +5,22 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
     {
-        title: "Premium Lagers",
-        subtitle: "Crisp, Refreshing & Imported",
-        price: "From RM 120 / carton",
-        img: "https://images.unsplash.com/photo-1614316654271-9cece54682c0?w=800&q=80",
+        title: "Whisky",
+        subtitle: "Premium Single Malt & Blended Whisky",
+        price: "From RM 180 / bottle",
+        img: "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/whisky_slide.png",
     },
     {
-        title: "Craft Ales",
-        subtitle: "IPA, Pale Ale & Unique Brews",
+        title: "Wine",
+        subtitle: "Fine Red & White Wines",
+        price: "From RM 90 / bottle",
+        img: "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/wine_slide.png",
+    },
+    {
+        title: "Craft Beer",
+        subtitle: "Imported Craft Beers & IPAs",
         price: "From RM 150 / carton",
-        img: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=800&q=80",
-    },
-    {
-        title: "Stouts & Porters",
-        subtitle: "Rich, Dark & Robust",
-        price: "From RM 160 / carton",
-        img: "https://images.unsplash.com/photo-1505075937365-240428d0092c?w=800&q=80",
+        img: "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/beer_slide.png",
     }
 ];
 
@@ -135,11 +135,7 @@ export function CollectionCarousel() {
                                 if (isLeft) prevSlide();
                                 else if (isRight) nextSlide();
                                 else if (isCenter) {
-                                    // Map slightly different display titles into standard categories
-                                    let filterCat = slide.title;
-                                    if (filterCat === "Premium Lagers" || filterCat === "Craft Ales" || filterCat === "Stouts & Porters") filterCat = "Beer";
-
-                                    window.dispatchEvent(new CustomEvent('filterCategory', { detail: filterCat }));
+                                    window.dispatchEvent(new CustomEvent('filterCategory', { detail: slide.title }));
                                     document.getElementById("products")?.scrollIntoView({ behavior: 'smooth' });
                                 }
                             }}
