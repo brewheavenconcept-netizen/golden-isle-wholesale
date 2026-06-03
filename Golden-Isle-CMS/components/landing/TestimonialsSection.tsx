@@ -5,14 +5,16 @@ import { Quote } from "lucide-react";
 
 const testimonials = [
     {
-        quote: "Golden Isle has transformed our beverage program. Access to rare vintage whiskies at duty-free rates gives us a competitive edge no other supplier can match.",
-        name: "James Sterling",
-        role: "Bar Manager, The Ritz-Carlton KL",
+        quote: "Golden Isle has transformed our beverage program. Access to rare vintage whiskies at duty-free rates gives us a competitive edge no other supplier in Malaysia can match.",
+        name: "Dato' Adrian Tan",
+        role: "Director of F&B, The Ritz-Carlton KL",
+        avatar: "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/avatar_adrian.png"
     },
     {
-        quote: "Reliability is key in hospitality. Their authenticity guarantee and prompt logistics make them our preferred supplier for all premium spirits and wines.",
-        name: "Elena Rodriguez",
-        role: "F&B Director, Azure Resorts",
+        quote: "Reliability is key in Sabah's hospitality. Their authenticity guarantee and prompt logistics make them our preferred supplier for all premium spirits and wines.",
+        name: "Farah Amira",
+        role: "F&B Operations Consultant, Luna Premium Lounge KK",
+        avatar: "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/avatar_farah.png"
     }
 ];
 
@@ -43,8 +45,16 @@ export function TestimonialsSection() {
                             </p>
 
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#d4af37] to-[#b8960c] flex items-center justify-center shrink-0 shadow-sm">
-                                </div>
+                                {testimonial.avatar ? (
+                                    <img 
+                                        src={testimonial.avatar} 
+                                        alt={testimonial.name}
+                                        className="w-12 h-12 rounded-full object-cover border border-[#d4af37]/30 shadow-sm shrink-0"
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#d4af37] to-[#b8960c] flex items-center justify-center shrink-0 shadow-sm">
+                                    </div>
+                                )}
                                 <div>
                                     <h4 className="font-bold text-white">{testimonial.name}</h4>
                                     <p className="text-sm text-[#b8960c] font-medium">{testimonial.role}</p>

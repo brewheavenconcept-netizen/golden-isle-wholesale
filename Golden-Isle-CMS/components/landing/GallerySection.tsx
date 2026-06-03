@@ -8,7 +8,7 @@ const photos = [
     "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_whisky.png",
     "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_wine.png",
     "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_beer.png",
-    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_loading.png",
+    "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_manager.png",
     "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_barrels.png",
     "https://uvnngzfhxeeggmaocbws.supabase.co/storage/v1/object/public/product-images/warehouse_shipment.png"
 ];
