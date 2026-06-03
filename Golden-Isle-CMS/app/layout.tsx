@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter } from "next/font/google";
+import { DM_Sans, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientToaster } from "@/components/providers/ClientToaster";
@@ -15,6 +15,13 @@ const dmSans = DM_Sans({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
 });
 
@@ -63,7 +70,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${dmSans.variable} ${inter.variable} font-body antialiased overflow-x-hidden`}
+        className={`${dmSans.variable} ${inter.variable} ${playfair.variable} font-body antialiased overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"

@@ -76,8 +76,8 @@ export function CollectionCarousel() {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#d4af37]/10 via-transparent to-transparent pointer-events-none"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center mb-16">
-                <h2 className="font-display text-4xl md:text-5xl font-bold text-[#1a1a1a]">
-                    Our <span className="text-[#b8960c] italic font-normal">Premium Collection</span>
+                <h2 className="font-display text-4xl md:text-5xl font-bold text-[#1a1a1a] tracking-tight">
+                    Our <span className="font-serif text-[#b8960c] italic font-normal">Premium Collection</span>
                 </h2>
                 <p className="mt-4 text-lg text-[#6b6b6b] max-w-2xl mx-auto">
                     Curated premium beers and craft brews from the world&apos;s most renowned breweries.
