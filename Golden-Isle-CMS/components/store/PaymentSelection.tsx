@@ -116,19 +116,27 @@ export default function PaymentSelection({ orderId, amount }: PaymentSelectionPr
                 <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[10px] text-gray-400 shrink-0 whitespace-nowrap">Coming Soon</span>
             </div>
 
-            {/* Credit Card */}
-            <div className="bg-gray-50 rounded-2xl border border-gray-100 p-4 flex items-center justify-between gap-3 opacity-60 overflow-hidden">
-                <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 bg-white border border-gray-100 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-                        <CreditCard size={20} className="text-gray-400" />
+            {/* Credit Card (Stripe Mockup) */}
+            <motion.div
+                whileHover={{ y: -2 }}
+                className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4 shadow-sm overflow-hidden"
+            >
+                <div className="flex items-center gap-4 min-w-0 text-left">
+                    <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-indigo-100">
+                        <CreditCard size={24} className="text-white" />
                     </div>
-                    <div className="min-w-0">
-                        <h3 className="font-semibold text-sm text-gray-400">Credit card</h3>
-                        <p className="text-[10px] text-gray-400">Visa, Mastercard</p>
+                    <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-sm text-gray-900">Pay via Stripe</h3>
+                        <p className="text-[11px] text-gray-500">Visa, Mastercard, American Express</p>
                     </div>
                 </div>
-                <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[10px] text-gray-400 shrink-0 whitespace-nowrap">Coming Soon</span>
-            </div>
+                <button
+                    onClick={() => router.push(`/payment/stripe/${orderId}`)}
+                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition shadow-md shadow-indigo-100"
+                >
+                    Pay with Card
+                </button>
+            </motion.div>
 
             {/* Footer */}
             <div className="grid grid-cols-2 gap-x-6 gap-y-3 pt-2">

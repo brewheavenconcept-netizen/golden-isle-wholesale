@@ -93,31 +93,31 @@ async function saveLead(data: any) {
         if (payload.action === "order_created") {
             messageText = `🎉 *[GOLDEN ISLE - NEW ORDER SUCCESS!]* 💰\n\n`;
             messageText += `🆔 *Order ID:* \`${payload.orderId}\`\n`;
-            messageText += `👤 *Pelanggan:* \`${payload.name || "Anonymous"}\` (${payload.phone || "No Phone"})\n`;
-            messageText += `🌐 *Bahasa:* \`${payload.language?.toUpperCase() || "MS"}\`\n`;
-            if (payload.quantity) messageText += `📦 *Jumlah Kuantiti:* \`${payload.quantity} unit\`\n`;
+            messageText += `👤 *Customer:* \`${payload.name || "Anonymous"}\` (${payload.phone || "No Phone"})\n`;
+            messageText += `🌐 *Language:* \`${payload.language?.toUpperCase() || "EN"}\`\n`;
+            if (payload.quantity) messageText += `📦 *Total Quantity:* \`${payload.quantity} unit(s)\`\n`;
             messageText += `\n📄 *PDF Invoice:* ${invoiceUrl}\n`;
-            if (whatsappLink) messageText += `💬 *Hubungi Pelanggan:* [Klik WhatsApp](${whatsappLink})\n`;
+            if (whatsappLink) messageText += `💬 *Contact Customer:* [Click WhatsApp](${whatsappLink})\n`;
         } else {
             messageText = `🍻 *[GOLDEN ISLE - NEW LEAD]* 🚨\n\n`;
-            messageText += `👤 *Status:* \`${payload.action === "whatsapp_click" ? "📞 Klik WhatsApp" : "🛒 Tambah Troli"}\`\n`;
-            messageText += `🌐 *Bahasa:* \`${payload.language?.toUpperCase() || "MS"}\`\n`;
+            messageText += `👤 *Status:* \`${payload.action === "whatsapp_click" ? "📞 WhatsApp Click" : "🛒 Added to Cart"}\`\n`;
+            messageText += `🌐 *Language:* \`${payload.language?.toUpperCase() || "EN"}\`\n`;
             
             if (payload.budget) messageText += `💰 *Budget:* \`${payload.budget}\`\n`;
-            if (payload.quantity) messageText += `📦 *Kuantiti:* \`${payload.quantity}\`\n`;
-            if (payload.preference) messageText += `⭐ *Minat:* \`${payload.preference}\`\n`;
+            if (payload.quantity) messageText += `📦 *Quantity:* \`${payload.quantity}\`\n`;
+            if (payload.preference) messageText += `⭐ *Interest:* \`${payload.preference}\`\n`;
         }
         
         if (payload.cart && payload.cart.length > 0) {
-            messageText += `\n*🛒 Draf Troli (Sebut Harga):*\n`;
+            messageText += `\n*🛒 Cart Draft (Quotation):*\n`;
             payload.cart.forEach((item: any) => {
                 messageText += `- ${item.quantity}x ${item.name} (${item.price || item.total})\n`;
             });
             
-            messageText += `\n💵 *Jumlah Draf:* *RM ${totalAmount.toFixed(2)}*\n`;
+            messageText += `\n💵 *Draft Total:* *RM ${totalAmount.toFixed(2)}*\n`;
         }
 
-        messageText += `\n⏰ *Waktu:* _${new Date(payload.timestamp || Date.now()).toLocaleString("en-MY", { timeZone: "Asia/Kuala_Lumpur" })}_`;
+        messageText += `\n⏰ *Time:* _${new Date(payload.timestamp || Date.now()).toLocaleString("en-MY", { timeZone: "Asia/Kuala_Lumpur" })}_`;
 
         const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
         
@@ -150,7 +150,7 @@ async function saveLead(data: any) {
                         const file = new File([new Uint8Array(pdfBuffer)], `Quotation_${payload.orderId}.pdf`, { type: "application/pdf" });
                         formData.append("chat_id", telegramChatId);
                         formData.append("document", file);
-                        formData.append("caption", `📄 Fail PDF Sebut Harga rasmi untuk Order ID: ${payload.orderId}`);
+                        formData.append("caption", `📄 Official PDF Quotation file for Order ID: ${payload.orderId}`);
 
                         const res = await fetch(telegramDocUrl, {
                             method: "POST",

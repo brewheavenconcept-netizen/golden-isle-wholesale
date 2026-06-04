@@ -29,6 +29,7 @@ import {
   Zap,
   Building2,
   Gift,
+  CreditCard,
   Globe,
   CheckCircle2,
   GlassWater,
@@ -1346,7 +1347,7 @@ function CheckoutDetailsView({ onBack, onSubmit, lang }: { onBack: () => void; o
 
 // ─── Payment Selection View ──────────────────────────────────────────────────
 
-function PaymentSelectionView({ cart, name, phone, email, onBack, onProcessCheckout, lang }: { cart: CartItem[]; name: string; phone: string; email?: string; onBack: () => void; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp', name: string, phone: string, email?: string) => void; lang: Language }) {
+function PaymentSelectionView({ cart, name, phone, email, onBack, onProcessCheckout, lang }: { cart: CartItem[]; name: string; phone: string; email?: string; onBack: () => void; onProcessCheckout: (method: 'qr' | 'bank_transfer' | 'whatsapp' | 'stripe', name: string, phone: string, email?: string) => void; lang: Language }) {
   const grandTotal = cart.reduce((acc, item) => acc + (item.priceNum * item.quantity), 0);
 
   return (
@@ -1391,6 +1392,22 @@ function PaymentSelectionView({ cart, name, phone, email, onBack, onProcessCheck
               <div>
                 <span className="text-[13px] font-bold text-[#1a1a1a] block">Bank Transfer</span>
                 <span className="text-[10px] text-slate-500">Manual upload, bank transaction slip</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-500" />
+          </button>
+
+          <button
+            onClick={() => onProcessCheckout('stripe', name, phone, email)}
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#fafaf8] border border-slate-200 hover:border-[#d4af37] hover:bg-[#d4af37]/5 transition-all text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-[#d4af37]/15 flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-[#d4af37]" />
+              </div>
+              <div>
+                <span className="text-[13px] font-bold text-[#1a1a1a] block">Credit Card (Stripe)</span>
+                <span className="text-[10px] text-slate-500">Visa, Mastercard, Amex (Mockup)</span>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-500" />
@@ -1966,7 +1983,7 @@ export default function ChatWidget() {
 
   // ── handleProcessCheckout ───────────────────────────────────────────────────
 
-  const handleProcessCheckout = async (method: 'qr' | 'bank_transfer' | 'whatsapp', customerName: string, customerPhone: string, customerEmail?: string) => {
+  const handleProcessCheckout = async (method: 'qr' | 'bank_transfer' | 'whatsapp' | 'stripe', customerName: string, customerPhone: string, customerEmail?: string) => {
     if (method === 'whatsapp') {
       let waMsg = `Hi, saya mahu proceed pesanan borong untuk:\n\n`;
       cart.forEach((item) => {
@@ -2048,6 +2065,11 @@ export default function ChatWidget() {
       try {
         localStorage.removeItem("golden_ai_cart");
       } catch (e) { }
+
+      if (method === 'stripe') {
+        router.push(`/payment/stripe/${orderId}`);
+        return;
+      }
 
       // Add a rich success message with upsell
       const tLocal = TRANSLATIONS[lang];
