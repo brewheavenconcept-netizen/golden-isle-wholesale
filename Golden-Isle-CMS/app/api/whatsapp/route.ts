@@ -49,13 +49,22 @@ export async function POST(request: Request) {
         // --- 1. TARIK KATALOG PRODUK DARI SUPABASE ---
         let catalogText = "Tiada senarai produk (Stok Kosong).";
         try {
+          console.log('🗄️ Querying Supabase...');
+          console.log('🔑 Supabase URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+          console.log('🔑 Supabase Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+          
           const { data: products, error: dbError } = await supabase
             .from('products')
             .select('name, price, category, stock_status')
             .eq('stock_status', 'in_stock');
             
-          if (!dbError && products && products.length > 0) {
+          if (dbError) {
+            console.error('❌ Supabase error:', dbError.message);
+          } else if (products && products.length > 0) {
             catalogText = products.map(p => `- ${p.name} (RM ${p.price})`).join('\n');
+            console.log(`✅ Supabase OK: ${products.length} produk jumpa`);
+          } else {
+            console.log('⚠️ Supabase: tiada produk in_stock');
           }
         } catch (e) {
           console.error("Gagal tarik produk:", e);
@@ -81,6 +90,9 @@ Arahan penting:
           ]
         };
 
+        console.log('🔄 Calling OpenAI...');
+        console.log('🔑 OpenAI Key exists:', !!process.env.OPENAI_API_KEY);
+
         const openaiRes = await fetch(openaiUrl, {
           method: 'POST',
           headers: { 
@@ -90,17 +102,22 @@ Arahan penting:
           body: JSON.stringify(openaiPayload)
         });
 
+        console.log('📡 OpenAI HTTP status:', openaiRes.status);
         const openaiData = await openaiRes.json();
-        console.log('\n--- OPENAI API RESPONSE ---');
-        console.log(JSON.stringify(openaiData, null, 2));
-        console.log('---------------------------\n');
+        
+        if (!openaiRes.ok) {
+          console.error('❌ OpenAI ERROR:', JSON.stringify(openaiData));
+        }
 
         const aiResponseText = openaiData.choices?.[0]?.message?.content || "Maaf bosku, otak saya sangkut sikit kejap.";
-        console.log(`🤖 AI BALAS: ${aiResponseText}`);
+        console.log(`🤖 AI BALAS: ${aiResponseText.substring(0, 150)}`);
 
-        // 2. HANTAR JAWAPAN GEMINI BALIK KE WHATSAPP PELANGGAN
+        // 3. HANTAR JAWAPAN AI BALIK KE WHATSAPP PELANGGAN
         const waToken = process.env.WHATSAPP_TOKEN;
         const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+        console.log('🔑 WA Token exists:', !!waToken);
+        console.log('📱 WA Phone ID exists:', !!waPhoneId);
 
         if (waToken && waPhoneId) {
           const waUrl = `https://graph.facebook.com/v17.0/${waPhoneId}/messages`;
@@ -110,6 +127,7 @@ Arahan penting:
             text: { body: aiResponseText }
           };
 
+          console.log('📤 Sending to WhatsApp API...');
           const waRes = await fetch(waUrl, {
             method: 'POST',
             headers: {
@@ -119,10 +137,12 @@ Arahan penting:
             body: JSON.stringify(waPayload)
           });
           
+          const waResText = await waRes.text();
           if(waRes.ok) {
             console.log('✅ Berjaya hantar mesej AI ke WhatsApp pelanggan!');
           } else {
-            console.log('❌ Gagal hantar mesej ke WhatsApp:', await waRes.text());
+            console.log('❌ Gagal hantar mesej ke WhatsApp. Status:', waRes.status);
+            console.log('❌ WA Error Response:', waResText);
           }
         } else {
           console.log('⚠️ WHATSAPP_TOKEN atau WHATSAPP_PHONE_NUMBER_ID belum diset dalam .env.local');
