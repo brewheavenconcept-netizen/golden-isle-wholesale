@@ -91,6 +91,40 @@ async function sendWAInteractiveList(to: string, sections: any[]) {
   });
 }
 
+// Hantar mesej dengan 3 Quick Reply Buttons ke WA
+async function sendWAButtons(to: string, bodyText: string, buttons: { id: string; title: string }[]) {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return;
+
+  // WA limit: max 3 buttons, title max 20 chars
+  const waButtons = buttons.slice(0, 3).map(b => ({
+    type: 'reply',
+    reply: {
+      id: b.id,
+      title: b.title.slice(0, 20),
+    },
+  }));
+
+  await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${waToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: { text: bodyText },
+        action: { buttons: waButtons },
+      },
+    }),
+  });
+}
+
 // Notify Telegram Admin
 async function notifyTelegram(msg: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -109,13 +143,16 @@ async function notifyTelegram(msg: string) {
 }
 
 // ── Intent Detector ─────────────────────────────────────────────────────────
-function detectIntent(text: string): 'catalog' | 'receipt' | 'suggest' | 'ai' {
+function detectIntent(text: string): 'greet' | 'catalog' | 'receipt' | 'suggest' | 'ai' {
   const lower = text.toLowerCase().trim();
 
+  const greetKeywords = ['hai', 'hi', 'hello', 'helo', 'hey', 'assalamualaikum', 'salam', 'start', 'mula', 'mulakan', 'apa khabar', 'selamat'];
   const catalogKeywords = ['catalog', 'katalog', 'senarai', 'produk', 'product', 'list', 'stok', 'stock', 'barang', 'harga semua'];
   const receiptKeywords = ['resit', 'receipt', 'order saya', 'pesanan', 'invois', 'invoice', 'status order', 'order status'];
   const suggestKeywords = ['cadangan', 'suggest', 'suggestion', 'feedback', 'idea', 'saranan', 'komen', 'comment', 'review'];
 
+  // Greet only if short message (≤4 words) to avoid false positives
+  if (greetKeywords.some(k => lower.includes(k)) && lower.split(' ').length <= 4) return 'greet';
   if (catalogKeywords.some(k => lower.includes(k))) return 'catalog';
   if (receiptKeywords.some(k => lower.includes(k))) return 'receipt';
   if (suggestKeywords.some(k => lower.includes(k))) return 'suggest';
@@ -123,6 +160,19 @@ function detectIntent(text: string): 'catalog' | 'receipt' | 'suggest' | 'ai' {
 }
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
+
+// GREETING: Hantar welcome message dengan 3 Quick Reply Buttons
+async function handleGreeting(from: string) {
+  await sendWAButtons(
+    from,
+    `👋 *Hai bosku! Selamat datang ke Golden Isle Wholesale* 🥃\n\nKami menyediakan minuman premium borong terbaik di Sabah & Labuan.\n\n*Apa yang boleh kami bantu hari ni?*`,
+    [
+      { id: 'btn_catalog',  title: '🛍️ Lihat Katalog' },
+      { id: 'btn_receipt',  title: '🧾 Semak Resit' },
+      { id: 'btn_suggest',  title: '💡 Beri Cadangan' },
+    ]
+  );
+}
 
 // CATALOG: Fetch produk dari Supabase & format sebagai WA Interactive List
 async function handleCatalog(from: string) {
@@ -338,6 +388,25 @@ export async function POST(request: Request) {
       const value = changes?.value;
       const message = value?.messages?.[0];
 
+      // Handle Quick Reply Button tap (user tekan butang)
+      if (message && message.type === 'button') {
+        const from = message.from;
+        const buttonPayload = message.button?.payload?.trim() || '';
+        console.log(`\n🔘 BUTTON REPLY: [${from}] "${buttonPayload}"`);
+
+        // Map button payload to intent handlers
+        if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog') {
+          await handleCatalog(from);
+        } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit') {
+          await handleReceipt(from);
+        } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
+          await handleSuggestion(from, buttonPayload);
+        } else {
+          await handleAIChat(from, buttonPayload);
+        }
+        return new NextResponse('EVENT_RECEIVED', { status: 200 });
+      }
+
       // Handle interactive reply (user pilih dari catalog list)
       if (message && message.type === 'interactive') {
         const from = message.from;
@@ -392,6 +461,9 @@ export async function POST(request: Request) {
         console.log(`🧠 Intent detected: ${intent}`);
 
         switch (intent) {
+          case 'greet':
+            await handleGreeting(from);
+            break;
           case 'catalog':
             await handleCatalog(from);
             break;
