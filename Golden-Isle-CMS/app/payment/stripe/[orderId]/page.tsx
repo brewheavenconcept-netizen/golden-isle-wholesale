@@ -121,7 +121,7 @@ export default function StripeGatewayPage() {
   const [items, setItems] = useState<ItemState[]>([]);
 
   // Checkout inputs
-  const [email, setEmail] = useState("customer@brewcart-demo.com");
+  const [email, setEmail] = useState("jiangeddy3@gmail.com");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCVC, setCardCVC] = useState("");
@@ -148,7 +148,7 @@ export default function StripeGatewayPage() {
           const foundOrder = await getOrder(orderId);
           if (foundOrder) {
             setOrder(foundOrder as any);
-            setEmail('customer@brewcart-demo.com');
+            setEmail('jiangeddy3@gmail.com');
             setCardName(foundOrder.customer_name || 'Bobby Lim');
             
             const mappedItems: ItemState[] = foundOrder.items.map((item: any, index: number) => ({
@@ -255,6 +255,30 @@ export default function StripeGatewayPage() {
           );
         } catch (err) {
           console.warn('DB update failed, utilizing memory fallback:', err);
+        }
+
+        // Trigger automatic paid invoice email via Resend
+        try {
+          await fetch(`/api/invoice/${orderId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              customerEmail: email,
+              customerName: cardName || order?.customer_name || 'Customer',
+              items: items.map((item) => ({
+                name: item.name,
+                description: item.description,
+                quantity: item.quantity,
+                priceNum: item.price
+              })),
+              taxRate: 0.08
+            })
+          });
+          console.log('✅ Automatic Resend invoice receipt sent.');
+        } catch (emailErr) {
+          console.warn('⚠️ Failed to send automatic email receipt:', emailErr);
         }
       }
     }, 2400);
