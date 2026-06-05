@@ -29,6 +29,38 @@ async function sendWAText(to: string, text: string) {
   });
 }
 
+// Hantar mesej gambar berserta caption ke WA
+async function sendWAImage(to: string, imageUrl: string, caption: string) {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return;
+
+  // Handle Supabase relative paths if needed, but usually image_url should be absolute or we format it.
+  // Assuming imageUrl is a full valid URL here.
+  let finalImageUrl = imageUrl;
+  if (imageUrl.startsWith('/')) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+    finalImageUrl = `${appUrl}${imageUrl}`;
+  }
+
+  await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${waToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'image',
+      image: {
+        link: finalImageUrl,
+        caption: caption,
+      },
+    }),
+  });
+}
+
 // Hantar WA Interactive List (Catalog)
 async function sendWAInteractiveList(to: string, sections: any[]) {
   const waToken = process.env.WHATSAPP_TOKEN;
@@ -316,22 +348,25 @@ export async function POST(request: Request) {
           const productId = selectedId.replace('product_', '');
           const { data: product } = await supabase
             .from('products')
-            .select('name, price, description, category')
+            .select('name, price, description, category, image_url')
             .eq('id', productId)
             .single();
 
           if (product) {
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
-            await sendWAText(
-              from,
-              `📦 *${product.name}*\n` +
+            const caption = `📦 *${product.name}*\n` +
               `━━━━━━━━━━━━━━━\n` +
               `💰 Harga: RM ${Number(product.price).toFixed(2)}\n` +
               `📁 Kategori: ${product.category || '-'}\n` +
               `📝 ${product.description || 'Premium quality product.'}\n\n` +
               `🛒 Mau order? Klik link:\n${appUrl}\n\n` +
-              `_Atau WhatsApp terus untuk order borong!_`
-            );
+              `_Atau WhatsApp terus untuk order borong!_`;
+
+            if (product.image_url) {
+              await sendWAImage(from, product.image_url, caption);
+            } else {
+              await sendWAText(from, caption);
+            }
           } else {
             await sendWAText(from, `Maaf, maklumat produk "${selectedTitle}" tidak dijumpai. Taip "catalog" untuk lihat semula.`);
           }
