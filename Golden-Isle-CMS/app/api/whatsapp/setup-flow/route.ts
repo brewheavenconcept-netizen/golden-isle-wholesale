@@ -147,7 +147,7 @@ export async function GET(request: Request) {
     },
     body: JSON.stringify({
       name: 'Golden Isle Order Form',
-      categories: ['UTILITY'],
+      categories: ['OTHER'],
     }),
   });
 
