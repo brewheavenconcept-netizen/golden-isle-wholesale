@@ -237,8 +237,8 @@ async function handleOrder(from: string) {
     return;
   }
 
-  // Hantar WA Flow — borang cantik terus dalam chat!
-  await sendWAFlow(from, flowId, 'published');
+  // Hantar WA Flow — guna 'draft' untuk test, 'published' bila dah publish
+  await sendWAFlow(from, flowId, 'draft');
 }
 
 // CATALOG: Fetch produk dari Supabase & format sebagai WA Interactive List
