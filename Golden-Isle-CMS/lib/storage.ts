@@ -95,6 +95,14 @@ export async function addProduct(
         console.error('[addProduct] Error:', error.message);
         throw new Error(error.message);
     }
+    
+    // Trigger on-demand sync to Meta Catalog
+    fetch('/api/catalog/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: data.id }),
+    }).catch(err => console.error('Failed to trigger Meta Catalog sync:', err));
+
     return data;
 }
 
@@ -132,7 +140,16 @@ export async function updateProduct(
         .from('products')
         .update(payload)
         .eq('id', id);
-    if (error) console.error('[updateProduct] Error:', error.message);
+    if (error) {
+        console.error('[updateProduct] Error:', error.message);
+    } else {
+        // Trigger on-demand sync to Meta Catalog
+        fetch('/api/catalog/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id }),
+        }).catch(err => console.error('Failed to trigger Meta Catalog sync:', err));
+    }
 }
 
 export async function deleteProduct(id: string, storeId?: string): Promise<void> {
@@ -140,7 +157,16 @@ export async function deleteProduct(id: string, storeId?: string): Promise<void>
         .from('products')
         .delete()
         .eq('id', id);
-    if (error) console.error('[deleteProduct] Error:', error.message);
+    if (error) {
+        console.error('[deleteProduct] Error:', error.message);
+    } else {
+        // Trigger on-demand sync to Meta Catalog (delete action)
+        fetch('/api/catalog/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id, action: 'delete' }),
+        }).catch(err => console.error('Failed to trigger Meta Catalog delete sync:', err));
+    }
 }
 
 export async function createOrderWithStockCheck(

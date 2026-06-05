@@ -1,11 +1,12 @@
 'use client';
 
-import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox, Bell, Banknote, FileText } from "lucide-react";
+import { Menu, X, LayoutDashboard, Package, ShoppingBag, Settings, ExternalLink, TrendingUp, LogOut, Sun, Moon, Megaphone, CreditCard, ShieldCheck, Inbox, Bell, Banknote, FileText, RefreshCw } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { useStore as useStoreData } from "@/hooks/useStore";
+import toast from "react-hot-toast";
 
 import { useNotificationsContext } from "@/hooks/useNotifications";
 import { useTheme } from "next-themes";
@@ -34,6 +35,30 @@ export default function Sidebar({
 
     const storeName = settings.store_name || "Golden Isle Wholesale";
     const [newInquiries, setNewInquiries] = useState(0);
+    const [syncing, setSyncing] = useState(false);
+
+    const handleSyncCatalog = async () => {
+        setSyncing(true);
+        const toastId = toast.loading('Syncing products to Meta Catalog...');
+        try {
+            const res = await fetch('/api/catalog/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'sync_all' }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success('Meta Catalog successfully synced!', { id: toastId });
+            } else {
+                toast.error(data.error || 'Failed to sync Meta Catalog.', { id: toastId });
+            }
+        } catch (err: any) {
+            console.error(err);
+            toast.error('Connection error occurred while syncing.', { id: toastId });
+        } finally {
+            setSyncing(false);
+        }
+    };
 
     useEffect(() => {
         const fetchInquiriesCount = async () => {
@@ -171,6 +196,18 @@ export default function Sidebar({
                     {navItem("/admin/payments", "Fintech Ledger", Banknote)}
                     {navItem("/admin/payment", "Payment Settings", CreditCard)}
                     {navItem("/admin/settings", "Settings", Settings)}
+                    
+                    <button
+                        type="button"
+                        onClick={handleSyncCatalog}
+                        disabled={syncing}
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group border-l-2 text-slate-400 hover:bg-white/5 hover:text-white border-transparent disabled:opacity-50"
+                    >
+                        <div className="flex items-center gap-3">
+                            <RefreshCw size={20} className={`transition-transform duration-200 group-hover:scale-105 ${syncing ? 'animate-spin text-blue-400' : ''}`} />
+                            <span className="text-sm font-medium">{syncing ? 'Syncing...' : 'Sync Meta Catalog'}</span>
+                        </div>
+                    </button>
                 </nav>
 
                 {/* Bottom Actions */}
