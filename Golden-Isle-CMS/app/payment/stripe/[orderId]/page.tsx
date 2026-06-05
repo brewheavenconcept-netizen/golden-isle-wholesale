@@ -386,155 +386,155 @@ export default function StripeGatewayPage() {
         {/* ================= COLUMN 1: Cart Configurator & Invoice ================= */}
         <section className="lg:col-span-5 flex flex-col gap-6">
           
-          {/* Total Amount Panel */}
-          <div className={`p-8 rounded-[16px] border relative overflow-hidden transition-all duration-300 ${
+          {/* Unified Order Panel */}
+          <div className={`rounded-[16px] border overflow-hidden transition-all duration-300 divide-y ${
             darkMode 
-              ? 'bg-[#131926] border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.3)]' 
-              : 'bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.03)]'
+              ? 'bg-[#131926] border-white/5 divide-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.3)]' 
+              : 'bg-white border-slate-200/60 divide-slate-100 shadow-[0_12px_32px_rgba(0,0,0,0.03)]'
           }`}>
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="text-[10px] tracking-[0.15em] font-bold text-slate-400 block mb-1">
-                  AMOUNT DUE
-                </span>
-                <h1 className="text-4xl lg:text-5xl font-black tracking-tight tabular-nums text-slate-905 dark:text-white flex items-baseline">
-                  <span className="text-xl font-normal text-slate-400 mr-1.5">RM</span>
-                  {totalDue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h1>
-              </div>
-              <div className="text-right">
-                <span className="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-105 dark:bg-white/5 text-slate-500 dark:text-slate-400">
-                  REF-{orderId.slice(-6).toUpperCase()}
-                </span>
+            
+            {/* Total Amount Panel */}
+            <div className="p-8 relative overflow-hidden">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] tracking-[0.15em] font-bold text-slate-400 block mb-1">
+                    AMOUNT DUE
+                  </span>
+                  <h1 className="text-4xl lg:text-5xl font-black tracking-tight tabular-nums text-slate-905 dark:text-white flex items-baseline">
+                    <span className="text-xl font-normal text-slate-400 mr-1.5">RM</span>
+                    {totalDue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h1>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-105 dark:bg-white/5 text-slate-500 dark:text-slate-400">
+                    REF-{orderId.slice(-6).toUpperCase()}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Configurator Column */}
-          <div className={`p-6 rounded-[16px] border transition-all duration-300 ${
-            darkMode ? 'bg-[#131926] border-white/5' : 'bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.02)]'
-          }`}>
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                01 / CONFIGURATOR
-              </h3>
-              <span className="text-[9px] font-bold text-[#635bff] bg-[#635bff]/10 px-2 py-0.5 rounded-full">
-                Adjust Units
-              </span>
-            </div>
+            {/* Configurator Column */}
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                  01 / CONFIGURATOR
+                </h3>
+                <span className="text-[9px] font-bold text-[#635bff] bg-[#635bff]/10 px-2 py-0.5 rounded-full">
+                  Adjust Units
+                </span>
+              </div>
 
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div 
-                  key={item.id} 
-                  className={`p-4 rounded-[12px] border transition-all duration-300 relative overflow-hidden ${
-                    item.quantity > 0 
-                      ? (darkMode ? 'bg-[#1a202e] border-[#635bff]/30' : 'bg-white border-[#635bff]/20 shadow-sm') 
-                      : (darkMode ? 'bg-[#131926]/50 border-white/5' : 'bg-slate-55/50 border-slate-200/60')
-                  }`}
-                >
-                  <div className="flex gap-3 justify-between items-start mb-3">
-                    <div className="flex gap-3 items-center">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-50 border border-slate-200/40 flex items-center justify-center text-xs font-mono font-bold text-slate-400">
-                        {item.image ? (
-                          <img src={item.image} className="w-full h-full object-cover" alt="" />
-                        ) : (
-                          "BEER"
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-bold text-xs text-slate-800 dark:text-white tracking-tight">{item.name}</span>
-                          <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider ${
-                            item.badge === "Best Seller" ? 'bg-[#635bff]/10 text-[#635bff]' : 'bg-amber-500/10 text-amber-600'
-                          }`}>
-                            {item.badge}
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className={`p-4 rounded-[12px] border transition-all duration-300 relative overflow-hidden ${
+                      item.quantity > 0 
+                        ? (darkMode ? 'bg-[#1a202e] border-[#635bff]/30' : 'bg-white border-[#635bff]/20 shadow-sm') 
+                        : (darkMode ? 'bg-[#131926]/50 border-white/5' : 'bg-slate-55/50 border-slate-200/60')
+                    }`}
+                  >
+                    <div className="flex gap-3 justify-between items-start mb-3">
+                      <div className="flex gap-3 items-center">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-50 border border-slate-200/40 flex items-center justify-center text-xs font-mono font-bold text-slate-400">
+                          {item.image ? (
+                            <img src={item.image} className="w-full h-full object-cover" alt="" />
+                          ) : (
+                            "BEER"
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-xs text-slate-800 dark:text-white tracking-tight">{item.name}</span>
+                            <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider ${
+                              item.badge === "Best Seller" ? 'bg-[#635bff]/10 text-[#635bff]' : 'bg-amber-500/10 text-amber-600'
+                            }`}>
+                              {item.badge}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-550 block mt-0.5 max-w-[180px] truncate">
+                            {item.description}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-550 block mt-0.5 max-w-[180px] truncate">
-                          {item.description}
+                      </div>
+                      
+                      <div className="text-right shrink-0">
+                        <span className="font-mono font-bold text-xs text-slate-705 dark:text-slate-250">
+                          RM {item.price.toFixed(2)}
                         </span>
                       </div>
                     </div>
-                    
-                    <div className="text-right shrink-0">
-                      <span className="font-mono font-bold text-xs text-slate-705 dark:text-slate-250">
-                        RM {item.price.toFixed(2)}
-                      </span>
+
+                    {/* Quantity adjustments */}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
+                      <span className="text-[9px] uppercase font-extrabold tracking-wider text-slate-400">Units:</span>
+                      <div className={`flex items-center p-0.5 rounded-lg border ${
+                        darkMode ? 'bg-black/40 border-white/5' : 'bg-slate-100/70 border-slate-200'
+                      }`}>
+                        <button 
+                          type="button"
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className={`p-1 px-2.5 rounded transition-all text-xs font-extrabold ${
+                            item.quantity === 0 
+                              ? 'opacity-30 cursor-not-allowed' 
+                              : (darkMode ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-white text-slate-800 shadow-sm')
+                          }`}
+                          disabled={item.quantity === 0}
+                        >
+                          -
+                        </button>
+                        
+                        <span className="text-xs font-mono font-bold px-3 min-w-[28px] text-center">
+                          {item.quantity}
+                        </span>
+
+                        <button 
+                          type="button"
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className={`p-1 px-2.5 rounded transition-all text-xs font-extrabold ${
+                            darkMode ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-white text-slate-805 shadow-sm'
+                          }`}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Quantity adjustments */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
-                    <span className="text-[9px] uppercase font-extrabold tracking-wider text-slate-400">Units:</span>
-                    <div className={`flex items-center p-0.5 rounded-lg border ${
-                      darkMode ? 'bg-black/40 border-white/5' : 'bg-slate-100/70 border-slate-200'
-                    }`}>
-                      <button 
-                        type="button"
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className={`p-1 px-2.5 rounded transition-all text-xs font-extrabold ${
-                          item.quantity === 0 
-                            ? 'opacity-30 cursor-not-allowed' 
-                            : (darkMode ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-white text-slate-800 shadow-sm')
-                        }`}
-                        disabled={item.quantity === 0}
-                      >
-                        -
-                      </button>
-                      
-                      <span className="text-xs font-mono font-bold px-3 min-w-[28px] text-center">
-                        {item.quantity}
-                      </span>
-
-                      <button 
-                        type="button"
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className={`p-1 px-2.5 rounded transition-all text-xs font-extrabold ${
-                          darkMode ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-white text-slate-805 shadow-sm'
-                        }`}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Receipt invoice details */}
-          <div className={`p-6 rounded-[16px] border transition-all duration-300 relative ${
-            darkMode ? 'bg-[#131926] border-white/5' : 'bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.02)]'
-          }`}>
-            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-4">
-              02 / ORDER SUMMARY
-            </h4>
-            
-            <div className="space-y-3.5 text-xs">
-              <div className="flex justify-between text-slate-505">
-                <span>Subtotal</span>
-                <span className="font-mono text-slate-800 dark:text-slate-100 font-medium">
-                  RM {subtotal.toFixed(2)}
-                </span>
+                ))}
               </div>
+            </div>
+
+            {/* Receipt invoice details */}
+            <div className="p-6 relative">
+              <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-4">
+                02 / ORDER SUMMARY
+              </h4>
               
-              <div className="flex justify-between text-slate-505">
-                <span>Fulfillment (Langkawi / Labuan / KL)</span>
-                <span className="text-emerald-605 font-mono font-bold tracking-wider text-[10px]">
-                  FREE
-                </span>
-              </div>
+              <div className="space-y-3.5 text-xs">
+                <div className="flex justify-between text-slate-505">
+                  <span>Subtotal</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-100 font-medium">
+                    RM {subtotal.toFixed(2)}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between text-slate-505 items-center gap-2">
+                  <span className="whitespace-nowrap truncate text-[11px]">Fulfillment (Langkawi/Labuan/KL)</span>
+                  <span className="text-emerald-605 font-mono font-bold tracking-wider text-[10px] shrink-0">
+                    FREE
+                  </span>
+                </div>
 
-              <div className="border-t border-slate-150 dark:border-white/5 pt-3.5 flex justify-between text-sm">
-                <span className="font-semibold text-slate-705 dark:text-slate-200">Total due</span>
-                <span className="font-mono font-bold text-lg text-[#635bff]">
-                  RM {totalDue.toFixed(2)}
-                </span>
+                <div className="border-t border-slate-150 dark:border-white/5 pt-3.5 flex justify-between text-sm">
+                  <span className="font-semibold text-slate-705 dark:text-slate-200">Total due</span>
+                  <span className="font-mono font-bold text-lg text-[#635bff]">
+                    RM {totalDue.toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
+          </div>
         </section>
 
         {/* ================= COLUMN 2: Checkout Form & Stripe Panel ================= */}
@@ -782,42 +782,42 @@ export default function StripeGatewayPage() {
 
       {/* Success Transaction Overlay Modal */}
       {paymentSuccess && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-[#0b0f19] border border-slate-200/80 dark:border-white/10 rounded-[20px] max-w-md w-full p-8 shadow-3xl text-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border border-slate-200/80 rounded-[20px] max-w-md w-full p-8 shadow-3xl text-center relative overflow-hidden">
             
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 rounded-full blur-[50px]"></div>
             </div>
 
             <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Icons.CheckCircle className="w-8 h-8 text-emerald-605" />
+              <Icons.CheckCircle className="w-8 h-8 text-emerald-600" />
             </div>
 
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-655 bg-emerald-500/10 px-3 py-1 rounded-full">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full">
               TRANSACTION CONFIRMED
             </span>
 
-            <h3 className="text-2xl font-black text-slate-805 dark:text-white mt-4 tracking-tight">
+            <h3 className="text-2xl font-black text-slate-900 mt-4 tracking-tight">
               Payment Completed
             </h3>
             
             <p className="text-xs text-slate-500 mt-2 px-4 leading-relaxed">
-              Your transaction of <strong className="text-slate-850 dark:text-white font-mono">RM {totalDue.toFixed(2)}</strong> was successfully authorized and completed.
+              Your transaction of <strong className="text-slate-800 font-mono">RM {totalDue.toFixed(2)}</strong> was successfully authorized and completed.
             </p>
 
             {/* Invoiced Receipt inside Modal */}
-            <div className="my-6 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/5 text-xs text-left divide-y divide-slate-200/60 dark:divide-white/5">
+            <div className="my-6 p-4 rounded-xl bg-slate-50 border border-slate-200/60 text-xs text-left divide-y divide-slate-200/60">
               <div className="pb-2.5 flex justify-between">
-                <span className="text-slate-455">Account</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{email}</span>
+                <span className="text-slate-500">Account</span>
+                <span className="font-semibold text-slate-800">{email}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-slate-455">Merchant</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">GOLDEN AI RETAILER</span>
+                <span className="text-slate-500">Merchant</span>
+                <span className="font-semibold text-slate-800">GOLDEN AI RETAILER</span>
               </div>
               <div className="pt-2.5 flex justify-between">
-                <span className="text-slate-455">Total Invoiced</span>
-                <span className="font-mono font-bold text-emerald-650 dark:text-emerald-400">RM {totalDue.toFixed(2)}</span>
+                <span className="text-slate-500">Total Invoiced</span>
+                <span className="font-mono font-bold text-emerald-600">RM {totalDue.toFixed(2)}</span>
               </div>
             </div>
 

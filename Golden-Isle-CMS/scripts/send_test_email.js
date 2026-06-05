@@ -2,7 +2,7 @@
 // Tests BOTH the /api/chat order email AND the new /api/invoice/:id POST email
 // Run: node scripts/send_test_email.js
 
-const BASE = "http://localhost:3000";
+const BASE = "https://goldenisle-wholesale.vercel.app";
 const RECIPIENT = "jiangeddy3@gmail.com";
 
 // ── Test 1: New clean white invoice via POST /api/invoice/:id ─────────────

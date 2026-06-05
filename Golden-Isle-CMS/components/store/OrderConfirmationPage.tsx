@@ -161,346 +161,410 @@ Please confirm my order. Thank you!`;
         ? `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
         : null;
 
-
-
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 font-sans text-gray-900">
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="max-w-xl mx-auto space-y-8 tracking-wide"
-            >
-                {/* 1. Success Header & Summary Card */}
-                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                    <div className="bg-white p-8 text-center border-b border-gray-100 relative">
-                        <CheckCircle
-                            className="mx-auto w-16 h-16 mb-4 text-emerald-500 cursor-pointer hover:scale-105 transition-transform"
-                            onClick={handleSecretTrigger}
-                        />
-                        <h1 className="text-3xl font-light tracking-tight text-gray-900">Order Confirmed</h1>
-                        <p className="text-gray-500 font-medium mt-2 text-sm uppercase tracking-widest">Order #{order?.id?.slice(0, 8) || ''}</p>
-                    </div>
+        <div className="min-h-screen relative overflow-hidden bg-[#F8F9FC] text-slate-900 antialiased flex flex-col font-sans">
+            
+            {/* Google Inter Font Injected */}
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+                .font-sans {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                }
+            `}</style>
 
-                    <div className="p-8 space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-semibold text-gray-800 tracking-wide">Review Information</h2>
-                            {currentStatus === 'pending_payment' || currentStatus === 'unpaid' ? (
-                                <button
-                                    onClick={() => router.push('/checkout')}
-                                    className="text-gray-500 font-medium text-sm flex items-center gap-1 hover:text-gray-900 transition-colors"
-                                >
-                                    <Edit size={14} /> Edit
-                                </button>
-                            ) : null}
-                        </div>
+            {/* Stripe Iconic Diagonal Mesh Gradient Background */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                <div 
+                    className="absolute top-[25%] -left-[10%] w-[120%] h-[40%] origin-top-left -rotate-[6deg] opacity-[0.85] blur-[1px] transition-all"
+                    style={{
+                        background: 'linear-gradient(110deg, #F3F7FF 10%, #E8EFFF 30%, #E9D3FF 50%, #FFD6E8 75%, #FFF0D4 95%)'
+                    }}
+                />
+            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-2xl text-sm">
-                            <div className="space-y-1">
-                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Full Name</p>
-                                <p className="font-medium text-gray-900">{order?.customer_name}</p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Phone Number</p>
-                                <p className="font-medium text-gray-900">{order?.phone || order?.customer_phone}</p>
-                            </div>
-                            <div className="md:col-span-2 space-y-1">
-                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Delivery Address</p>
-                                <p className="font-medium text-gray-700 leading-relaxed">{order?.address || order?.delivery_address}</p>
-                            </div>
-                            <div className="md:col-span-2 space-y-1 pt-4 border-t border-gray-100 mt-2">
-                                <p className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Total Amount</p>
-                                <p className="text-3xl font-light text-gray-900 tracking-tight">RM {order?.total ? Number(order?.total).toFixed(2) : '0.00'}</p>
-                            </div>
-                        </div>
-                    </div>
+            {/* Header Panel */}
+            <header className="px-6 py-4 flex items-center justify-between border-b relative z-20 border-slate-200/50 bg-white/70 backdrop-blur-md">
+                <div className="flex items-center space-x-4">
+                    <button 
+                        onClick={() => router.push('/')}
+                        className="flex items-center space-x-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-all bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200/80 shadow-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Store</span>
+                    </button>
+                </div>
+                
+                {/* Brand Logo & Title */}
+                <div className="flex items-center space-x-2" onClick={handleSecretTrigger}>
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-800 cursor-pointer">
+                        <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
+                        <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="1" />
+                        <path d="M50 20V80M20 50H80" stroke="currentColor" strokeWidth="0.5" />
+                        <circle cx="50" cy="50" r="8" fill="currentColor" className="opacity-80" />
+                    </svg>
+                    <span className="font-sans text-[11px] tracking-[0.2em] font-extrabold uppercase opacity-90 text-slate-700">
+                        GOLDEN AI RETAILER
+                    </span>
                 </div>
 
-                {/* CONDITIONAL UI LOGIC BASED ON STATUS */}
-                <AnimatePresence mode="wait">
-                    {/* STATE 1: PENDING PAYMENT / UNPAID */}
-                    {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
-                        <motion.div
-                            key="pending"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.98 }}
-                            transition={{ duration: 0.4 }}
-                            className="space-y-6 relative"
-                        >
-                            <div className="text-center pt-2">
-                                <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Secure payment</h1>
-                                <p className="text-gray-500 font-medium mt-1 text-sm">Choose your preferred payment method</p>
-                                
-                                <div className="mt-4 mx-auto inline-flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-200 text-xs text-gray-600 font-medium">
-                                    <span>🔒 Secure checkout</span>
-                                    <span>•</span>
-                                    <span>⚡ Instant processing</span>
-                                    <span>•</span>
-                                    <span>🇲🇾 Malaysian</span>
+                <div className="w-16"></div> {/* spacer */}
+            </header>
+
+            {/* Main Grid Layout */}
+            <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-12 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* ================= COLUMN 1: Order Details & Products ================= */}
+                <section className="lg:col-span-5 flex flex-col gap-6">
+                    
+                    {/* Amount Paid / Due Panel */}
+                    <div className="p-8 rounded-[16px] border bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.03)] relative overflow-hidden">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <span className="text-[10px] tracking-[0.15em] font-bold text-slate-400 block mb-1">
+                                    {currentStatus === 'paid' ? 'TOTAL PAID' : 'AMOUNT DUE'}
+                                </span>
+                                <h1 className="text-4xl lg:text-5xl font-black tracking-tight tabular-nums text-slate-900 flex items-baseline">
+                                    <span className="text-xl font-normal text-slate-400 mr-1.5">RM</span>
+                                    {Number(order.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </h1>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-105 text-slate-500">
+                                    REF-{order.id.slice(-6).toUpperCase()}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Status badge in amount panel */}
+                        <div className="mt-4 pt-4 border-t border-slate-100 flex items-center">
+                            {currentStatus === 'paid' ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                                    Payment Confirmed
+                                </span>
+                            ) : currentStatus === 'verifying_payment' || currentStatus === 'pending_verification' ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-500/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+                                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                    Verifying Transfer
+                                </span>
+                            ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 bg-rose-500/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping"></span>
+                                    Awaiting Payment
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Customer Info Card */}
+                    <div className="p-6 rounded-[16px] border bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.02)]">
+                        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-4">
+                            02 / CUSTOMER DETAILS
+                        </h3>
+                        <div className="space-y-4 text-xs">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <span className="text-slate-400 font-bold uppercase text-[9px]">Full Name</span>
+                                    <p className="font-semibold text-slate-800">{order.customer_name}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-slate-400 font-bold uppercase text-[9px]">Phone</span>
+                                    <p className="font-semibold text-slate-800">{order.customer_phone || order.phone}</p>
                                 </div>
                             </div>
+                            <div className="space-y-1 pt-3 border-t border-slate-100">
+                                <span className="text-slate-400 font-bold uppercase text-[9px]">Delivery Address</span>
+                                <p className="font-medium text-slate-700 leading-relaxed">{order.delivery_address || order.address}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div className="space-y-4">
-                                {/* CARD 1: PAY VIA TRANSFER */}
-                                <div
-                                    className="relative group p-6 bg-white rounded-2xl border-2 border-gray-900 transition-all"
-                                >
-                                    <div className="absolute -top-3 left-6 z-20">
-                                        <div className="bg-gray-900 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
-                                            <span>⚡</span> Most popular
+                    {/* Purchased Items Card */}
+                    <div className="p-6 rounded-[16px] border bg-white border-slate-200/60 shadow-[0_12px_32px_rgba(0,0,0,0.02)]">
+                        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-4">
+                            03 / PRODUCTS PURCHASED
+                        </h3>
+                        <div className="space-y-3">
+                            {order.items?.map((item: any, idx: number) => (
+                                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <div className="w-10 h-10 bg-white border border-slate-200/40 rounded-lg overflow-hidden shrink-0 flex items-center justify-center text-xs font-mono font-bold text-slate-400">
+                                        {item.product?.images?.[0] || item.product?.image_url ? (
+                                            <img src={item.product?.images?.[0] || item.product?.image_url} className="w-full h-full object-cover" alt="" />
+                                        ) : (
+                                            "BEER"
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start">
+                                            <span className="font-bold text-xs text-slate-800 truncate block max-w-[150px]">{item.product?.name || item.name}</span>
+                                            <span className="font-mono font-bold text-xs text-slate-700">
+                                                RM {Number(item.product?.price || item.price || 0).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center mt-1">
+                                            <span className="text-[10px] text-slate-400">Qty: {item.qty || item.quantity}</span>
+                                            <span className="text-[10px] font-bold text-[#635bff] bg-[#635bff]/10 px-1.5 py-0.5 rounded">
+                                                RM {(Number(item.product?.price || item.price || 0) * (item.qty || item.quantity)).toFixed(2)}
+                                            </span>
                                         </div>
                                     </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* ================= COLUMN 2: Status Action Center ================= */}
+                <section className="lg:col-span-7 rounded-[16px] border bg-white border-slate-200/80 shadow-[0_20px_48px_rgba(0,0,0,0.04)] p-8 lg:p-10">
+                    <div className="max-w-md mx-auto">
+                        <AnimatePresence mode="wait">
+                            {/* STATE 3: PAID */}
+                            {currentStatus === 'paid' && (
+                                <motion.div
+                                    key="paid"
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="space-y-6 text-center"
+                                >
+                                    <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 text-left mb-6">
+                                        01 / TRANSACTION STATUS
+                                    </h2>
                                     
-                                    <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between mt-2">
-                                        <div className="space-y-3">
-                                            <div>
-                                                <h3 className="font-semibold text-gray-900 text-lg">Pay via transfer</h3>
-                                                <p className="text-gray-500 text-sm mt-0.5">DuitNow QR or bank transfer</p>
+                                    <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <CheckCircle className="w-8 h-8 text-emerald-600" />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Payment Completed</h3>
+                                        <p className="text-xs text-slate-500 px-6 leading-relaxed">
+                                            Your transaction was successfully processed. A copy of the receipt has been emailed to you.
+                                        </p>
+                                    </div>
+
+                                    {/* Bento Receipt Box */}
+                                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/60 text-xs text-left divide-y divide-slate-200/60 my-6">
+                                        <div className="pb-2.5 flex justify-between">
+                                            <span className="text-slate-500">Merchant</span>
+                                            <span className="font-semibold text-slate-800">GOLDEN AI RETAILER</span>
+                                        </div>
+                                        <div className="py-2.5 flex justify-between">
+                                            <span className="text-slate-500">Payment Mode</span>
+                                            <span className="font-semibold text-slate-800">{order.payment_method || 'Online Transfer'}</span>
+                                        </div>
+                                        <div className="pt-2.5 flex justify-between">
+                                            <span className="text-slate-500">Total Invoiced</span>
+                                            <span className="font-mono font-bold text-emerald-600">RM {Number(order.total).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="space-y-3">
+                                        <button
+                                            onClick={() => window.open(`/api/invoice/${order.id}`, '_blank')}
+                                            className="w-full py-3.5 px-6 rounded-md text-sm font-semibold tracking-tight text-white transition-all bg-[#635bff] hover:bg-[#544ee0] shadow-[0_2px_4px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(99,91,255,0.25)] flex items-center justify-center gap-2"
+                                        >
+                                            <Download size={16} />
+                                            <span>Download Invoice</span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => router.push('/')}
+                                            className="w-full py-3 px-6 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs tracking-widest uppercase rounded-lg border border-slate-200 transition-all shadow-sm"
+                                        >
+                                            Back to Store
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* STATE 2: VERIFYING */}
+                            {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification') && (
+                                <motion.div
+                                    key="verifying"
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="space-y-6 text-center"
+                                >
+                                    <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 text-left mb-6">
+                                        01 / TRANSACTION STATUS
+                                    </h2>
+
+                                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto relative mb-4">
+                                        <Hourglass className="text-[#c8a84b] w-8 h-8 animate-pulse" />
+                                        <div className="absolute inset-0 border-[3px] border-amber-50 rounded-full animate-spin border-t-[#c8a84b]" style={{ animationDuration: '2.5s' }} />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Payment Verifying</h3>
+                                        <p className="text-xs text-slate-500 px-6 leading-relaxed">
+                                            Our finance team is currently validating your transfer. You will receive a notification email as soon as it's approved.
+                                        </p>
+                                    </div>
+
+                                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/60 text-xs text-left divide-y divide-slate-200/60 my-6">
+                                        <div className="pb-2.5 flex justify-between">
+                                            <span className="text-slate-500">Verification Status</span>
+                                            <span className="font-semibold text-amber-600 flex items-center gap-1.5 animate-pulse">
+                                                Pending Approval
+                                            </span>
+                                        </div>
+                                        <div className="pt-2.5 flex justify-between">
+                                            <span className="text-slate-500">Amount Sent</span>
+                                            <span className="font-mono font-bold text-slate-800">RM {Number(order.total).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => router.push('/')}
+                                        className="w-full py-3.5 px-6 rounded-md text-sm font-semibold tracking-tight text-white transition-all bg-[#635bff] hover:bg-[#544ee0] shadow-sm flex items-center justify-center"
+                                    >
+                                        Back to Store
+                                    </button>
+                                </motion.div>
+                            )}
+
+                            {/* STATE 1: UNPAID / PENDING */}
+                            {(currentStatus === 'pending_payment' || currentStatus === 'unpaid') && (
+                                <motion.div
+                                    key="unpaid"
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="space-y-6"
+                                >
+                                    <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-6">
+                                        01 / PAYMENT REQUIRED
+                                    </h2>
+
+                                    <div className="text-center space-y-2 mb-6">
+                                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Complete Payment</h3>
+                                        <p className="text-xs text-slate-500 leading-relaxed">
+                                            Securely select your preferred payment mode below to settle the quotation.
+                                        </p>
+                                    </div>
+
+                                    {/* Payment Methods Layout */}
+                                    <div className="space-y-4">
+                                        {/* DuitNow Transfer */}
+                                        <div className="p-5 bg-white rounded-2xl border-2 border-slate-900 flex flex-col gap-3 relative shadow-sm">
+                                            <div className="absolute -top-3 left-4 z-10 flex items-center gap-1 px-3 py-0.5 bg-[#1a1a1a] text-white rounded-full text-[8px] font-bold tracking-widest uppercase">
+                                                ★ POPULAR
                                             </div>
-                                            <div className="space-y-2 mt-2">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <CheckIcon className="w-4 h-4 text-black" />
-                                                    <span>Instant verification</span>
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <h4 className="font-bold text-sm text-slate-800">Pay via Bank Transfer</h4>
+                                                    <p className="text-[10px] text-slate-400 mt-0.5">DuitNow QR or manual bank transfer</p>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <CheckIcon className="w-4 h-4 text-black" />
-                                                    <span>No extra fees</span>
-                                                </div>
+                                                <button
+                                                    onClick={() => router.push(`/payment/transfer/${orderId}`)}
+                                                    className="py-2 px-4 bg-[#1a1a1a] text-white rounded-lg text-xs font-bold transition hover:bg-slate-800"
+                                                >
+                                                    Transfer
+                                                </button>
                                             </div>
                                         </div>
-                                        <div className="w-full flex justify-center sm:justify-end">
+
+                                        {/* Stripe card */}
+                                        <div className="p-5 bg-white rounded-2xl border border-slate-200/80 flex justify-between items-center shadow-sm">
+                                            <div>
+                                                <h4 className="font-bold text-sm text-slate-805">Pay via Stripe</h4>
+                                                <p className="text-[10px] text-slate-400 mt-0.5">Instant Visa, Mastercard, AMEX</p>
+                                            </div>
                                             <button
-                                                onClick={() => router.push(`/payment/transfer/${orderId}`)}
-                                                className="jelly-btn btn-transfer transition-transform active:scale-95"
+                                                onClick={() => router.push(`/payment/stripe/${orderId}`)}
+                                                className="py-2 px-4 bg-[#635bff] text-white rounded-lg text-xs font-bold transition hover:bg-[#544ee0]"
                                             >
-                                                Transfer Now
+                                                Pay Card
                                             </button>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* CARD 2: ORDER VIA WHATSAPP */}
-                                    {waLink ? (
-                                        <a
-                                            href={waLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            onClick={handleSecretTrigger}
-                                            className="group p-4 bg-white rounded-2xl border border-gray-100 shadow-sm transition-all cursor-pointer flex flex-col gap-4"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
-                                                    <WhatsappIcon className="w-5 h-5" />
+                                        {/* WhatsApp Support */}
+                                        {waLink && (
+                                            <div className="p-5 bg-white rounded-2xl border border-slate-200/80 flex justify-between items-center shadow-sm">
+                                                <div>
+                                                    <h4 className="font-bold text-sm text-slate-850">WhatsApp Invoice</h4>
+                                                    <p className="text-[10px] text-slate-400 mt-0.5">Confirm order directly with sales agent</p>
                                                 </div>
-                                                <h3 className="font-semibold text-gray-900 text-base">Order via WhatsApp</h3>
+                                                <a
+                                                    href={waLink}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="py-2 px-4 bg-[#25D366] text-white rounded-lg text-xs font-bold transition hover:bg-emerald-600 text-center"
+                                                >
+                                                    Chat Sales
+                                                </a>
                                             </div>
-                                            <div className="jelly-btn btn-whatsapp mx-auto">
-                                                <WhatsappIcon className="w-5 h-5" />
-                                                Chat Now
-                                            </div>
-                                        </a>
-                                    ) : (
-                                        <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-4 opacity-60">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0"></div>
-                                                <h3 className="font-semibold text-gray-400 text-base">Order via WhatsApp</h3>
-                                            </div>
-                                            <div className="w-full py-2.5 px-4 bg-gray-200 text-gray-400 rounded-xl font-medium text-sm text-center">
-                                                Connecting...
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* CARD 3: PAY VIA FPX */}
-                                    <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-4 opacity-60">
-                                        <div className="flex items-center gap-3">
-                                            <Image src="/fpx-logo.png" alt="FPX" width={48} height={24} />
-                                            <h3 className="font-semibold text-gray-900 text-base">FPX online banking</h3>
-                                        </div>
-                                        <button 
-                                            disabled 
-                                            onClick={handleFPXCheckout} 
-                                            className="w-full max-w-[180px] mx-auto py-2.5 px-4 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm text-center transition-colors"
-                                        >
-                                            Coming Soon
-                                        </button>
+                                        )}
                                     </div>
-                                </div>
-                                
-                                <div className="grid grid-cols-1 gap-4">
-                                    {/* CARD 4: CREDIT CARD */}
-                                    <div className="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 opacity-50">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 shrink-0">
-                                                 <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-gray-900 text-base">Credit card</h3>
-                                                <p className="text-gray-500 text-xs mt-0.5">Visa, Mastercard</p>
-                                            </div>
-                                        </div>
-                                        <button disabled className="w-full sm:w-auto py-2.5 px-8 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm text-center">
-                                            Coming Soon
-                                        </button>
-                                    </div>
-                                </div>
+                                </motion.div>
+                            )}
 
-                                {/* WHY CHOOSE US */}
-                                <div className="pt-6 pb-2">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4">
-                                        <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                                            <CheckIcon className="w-4 h-4 text-black shrink-0" />
-                                            Secure payments
-                                        </div>
-                                        <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                                            <CheckIcon className="w-4 h-4 text-black shrink-0" />
-                                            Fast order processing
-                                        </div>
-                                        <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                                            <CheckIcon className="w-4 h-4 text-black shrink-0" />
-                                            Trusted by customers
-                                        </div>
-                                        <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                                            <CheckIcon className="w-4 h-4 text-black shrink-0" />
-                                            24/7 dedicated support
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
+                        </AnimatePresence>
+                    </div>
+                </section>
 
-                    {/* STATE 2: VERIFYING PAYMENT (LEGIT STYLE) */}
-                    {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification') && (
+            </main>
+
+            {/* Developer Backdoor Modal */}
+            <AnimatePresence>
+                {showDevModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                         <motion.div
-                            key="verifying"
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-sm relative overflow-hidden"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{
+                                scale: 1,
+                                opacity: 1,
+                                x: isShaking ? [0, -10, 10, -10, 10, 0] : 0
+                            }}
+                            transition={{
+                                scale: { duration: 0.3 },
+                                opacity: { duration: 0.3 },
+                                x: { duration: 0.4, times: [0, 0.2, 0.4, 0.6, 0.8, 1] }
+                            }}
+                            onAnimationComplete={() => setIsShaking(false)}
+                            className="bg-[#0a0a0a] border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)] rounded-2xl max-w-sm w-full p-8 space-y-6"
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#c8a84b] via-amber-200 to-[#c8a84b] animate-pulse" />
-                            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto relative">
-                                <Hourglass className="text-[#c8a84b] w-10 h-10 animate-pulse" />
-                                <div className="absolute inset-0 border-[3px] border-amber-50 rounded-full animate-spin border-t-[#c8a84b]" style={{ animationDuration: '2.5s' }} />
+                            <div className="text-center space-y-2">
+                                <div className="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Lock className="text-amber-500 w-6 h-6" />
+                                </div>
+                                <h2 className="text-amber-500 font-bold tracking-[0.2em] text-sm uppercase">System Maintenance</h2>
+                                <p className="text-gray-500 text-xs tracking-wide">Secure authorization required for gateway access.</p>
                             </div>
                             <div className="space-y-4">
-                                <h2 className="text-2xl font-light text-gray-900 tracking-tight">Payment Verifying</h2>
-                                <p className="text-gray-500 font-medium leading-relaxed max-w-sm mx-auto text-sm tracking-wide">
-                                    Our financial team is reviewing your transfer. You will receive an update via WhatsApp or email shortly.
-                                </p>
-                            </div>
-                            <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-100 px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-gray-500">
-                                <Loader2 className="w-4 h-4 animate-spin text-[#c8a84b]" />
-                                Please wait for confirmation
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* STATE 3: PAID (CELEBRATION) */}
-                    {currentStatus === 'paid' && (
-                        <motion.div
-                            key="paid"
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6 }}
-                            className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-8 shadow-sm relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500" />
-                            <div className="bg-emerald-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto">
-                                <CheckCircle className="text-emerald-500 w-10 h-10" />
-                            </div>
-                            <div className="space-y-3">
-                                <h2 className="text-3xl font-light text-gray-900 tracking-tight">Payment Successful</h2>
-                                <p className="text-gray-500 font-medium max-w-sm mx-auto tracking-wide">
-                                    Your order is confirmed and will be processed right away.
-                                </p>
-                            </div>
-                            <button className="mx-auto flex items-center gap-3 bg-black text-white px-8 py-3.5 rounded-full font-semibold tracking-wide hover:bg-gray-800 transition-colors shadow-sm text-sm">
-                                <Download size={16} />
-                                Download Invoice
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {(currentStatus === 'verifying_payment' || currentStatus === 'pending_verification' || currentStatus === 'paid') && (
-                    <button
-                        onClick={() => router.push('/')}
-                        className="w-full mt-4 flex items-center justify-center py-4 bg-black text-white rounded-2xl font-semibold text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors shadow-md"
-                    >
-                        Back to Store
-                    </button>
-                )}
-
-                {/* Developer Backdoor Modal */}
-                <AnimatePresence>
-                    {showDevModal && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                        >
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{
-                                    scale: 1,
-                                    opacity: 1,
-                                    x: isShaking ? [0, -10, 10, -10, 10, 0] : 0
-                                }}
-                                transition={{
-                                    scale: { duration: 0.3 },
-                                    opacity: { duration: 0.3 },
-                                    x: { duration: 0.4, times: [0, 0.2, 0.4, 0.6, 0.8, 1] }
-                                }}
-                                onAnimationComplete={() => setIsShaking(false)}
-                                className="bg-[#0a0a0a] border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)] rounded-2xl max-w-sm w-full p-8 space-y-6"
-                            >
-                                <div className="text-center space-y-2">
-                                    <div className="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Lock className="text-amber-500 w-6 h-6" />
-                                    </div>
-                                    <h2 className="text-amber-500 font-bold tracking-[0.2em] text-sm uppercase">System Maintenance</h2>
-                                    <p className="text-gray-500 text-xs tracking-wide">Secure authorization required for gateway access.</p>
-                                </div>
-                                <div className="space-y-4">
-                                    <input
-                                        type="password"
-                                        value={devCode}
-                                        onChange={(e) => setDevCode(e.target.value)}
-                                        placeholder="Enter Access Code"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-center focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') handleAuthorize();
+                                <input
+                                    type="password"
+                                    value={devCode}
+                                    onChange={(e) => setDevCode(e.target.value)}
+                                    placeholder="Enter Access Code"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-center focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleAuthorize();
+                                    }}
+                                />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowDevModal(false);
+                                            setDevCode('');
+                                            setClickCount(0);
                                         }}
-                                    />
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            onClick={() => {
-                                                setShowDevModal(false);
-                                                setDevCode('');
-                                                setClickCount(0);
-                                            }}
-                                            className="py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold uppercase tracking-wider"
-                                        >
-                                            Dismiss
-                                        </button>
-                                        <button
-                                            onClick={handleAuthorize}
-                                            className="py-3 bg-amber-500 hover:bg-amber-600 text-black rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
-                                        >
-                                            Authorize
-                                        </button>
-                                    </div>
+                                        className="py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold uppercase tracking-wider"
+                                    >
+                                        Dismiss
+                                    </button>
+                                    <button
+                                        onClick={handleAuthorize}
+                                        className="py-3 bg-amber-500 hover:bg-amber-600 text-black rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
+                                    >
+                                        Authorize
+                                    </button>
                                 </div>
-                            </motion.div>
+                            </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
