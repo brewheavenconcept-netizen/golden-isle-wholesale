@@ -129,45 +129,64 @@ async function sendWAButtons(to: string, bodyText: string, buttons: { id: string
 async function sendWAFlow(to: string, flowId: string, mode: 'published' | 'draft' = 'published') {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  if (!waToken || !waPhoneId) return;
+  if (!waToken || !waPhoneId) {
+    console.error('❌ WHATSAPP_TOKEN or WHATSAPP_PHONE_NUMBER_ID is missing in environment variables.');
+    return;
+  }
 
   // Unique token per send so we can track which flow submission belongs to whom
   const flowToken = `gi_order_${to}_${Date.now()}`;
 
-  await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${waToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'interactive',
-      interactive: {
-        type: 'flow',
-        header: { type: 'text', text: '🛒 Borang Pesanan' },
-        body: {
-          text: 'Pilih produk, isi kuantiti & alamat — terus dalam WhatsApp tanpa perlu buka browser! Pesanan anda akan disahkan dalam 24 jam. 🥃',
-        },
-        footer: { text: 'Golden Isle Wholesale' },
-        action: {
-          name: 'flow',
-          parameters: {
-            flow_message_version: '3',
-            flow_action: 'navigate',
-            flow_token: flowToken,
-            flow_id: flowId,
-            flow_cta: 'Isi Borang Pesanan ▶',
-            mode,
-            flow_action_payload: {
-              screen: 'ORDER_FORM',
-            },
+  const payload = {
+    messaging_product: 'whatsapp',
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'flow',
+      header: { type: 'text', text: '🛒 Borang Pesanan' },
+      body: {
+        text: 'Pilih produk, isi kuantiti & alamat — terus dalam WhatsApp tanpa perlu buka browser! Pesanan anda akan disahkan dalam 24 jam. 🥃',
+      },
+      footer: { text: 'Golden Isle Wholesale' },
+      action: {
+        name: 'flow',
+        parameters: {
+          flow_message_version: '3',
+          flow_action: 'navigate',
+          flow_token: flowToken,
+          flow_id: flowId,
+          flow_cta: 'Isi Borang Pesanan ▶',
+          mode,
+          flow_action_payload: {
+            screen: 'ORDER_FORM',
           },
         },
       },
-    }),
-  });
+    },
+  };
+
+  console.log(`\n📤 SENDING FLOW: To: ${to} | FlowId: ${flowId} | Mode: ${mode}`);
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const resData = await res.json();
+    console.log(`📡 Meta API Response Status: ${res.status}`);
+    if (!res.ok) {
+      console.error('❌ Meta API Response Error Details:', JSON.stringify(resData, null, 2));
+    } else {
+      console.log('✅ Meta API Response Success Details:', JSON.stringify(resData, null, 2));
+    }
+  } catch (err) {
+    console.error('❌ Fetch error during sendWAFlow:', err);
+  }
 }
 
 // Notify Telegram Admin
