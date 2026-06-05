@@ -461,9 +461,15 @@ export async function POST(request: Request) {
       const message = value?.messages?.[0];
 
       // Handle Quick Reply Button tap (user tekan butang)
+      let buttonPayload = '';
       if (message && message.type === 'button') {
+        buttonPayload = message.button?.payload?.trim() || '';
+      } else if (message && message.type === 'interactive' && message.interactive?.type === 'button_reply') {
+        buttonPayload = message.interactive?.button_reply?.id?.trim() || '';
+      }
+
+      if (buttonPayload) {
         const from = message.from;
-        const buttonPayload = message.button?.payload?.trim() || '';
         console.log(`\n🔘 BUTTON REPLY: [${from}] "${buttonPayload}"`);
 
         // Map button payload to intent handlers
