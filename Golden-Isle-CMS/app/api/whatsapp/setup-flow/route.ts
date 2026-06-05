@@ -149,6 +149,8 @@ export async function GET(request: Request) {
   };
 
   // ── Step 4: Create the flow (POST /{waba_id}/flows) ───────────────────────
+  // Use timestamp suffix to ensure unique name (Meta rejects duplicate names)
+  const flowName = `GI Order Form v${Date.now()}`.slice(0, 60);
   const createRes = await fetch(`https://graph.facebook.com/v20.0/${wabaId}/flows`, {
     method: 'POST',
     headers: {
@@ -156,7 +158,7 @@ export async function GET(request: Request) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: 'Golden Isle Order Form',
+      name: flowName,
       categories: ['OTHER'],
     }),
   });
