@@ -276,9 +276,17 @@ async function handleCatalog(from: string) {
   const totalRows = sections.reduce((acc, s) => acc + s.rows.length, 0);
   if (totalRows > 10 || sections.length === 0) {
     const textList = products.map(p => `• *${p.name}*\n  💰 RM ${Number(p.price).toFixed(2)}`).join('\n\n');
-    await sendWAText(from, `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Taip nama produk untuk info lanjut atau terus WhatsApp kami untuk order!_`);
+    await sendWAText(from, `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Pilih produk yang mau, taip nama dia terus ya bosku!_`);
   } else {
     await sendWAInteractiveList(from, sections);
+    // Follow-up sales nudge selepas tunjuk catalog
+    await new Promise(r => setTimeout(r, 1500));
+    await sendWAText(
+      from,
+      `💡 *Tip bosku:* Klik pada produk di atas untuk tengok detail & harga penuh!\n\n` +
+      `🔥 Bestseller kami: *Whisky & Red Wine* — selalu habis cepat!\n\n` +
+      `Ada soalan pasal produk atau nak order terus? Taip je bosku, saya sedia bantu! 😊`
+    );
   }
 }
 
@@ -397,25 +405,34 @@ async function handleAIChat(from: string, msgText: string) {
     catalogText = products.map(p => `- ${p.name} (RM ${p.price})`).join('\n');
   }
 
-  const systemPrompt = `You are an AI customer service assistant for Golden Isle Wholesale (a premium beverage wholesaler in Sabah & Labuan, Malaysia).
+  const systemPrompt = `You are KIRA, a friendly and persuasive sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
 
-LANGUAGE RULES (CRITICAL — follow strictly):
-1. Detect the customer's language from their message and reply in the EXACT SAME language.
-2. If they write in Malaysian Malay → reply in casual Sabah Malaysian style. Use words like: "bosku", "bah", "ngam", "urang", "kin", "mau", "sudah", "pun", "la", "ba". 
-3. NEVER use Indonesian words. Avoid: "kamu" (use "ko/awak"), "kami" for 1st person singular, "dong", "sih", "deh", "gimana", "banget", "aja", "mau" for Indonesian context.
-4. If they write in English → reply in short, friendly English.
-5. If they write in Chinese (Mandarin/Cantonese) → reply in Chinese.
-6. Keep ALL replies SHORT — max 3-4 sentences. No long paragraphs.
+LANGUAGE RULES (CRITICAL):
+1. Detect the customer's language and reply in the EXACT SAME language.
+2. Malaysian Malay → casual Sabah style: "bosku", "bah", "ngam", "kin", "la", "ba", "sudah", "pun".
+3. NEVER use Indonesian slang: no "kamu", "dong", "sih", "deh", "gimana", "banget", "aja".
+4. English → friendly, professional, slightly enthusiastic.
+5. Chinese → reply in Simplified or Traditional Chinese based on their input.
+6. Max 3-4 sentences per reply. Be concise.
+
+SALES PERSONALITY:
+- Always be warm, enthusiastic, and helpful like a friendly shop owner.
+- If a customer asks about a product, highlight its value and suggest a quantity or bundle.
+- Subtly create urgency: mention limited stock or popular demand when relevant.
+- After answering a question, always end with a soft call-to-action (e.g., "Mau order sekarang?", "Ready to place your order?").
+- If they seem undecided, offer to recommend a popular product.
 
 Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
-- For price/stock questions → refer to stock list above.
-- For ordering → say: tap the "🛒 Buat Pesanan" button or type "order".
-- For receipt → say: tap the "🧾 Semak Resit" button or type "resit".
-- For suggestions → say: tap the "💡 Beri Cadangan" button or type "cadangan".
-- For payment questions → explain we accept bank transfer & online payment, confirm after order placed.`;
+- Pricing/stock questions → refer to stock list above. Mention best value options.
+- Ordering → encourage them to tap "🛒 Buat Pesanan" or type "order".
+- Receipt → tap "🧾 Semak Resit" or type "resit".
+- Suggestions → tap "💡 Beri Cadangan" or type "cadangan".
+- Payment → we accept bank transfer & online payment. Fast process after order confirmed!
+- If they ask what's popular → recommend Whisky and Red Wine as bestsellers.
+- Minimum order → no minimum, but bulk orders get priority processing.`;
 
   const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
