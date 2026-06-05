@@ -380,7 +380,8 @@ async function handleSuggestion(from: string, msgText: string) {
     from,
     `✍️ *Kami suka dengar pendapat anda!*\n\n` +
     `Sila tulis cadangan, maklum balas, atau idea anda sekarang.\n\n` +
-    `_Contoh: "Boleh tambah produk wine Perancis", "Packaging lebih cantik", dll._`
+    `_Contoh: "Boleh tambah produk wine Perancis", "Packaging lebih cantik", dll._\n\n` +
+    `👇 *Sila taip & hantar cadangan anda di ruangan chat di bawah:*`
   );
 }
 
