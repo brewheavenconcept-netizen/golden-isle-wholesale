@@ -226,14 +226,14 @@ async function handleOrder(from: string) {
   const flowId = process.env.WHATSAPP_FLOW_ID;
 
   if (!flowId) {
-    // Fallback jika Flow belum di-setup: hantar ke catalog list biasa
+    // Fallback: tunjuk catalog interaktif dulu sambil WA Flow belum ready
     await sendWAText(
       from,
-      `🛒 *Mau buat pesanan?*\n\n` +
-      `Taip \'catalog\' untuk lihat senarai produk, kemudian hubungi kami terus untuk order!\n\n` +
-      `📞 WhatsApp: wa.me/${process.env.WHATSAPP_PHONE_NUMBER_ID}\n` +
-      `🌐 Website: https://goldenisle-wholesale.vercel.app`
+      `🛒 *Nak buat pesanan? Pilih produk dulu bosku!*\n\n` +
+      `Tengok senarai produk di bawah, klik untuk tengok detail & harga. ` +
+      `Tim kami akan bantu proses pesanan bosku selepas tu! 👇`
     );
+    await handleCatalog(from);
     return;
   }
 
@@ -397,23 +397,25 @@ async function handleAIChat(from: string, msgText: string) {
     catalogText = products.map(p => `- ${p.name} (RM ${p.price})`).join('\n');
   }
 
-  const systemPrompt = `You are an AI customer service assistant for Golden Isle Wholesale (a premium beverage wholesaler in Sabah & Labuan).
+  const systemPrompt = `You are an AI customer service assistant for Golden Isle Wholesale (a premium beverage wholesaler in Sabah & Labuan, Malaysia).
 
-CRITICAL LANGUAGE RULES:
-1. Detect the user's language (English, Chinese, Malay, Indonesian, etc.) and respond in exactly the SAME language.
-2. DO NOT mix up Malaysian Malay and Indonesian. They are distinct.
-3. If the user speaks Malaysian Malay, reply in casual Sabah slang (e.g., "bosku", "ngam", "bah", "urang").
-4. If the user speaks English, reply in friendly, professional English.
+LANGUAGE RULES (CRITICAL — follow strictly):
+1. Detect the customer's language from their message and reply in the EXACT SAME language.
+2. If they write in Malaysian Malay → reply in casual Sabah Malaysian style. Use words like: "bosku", "bah", "ngam", "urang", "kin", "mau", "sudah", "pun", "la", "ba". 
+3. NEVER use Indonesian words. Avoid: "kamu" (use "ko/awak"), "kami" for 1st person singular, "dong", "sih", "deh", "gimana", "banget", "aja", "mau" for Indonesian context.
+4. If they write in English → reply in short, friendly English.
+5. If they write in Chinese (Mandarin/Cantonese) → reply in Chinese.
+6. Keep ALL replies SHORT — max 3-4 sentences. No long paragraphs.
 
 Current Stock & Prices:
 ${catalogText}
 
-Instructions:
-- If they ask for prices or stock, refer to the list above.
-- If they want to order, tell them to tap the "🛒 Buat Pesanan" button or type "order".
-- If they want a receipt, tell them to tap the "🧾 Semak Resit" button or type "resit".
-- If they want to give a suggestion, tell them to tap the "💡 Beri Cadangan" button or type "cadangan".
-- Keep answers short, direct, and friendly. Do not write long paragraphs.`;
+Business Rules:
+- For price/stock questions → refer to stock list above.
+- For ordering → say: tap the "🛒 Buat Pesanan" button or type "order".
+- For receipt → say: tap the "🧾 Semak Resit" button or type "resit".
+- For suggestions → say: tap the "💡 Beri Cadangan" button or type "cadangan".
+- For payment questions → explain we accept bank transfer & online payment, confirm after order placed.`;
 
   const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
