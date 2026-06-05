@@ -125,6 +125,51 @@ async function sendWAButtons(to: string, bodyText: string, buttons: { id: string
   });
 }
 
+// Hantar WA Flow (Interactive Order Form)
+async function sendWAFlow(to: string, flowId: string, mode: 'published' | 'draft' = 'published') {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return;
+
+  // Unique token per send so we can track which flow submission belongs to whom
+  const flowToken = `gi_order_${to}_${Date.now()}`;
+
+  await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${waToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        header: { type: 'text', text: '🛒 Borang Pesanan' },
+        body: {
+          text: 'Pilih produk, isi kuantiti & alamat — terus dalam WhatsApp tanpa perlu buka browser! Pesanan anda akan disahkan dalam 24 jam. 🥃',
+        },
+        footer: { text: 'Golden Isle Wholesale' },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_action: 'navigate',
+            flow_token: flowToken,
+            flow_id: flowId,
+            flow_cta: 'Isi Borang Pesanan ▶',
+            mode,
+            flow_action_payload: {
+              screen: 'ORDER_FORM',
+            },
+          },
+        },
+      },
+    }),
+  });
+}
+
 // Notify Telegram Admin
 async function notifyTelegram(msg: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -143,16 +188,18 @@ async function notifyTelegram(msg: string) {
 }
 
 // ── Intent Detector ─────────────────────────────────────────────────────────
-function detectIntent(text: string): 'greet' | 'catalog' | 'receipt' | 'suggest' | 'ai' {
+function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' | 'suggest' | 'ai' {
   const lower = text.toLowerCase().trim();
 
   const greetKeywords = ['hai', 'hi', 'hello', 'helo', 'hey', 'assalamualaikum', 'salam', 'start', 'mula', 'mulakan', 'apa khabar', 'selamat'];
+  const orderKeywords = ['order', 'pesan', 'beli', 'buat pesanan', 'nak beli', 'mau beli', 'nak order', 'mau order', 'tempah'];
   const catalogKeywords = ['catalog', 'katalog', 'senarai', 'produk', 'product', 'list', 'stok', 'stock', 'barang', 'harga semua'];
   const receiptKeywords = ['resit', 'receipt', 'order saya', 'pesanan', 'invois', 'invoice', 'status order', 'order status'];
   const suggestKeywords = ['cadangan', 'suggest', 'suggestion', 'feedback', 'idea', 'saranan', 'komen', 'comment', 'review'];
 
   // Greet only if short message (≤4 words) to avoid false positives
   if (greetKeywords.some(k => lower.includes(k)) && lower.split(' ').length <= 4) return 'greet';
+  if (orderKeywords.some(k => lower.includes(k))) return 'order';
   if (catalogKeywords.some(k => lower.includes(k))) return 'catalog';
   if (receiptKeywords.some(k => lower.includes(k))) return 'receipt';
   if (suggestKeywords.some(k => lower.includes(k))) return 'suggest';
@@ -167,11 +214,31 @@ async function handleGreeting(from: string) {
     from,
     `👋 *Hai bosku! Selamat datang ke Golden Isle Wholesale* 🥃\n\nKami menyediakan minuman premium borong terbaik di Sabah & Labuan.\n\n*Apa yang boleh kami bantu hari ni?*`,
     [
-      { id: 'btn_catalog',  title: '🛍️ Lihat Katalog' },
-      { id: 'btn_receipt',  title: '🧾 Semak Resit' },
-      { id: 'btn_suggest',  title: '💡 Beri Cadangan' },
+      { id: 'btn_order',   title: '🛒 Buat Pesanan' },
+      { id: 'btn_receipt', title: '🧾 Semak Resit' },
+      { id: 'btn_suggest', title: '💡 Beri Cadangan' },
     ]
   );
+}
+
+// ORDER FLOW: Hantar WA Flow borang pesanan interaktif
+async function handleOrder(from: string) {
+  const flowId = process.env.WHATSAPP_FLOW_ID;
+
+  if (!flowId) {
+    // Fallback jika Flow belum di-setup: hantar ke catalog list biasa
+    await sendWAText(
+      from,
+      `🛒 *Mau buat pesanan?*\n\n` +
+      `Taip \'catalog\' untuk lihat senarai produk, kemudian hubungi kami terus untuk order!\n\n` +
+      `📞 WhatsApp: wa.me/${process.env.WHATSAPP_PHONE_NUMBER_ID}\n` +
+      `🌐 Website: https://goldenisle-wholesale.vercel.app`
+    );
+    return;
+  }
+
+  // Hantar WA Flow — borang cantik terus dalam chat!
+  await sendWAFlow(from, flowId, 'published');
 }
 
 // CATALOG: Fetch produk dari Supabase & format sebagai WA Interactive List
@@ -395,7 +462,9 @@ export async function POST(request: Request) {
         console.log(`\n🔘 BUTTON REPLY: [${from}] "${buttonPayload}"`);
 
         // Map button payload to intent handlers
-        if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog') {
+        if (buttonPayload === 'btn_order' || buttonPayload === '🛒 Buat Pesanan') {
+          await handleOrder(from);
+        } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog') {
           await handleCatalog(from);
         } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit') {
           await handleReceipt(from);
@@ -407,9 +476,71 @@ export async function POST(request: Request) {
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
 
-      // Handle interactive reply (user pilih dari catalog list)
+      // Handle interactive reply — catalog list_reply OR flow nfm_reply
       if (message && message.type === 'interactive') {
         const from = message.from;
+        const interactiveType = message.interactive?.type || '';
+
+        // ── WA Flow Submission (nfm_reply) ────────────────────────────────
+        if (interactiveType === 'nfm_reply') {
+          console.log('\n📋 FLOW SUBMISSION received from:', from);
+          try {
+            const responseJson = JSON.parse(message.interactive?.nfm_reply?.response_json || '{}');
+            const { product_id, quantity, customer_name, delivery_address, notes } = responseJson;
+
+            // Lookup product name from id
+            const productKey = String(product_id || '').replace('prod_', '');
+            const { data: productRow } = await supabase
+              .from('products')
+              .select('name, price')
+              .eq('id', productKey)
+              .single();
+
+            const productName = productRow?.name || product_id || 'Produk tidak dikenal';
+            const productPrice = productRow ? `RM ${Number(productRow.price).toFixed(2)}` : '-';
+
+            // Save inquiry to Supabase
+            await supabase.from('inquiries').insert({
+              message: `ORDER VIA WA FLOW — Produk: ${productName} | Qty: ${quantity} | Nama: ${customer_name} | Alamat: ${delivery_address} | Catatan: ${notes || '-'}`,
+              channel: 'whatsapp_flow',
+              phone: from,
+              status: 'new',
+              created_at: new Date().toISOString(),
+            });
+
+            // Notify admin via Telegram
+            await notifyTelegram(
+              `🛒 <b>PESANAN BARU via WA Flow!</b>\n\n` +
+              `📱 No. Tel: +${from}\n` +
+              `📦 Produk: ${productName}\n` +
+              `💰 Harga: ${productPrice}\n` +
+              `🔢 Kuantiti: ${quantity}\n` +
+              `👤 Nama: ${customer_name}\n` +
+              `📍 Alamat: ${delivery_address}\n` +
+              `📝 Catatan: ${notes || '-'}\n\n` +
+              `<i>Sila hubungi pelanggan untuk sahkan & proses pembayaran.</i>`
+            );
+
+            // Confirm to customer
+            await sendWAText(
+              from,
+              `✅ *Pesanan Diterima, ${customer_name}!* 🎉\n\n` +
+              `━━━━━━━━━━━━━━━\n` +
+              `📦 *${productName}*\n` +
+              `🔢 Kuantiti: ${quantity}\n` +
+              `📍 Alamat: ${delivery_address}\n` +
+              `━━━━━━━━━━━━━━━\n\n` +
+              `Tim Golden Isle akan hubungi anda dalam masa *24 jam* untuk sahkan pesanan dan proses pembayaran. 🙏\n\n` +
+              `_Ada soalan? WhatsApp kami terus ya bosku!_`
+            );
+          } catch (flowErr) {
+            console.error('Error parsing flow response:', flowErr);
+            await sendWAText(from, '⚠️ Maaf, ada masalah terima pesanan. Sila cuba lagi atau hubungi admin.');
+          }
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        // ── Catalog List Reply ─────────────────────────────────────────────
         const selectedId = message.interactive?.list_reply?.id || '';
         const selectedTitle = message.interactive?.list_reply?.title || '';
 
@@ -463,6 +594,9 @@ export async function POST(request: Request) {
         switch (intent) {
           case 'greet':
             await handleGreeting(from);
+            break;
+          case 'order':
+            await handleOrder(from);
             break;
           case 'catalog':
             await handleCatalog(from);
