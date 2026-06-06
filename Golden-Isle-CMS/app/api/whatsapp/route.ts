@@ -408,24 +408,16 @@ async function handleGreeting(from: string) {
   );
 }
 
-// ORDER FLOW: Hantar WA Flow borang pesanan interaktif
+// ORDER FLOW: Hantar Katalog terus (Bypass WA Flow sementara waktu)
 async function handleOrder(from: string) {
-  const flowId = process.env.WHATSAPP_FLOW_ID;
-
-  if (!flowId) {
-    // Fallback: tunjuk catalog interaktif dulu sambil WA Flow belum ready
-    await sendWAText(
-      from,
-      `🛒 *Nak buat pesanan? Pilih produk dulu bosku!*\n\n` +
-      `Tengok senarai produk di bawah, klik untuk tengok detail & harga. ` +
-      `Tim kami akan bantu proses pesanan bosku selepas tu! 👇`
-    );
-    await handleCatalog(from);
-    return;
-  }
-
-  // Hantar WA Flow — guna 'draft' untuk test, 'published' bila dah publish
-  await sendWAFlow(from, flowId, 'draft');
+  // Fallback: tunjuk catalog interaktif terus sebab WA Flow 'draft' tak support WA Web
+  await sendWAText(
+    from,
+    `🛒 *Nak buat pesanan? Pilih produk dulu bosku!*\n\n` +
+    `Tengok senarai produk di bawah, klik untuk tengok detail & harga. ` +
+    `Tim kami akan bantu proses pesanan bosku selepas tu! 👇`
+  );
+  await handleCatalog(from);
 }
 
 // CATALOG: Cuba native Meta catalog dulu, fallback ke interactive list
