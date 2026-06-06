@@ -16,7 +16,7 @@ async function uploadWAMedia(buffer: Buffer, mimeType: string, filename: string)
 
   const form = new FormData();
   form.append('messaging_product', 'whatsapp');
-  form.append('file', new Blob([buffer], { type: mimeType }), filename);
+  form.append('file', new Blob([new Uint8Array(buffer)], { type: mimeType }), filename);
 
   try {
     const res = await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/media`, {
