@@ -41,6 +41,7 @@ import {
   Orbit,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { WhatsAppBusinessIcon } from "@/components/landing/HeroSection";
 import { usePublicStore } from "@/hooks/usePublicStore";
 import { getProducts, createOrderWithStockCheck, clearCart } from "@/lib/storage";
 import { Order, OrderItem } from "@/types";
@@ -1415,18 +1416,18 @@ function PaymentSelectionView({ cart, name, phone, email, onBack, onProcessCheck
 
           <button
             onClick={() => onProcessCheckout('whatsapp', name, phone, email)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#d4af37] hover:bg-[#b8960c] transition-all text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#008069] hover:bg-[#006A56] transition-all text-left cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-[#1a1a1a]" />
+              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+                <WhatsAppBusinessIcon className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-[13px] font-bold text-[#1a1a1a] block">Talk to Human Sales</span>
-                <span className="text-[10px] text-[#1a1a1a]/60">Support chat, manual order checkout</span>
+                <span className="text-[13px] font-bold text-white block">Talk to Human Sales</span>
+                <span className="text-[10px] text-white/80">Support chat, manual order checkout</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-[#1a1a1a]/60" />
+            <ChevronRight className="w-4 h-4 text-white/60" />
           </button>
         </div>
       </div>
@@ -1731,7 +1732,7 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
           >
             <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
-              <MessageCircle size={18} className="text-emerald-500" strokeWidth={1.5} />
+              <WhatsAppBusinessIcon className="w-[18px] h-[18px]" color="#008069" />
               <div>
                 <h4 className="text-[13.5px] font-bold text-gray-800">Order via WhatsApp</h4>
                 <p className="text-[10.5px] text-slate-400 mt-0.5 font-semibold">
@@ -3339,3 +3340,5 @@ export default function ChatWidget() {
     </>
   );
 }
+
+
