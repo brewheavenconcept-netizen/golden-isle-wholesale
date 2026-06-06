@@ -1722,17 +1722,20 @@ function GreetingMenuView({ lang, onSelect, onTalkToSales }: { lang: Language; o
             </div>
           </button>
 
-          {/* Action 3: Human Concierge */}
+          {/* Action 3: Order via WhatsApp */}
           <button
-            onClick={onTalkToSales}
+            onClick={() => {
+              const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER || '601164073143';
+              window.open(`https://wa.me/${phoneNumber}?text=Hi%20KIRA!%20Saya%20nak%20order%20dari%20Golden%20Isle%20ni%20🥃`, '_blank');
+            }}
             className="group relative w-full p-px rounded-[24px] overflow-hidden transition-all active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] cursor-pointer text-left"
           >
             <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-[24px] p-4.5 flex flex-col gap-4 border border-white group-hover:bg-white/80 transition-colors">
-              <Mic size={18} className="text-[#d4af37]" strokeWidth={1.5} />
+              <MessageCircle size={18} className="text-emerald-500" strokeWidth={1.5} />
               <div>
-                <h4 className="text-[13.5px] font-bold text-gray-800">Talk to Sales</h4>
+                <h4 className="text-[13.5px] font-bold text-gray-800">Order via WhatsApp</h4>
                 <p className="text-[10.5px] text-slate-400 mt-0.5 font-semibold">
-                  {lang === "zh" ? "联系销售团队" : lang === "ms" ? "Hubungi jualan" : "Human link"}
+                  Chat dengan KIRA sekarang
                 </p>
               </div>
             </div>
