@@ -448,7 +448,15 @@ async function handleCatalog(from: string) {
 
       // Cuba product_list (tunjuk produk mengikut kategori)
       const sentList = await sendWAProductList(from, nativeSections);
-      if (sentList) return;
+      if (sentList) {
+        await new Promise(r => setTimeout(r, 1000));
+        await sendWAButtons(from, "👆 Boleh tengok katalog di atas bosku. Ada apa-apa lagi KIRA boleh bantu?", [
+          { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
+          { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
+          { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Semua' }
+        ]);
+        return;
+      }
 
       // Fallback: catalog_message (tunjuk semua catalog sekaligus)
       const thumbnailId = String(products[0].id);
@@ -457,7 +465,15 @@ async function handleCatalog(from: string) {
         '🛍️ Tengok semua produk Golden Isle bosku! Tekan produk untuk Add to Cart terus! 🛒🍻',
         thumbnailId
       );
-      if (sentCatalog) return;
+      if (sentCatalog) {
+        await new Promise(r => setTimeout(r, 1000));
+        await sendWAButtons(from, "👆 Boleh tengok katalog di atas bosku. Ada apa-apa lagi KIRA boleh bantu?", [
+          { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
+          { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
+          { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Semua' }
+        ]);
+        return;
+      }
     }
   }
 
@@ -872,12 +888,17 @@ export async function POST(request: Request) {
         // Map button payload to intent handlers
         if (buttonPayload === 'btn_order' || buttonPayload === '🛒 Buat Pesanan' || buttonPayload === 'BUAT_PESANAN') {
           await handleOrder(from);
-        } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog') {
+        } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog' || buttonPayload === 'LIHAT_CATALOG') {
           await handleCatalog(from);
         } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit') {
           await handleReceipt(from);
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
+        } else if (buttonPayload === 'SEMAK_STOK') {
+          await sendWAText(from, "📦 *Stok Terkini:*\nSila tunggu sekejap, KIRA sedang semak senarai stok untuk bosku...");
+          await handleAIChat(from, "Tolong senaraikan rumusan ringkas stok yang available sekarang mengikut kategori.");
+        } else if (buttonPayload === 'TANYA_KIRA') {
+          await sendWAText(from, "👋 *Hai bosku! Saya KIRA.*\n\nSila taip apa-apa soalan pasal minuman, harga atau borong. KIRA sedia membantu bosku!");
         } else {
           await handleAIChat(from, buttonPayload);
         }
