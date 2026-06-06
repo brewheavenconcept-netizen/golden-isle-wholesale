@@ -152,13 +152,13 @@ export default function StripeGatewayPage() {
             setCardName(foundOrder.customer_name || 'Bobby Lim');
             
             const mappedItems: ItemState[] = foundOrder.items.map((item: any, index: number) => ({
-              id: item.product.id || String(index),
-              name: item.product.name,
+              id: item.product?.id || item.product_id || String(index),
+              name: item.product?.name || item.name || "Product",
               description: "Premium craft selection from Golden Isle Store",
-              price: item.product.price,
-              quantity: item.qty,
+              price: item.product?.price || item.price || 0,
+              quantity: item.qty || item.quantity || 1,
               badge: index === 0 ? "Best Seller" : "Add-on",
-              image: item.product.images?.[0]
+              image: item.product?.images?.[0] || item.image || undefined
             }));
             setItems(mappedItems);
           } else {
