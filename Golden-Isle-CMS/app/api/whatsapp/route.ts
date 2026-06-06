@@ -878,7 +878,7 @@ export async function POST(request: Request) {
         console.log(`\n🔘 BUTTON REPLY: [${from}] "${buttonPayload}"`);
 
         // Map button payload to intent handlers
-        if (buttonPayload === 'btn_order' || buttonPayload === '🛒 Buat Pesanan') {
+        if (buttonPayload === 'btn_order' || buttonPayload === '🛒 Buat Pesanan' || buttonPayload === 'BUAT_PESANAN') {
           await handleOrder(from);
         } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog') {
           await handleCatalog(from);
