@@ -683,7 +683,9 @@ async function handleSuggestion(from: string, msgText: string) {
   );
 }
 
-// AI CHAT: Guna OpenAI dengan konteks katalog
+// In-memory chat history for KIRA
+const chatHistory = new Map<string, { role: string, content: string }[]>();
+
 // AI CHAT: Guna OpenAI dengan konteks katalog
 async function handleAIChat(from: string, msgText: string) {
   let catalogText = 'Tiada maklumat stok terkini.';
@@ -717,7 +719,7 @@ Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
-- Recommend Products → Call the 'recommend_products' tool when the user asks for specific recommendations, wants to search for beverages, or wants to see certain types of drinks (e.g., whiskies, beers). Do NOT just list them in text.
+- Recommend Products → STRICT INSTRUCTION: Whenever a user asks for a recommendation, best product, popular item, or ANY product suggestion - you MUST ALWAYS call the 'recommend_products' tool. NEVER reply with text only for recommendations.
 - Full Catalog → Call the 'view_full_catalog' tool when the user asks to see all items, browse the shop, or generally wants the full list.
 - Pricing/stock questions → refer to stock list above. Mention best value options.
 - Ordering → encourage them to tap "🛒 Buat Pesanan" or type "order".
@@ -780,6 +782,12 @@ Business Rules:
     }
   ];
 
+  if (!chatHistory.has(from)) chatHistory.set(from, []);
+  const history = chatHistory.get(from)!;
+  
+  history.push({ role: 'user', content: msgText });
+  if (history.length > 10) history.splice(0, history.length - 10); // Keep only last 10 messages
+
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -791,7 +799,7 @@ Business Rules:
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: msgText },
+          ...history
         ],
         tools,
         tool_choice: 'auto'
@@ -824,6 +832,7 @@ Business Rules:
         if (!success) {
           await sendWAText(from, text);
         }
+        history.push({ role: 'assistant', content: `[System Note: Successfully recommended products to user using WhatsApp Product List UI. The text intro was: ${text}]` });
         return;
       }
 
@@ -835,11 +844,13 @@ Business Rules:
         if (!success) {
           await sendWAText(from, text);
         }
+        history.push({ role: 'assistant', content: `[System Note: Successfully sent the full product catalog to user using WhatsApp Catalog UI. The text intro was: ${text}]` });
         return;
       }
     }
 
     const reply = choiceMessage?.content || 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!';
+    history.push({ role: 'assistant', content: reply });
     await sendWAText(from, reply);
   } catch (err) {
     console.error('Error in handleAIChat:', err);
@@ -1003,7 +1014,83 @@ export async function POST(request: Request) {
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
 
+      // Handle Native Catalog Cart Order
+      if (message && message.type === 'order') {
+        const from = message.from;
+        const productItems = message.order?.product_items || [];
+        
+        console.log(`\n🛒 NATIVE CATALOG ORDER dari [${from}]:`, productItems);
+        
+        try {
+          // Parse items and calculate total
+          let subtotal = 0;
+          const parsedItems = [];
+          
+          for (const item of productItems) {
+            const qty = parseInt(item.quantity) || 1;
+            const price = parseFloat(item.item_price) || 0;
+            subtotal += (qty * price);
+            
+            // Fetch product details
+            const { data: pData } = await supabase.from('products').select('name').eq('id', item.product_retailer_id).single();
+            const name = pData?.name || `Produk ${item.product_retailer_id}`;
+            
+            parsedItems.push({
+              product_id: item.product_retailer_id,
+              name: name,
+              quantity: qty,
+              price: price
+            });
+          }
+          
+          const delivery_fee = 0;
+          const total = subtotal + delivery_fee;
+          
+          // Insert into orders table
+          const { data: newOrder, error: orderErr } = await supabase.from('orders').insert({
+            customer_phone: from,
+            status: 'pending',
+            payment_status: 'unpaid',
+            subtotal: subtotal,
+            delivery_fee: delivery_fee,
+            total: total,
+            items: parsedItems
+          }).select().single();
+          
+          if (orderErr) throw orderErr;
+          
+          const orderId = newOrder.id;
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+          const paymentLink = `${appUrl}/payment/selection/${orderId}`;
+          
+          // Reply to user
+          await sendWAText(from, 
+            `🎉 *Pesanan Diterima!*\n\n` +
+            `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n` +
+            `🛒 *Jumlah Keseluruhan: RM ${total.toFixed(2)}*\n\n` +
+            `Sila klik link di bawah untuk buat bayaran (FPX / Kad Kredit / Upload Resit):\n\n` +
+            `👉 ${paymentLink}\n\n` +
+            `_Pesanan akan diproses sebaik sahaja bayaran disahkan._`
+          );
+          
+          // Notify Telegram
+          await notifyTelegram(
+            `🛒 <b>PESANAN BARU (Native Catalog)!</b>\n\n` +
+            `📱 No. Tel: +${from}\n` +
+            `💰 Total: RM ${total.toFixed(2)}\n` +
+            `🔗 Status: Menunggu Pembayaran\n` +
+            `<i>ID Pesanan: ${orderId}</i>`
+          );
+        } catch (err) {
+          console.error("Error processing catalog order:", err);
+          await sendWAText(from, "⚠️ Maaf bosku, ada sedikit ralat masa memproses order. Sila hubungi admin.");
+        }
+        
+        return new NextResponse('EVENT_RECEIVED', { status: 200 });
+      }
+
       // Handle text messages
+
       if (message && message.type === 'text') {
         const from = message.from;
         const msgText = message.text?.body?.trim() || '';
