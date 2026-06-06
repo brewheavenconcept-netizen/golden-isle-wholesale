@@ -924,6 +924,9 @@ export async function GET(request: Request) {
   return new NextResponse('Forbidden', { status: 403 });
 }
 
+// ── SPAM TRACKER ─────────────────────────────────────────────────────────────
+const spamTracker = new Map<string, {count: number, resetAt: number}>();
+
 // ── TANGKAP MESEJ MASUK (POST) ───────────────────────────────────────────────
 export async function POST(request: Request) {
   try {
@@ -934,6 +937,34 @@ export async function POST(request: Request) {
       const changes = entry?.changes?.[0];
       const value = changes?.value;
       const message = value?.messages?.[0];
+
+      // === FEATURE 1: Spam Detector ===
+      if (message && message.from) {
+        const from = message.from;
+        const now = Date.now();
+        const record = spamTracker.get(from);
+
+        if (record) {
+          if (now < record.resetAt) {
+            record.count += 1;
+          } else {
+            record.count = 1;
+            record.resetAt = now + 30000;
+          }
+        } else {
+          spamTracker.set(from, { count: 1, resetAt: now + 30000 });
+        }
+
+        const updatedRecord = spamTracker.get(from)!;
+        if (updatedRecord.count >= 5) {
+          // If exactly 5, send the warning. If > 5, just ignore and return early to avoid spamming the warning itself.
+          if (updatedRecord.count === 5) {
+            await sendWAText(from, "Eh bosku, KIRA pun ada had laju tau 😅 Sekejap ya! Cuba lagi dalam 30 saat.");
+          }
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+      }
+
 
       // Handle Quick Reply Button tap (user tekan butang)
       let buttonPayload = '';
