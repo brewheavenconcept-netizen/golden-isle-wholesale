@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { generateInvoicePdf } from '../../../lib/pdfGenerator';
 
 // Setup Supabase (gunakan Service Role Key untuk bypass RLS dalam API)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -7,6 +8,77 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+async function uploadWAMedia(buffer: Buffer, mimeType: string, filename: string) {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return null;
+
+  const form = new FormData();
+  form.append('messaging_product', 'whatsapp');
+  form.append('file', new Blob([buffer], { type: mimeType }), filename);
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/media`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${waToken}` },
+      body: form,
+    });
+    const data = await res.json();
+    return data.id || null;
+  } catch (err) {
+    console.error('Error uploading media to WA:', err);
+    return null;
+  }
+}
+
+async function sendWAMediaById(to: string, mediaId: string, type: 'document' | 'audio', caption?: string, filename?: string) {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return;
+
+  const mediaObj: any = { id: mediaId };
+  if (caption && type === 'document') mediaObj.caption = caption;
+  if (filename && type === 'document') mediaObj.filename = filename;
+
+  await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${waToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type,
+      [type]: mediaObj,
+    }),
+  });
+}
+
+async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        voice: 'onyx',
+        input: text,
+        response_format: 'aac'
+      })
+    });
+    if (!res.ok) throw new Error('TTS API Error');
+    const arrayBuffer = await res.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (err) {
+    console.error('Error generating voice note:', err);
+    return null;
+  }
+}
 
 // Hantar mesej teks biasa ke WA
 async function sendWAText(to: string, text: string) {
@@ -61,13 +133,13 @@ async function sendWAImage(to: string, imageUrl: string, caption: string) {
   });
 }
 
-// Hantar WA Interactive List (Catalog)
+// Hantar WA Interactive List (Catalog) — fallback lama
 async function sendWAInteractiveList(to: string, sections: any[]) {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!waToken || !waPhoneId) return;
 
-  await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+  await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${waToken}`,
@@ -89,6 +161,102 @@ async function sendWAInteractiveList(to: string, sections: any[]) {
       },
     }),
   });
+}
+
+// ✅ NATIVE META CATALOG — Hantar full catalog dengan butang Add to Cart
+async function sendWACatalogMessage(to: string, bodyText: string, thumbnailProductId?: string): Promise<boolean> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const catalogId = process.env.WHATSAPP_CATALOG_ID;
+  if (!waToken || !waPhoneId || !catalogId) return false;
+
+  const action: any = { name: 'catalog_message' };
+  if (thumbnailProductId) {
+    action.parameters = { thumbnail_product_retailer_id: thumbnailProductId };
+  }
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'interactive',
+        interactive: {
+          type: 'catalog_message',
+          body: { text: bodyText },
+          footer: { text: 'Golden Isle Wholesale 🍻' },
+          action,
+        },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('❌ sendWACatalogMessage error:', JSON.stringify(data));
+      return false;
+    }
+    console.log('✅ Native catalog message sent!');
+    return true;
+  } catch (err) {
+    console.error('❌ sendWACatalogMessage fetch error:', err);
+    return false;
+  }
+}
+
+// ✅ NATIVE PRODUCT LIST — Hantar senarai produk pilihan dengan Add to Cart
+async function sendWAProductList(
+  to: string,
+  sections: Array<{ title: string; productIds: string[] }>,
+  bodyText?: string
+): Promise<boolean> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const catalogId = process.env.WHATSAPP_CATALOG_ID;
+  if (!waToken || !waPhoneId || !catalogId) return false;
+
+  const apiSections = sections.map(s => ({
+    title: s.title.slice(0, 24),
+    product_items: s.productIds.map(id => ({ product_retailer_id: id })),
+  }));
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'interactive',
+        interactive: {
+          type: 'product_list',
+          header: { type: 'text', text: '🛍️ Golden Isle Catalog' },
+          body: { text: bodyText || 'Berikut produk terbaik kami bosku! Tekan Add to Cart untuk order terus! 🛒🍻' },
+          footer: { text: 'Golden Isle Wholesale' },
+          action: {
+            catalog_id: catalogId,
+            sections: apiSections,
+          },
+        },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('❌ sendWAProductList error:', JSON.stringify(data));
+      return false;
+    }
+    console.log('✅ Native product list sent!');
+    return true;
+  } catch (err) {
+    console.error('❌ sendWAProductList fetch error:', err);
+    return false;
+  }
 }
 
 // Hantar mesej dengan 3 Quick Reply Buttons ke WA
@@ -260,8 +428,48 @@ async function handleOrder(from: string) {
   await sendWAFlow(from, flowId, 'draft');
 }
 
-// CATALOG: Fetch produk dari Supabase & format sebagai WA Interactive List
+// CATALOG: Cuba native Meta catalog dulu, fallback ke interactive list
 async function handleCatalog(from: string) {
+  const catalogId = process.env.WHATSAPP_CATALOG_ID;
+
+  // ── 1. Cuba Native Meta Catalog (Add to Cart butang) ──────────────────────
+  if (catalogId) {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id, name, category')
+      .eq('stock_status', 'in_stock')
+      .order('category')
+      .limit(30);
+
+    if (!error && products && products.length > 0) {
+      // Kumpul by category untuk product_list sections
+      const grouped: Record<string, string[]> = {};
+      for (const p of products) {
+        const cat = (p.category || 'Lain-lain').toUpperCase();
+        if (!grouped[cat]) grouped[cat] = [];
+        if (grouped[cat].length < 30) grouped[cat].push(String(p.id));
+      }
+
+      const nativeSections = Object.entries(grouped)
+        .slice(0, 10)
+        .map(([title, productIds]) => ({ title, productIds }));
+
+      // Cuba product_list (tunjuk produk mengikut kategori)
+      const sentList = await sendWAProductList(from, nativeSections);
+      if (sentList) return;
+
+      // Fallback: catalog_message (tunjuk semua catalog sekaligus)
+      const thumbnailId = String(products[0].id);
+      const sentCatalog = await sendWACatalogMessage(
+        from,
+        '🛍️ Tengok semua produk Golden Isle bosku! Tekan produk untuk Add to Cart terus! 🛒🍻',
+        thumbnailId
+      );
+      if (sentCatalog) return;
+    }
+  }
+
+  // ── 2. Fallback: WA Interactive List (lama) ────────────────────────────────
   const { data: products, error } = await supabase
     .from('products')
     .select('id, name, price, category, description')
@@ -274,7 +482,6 @@ async function handleCatalog(from: string) {
     return;
   }
 
-  // Kumpulkan produk by category untuk WA sections
   const grouped: Record<string, typeof products> = {};
   for (const p of products) {
     const cat = p.category || 'Umum';
@@ -286,19 +493,17 @@ async function handleCatalog(from: string) {
     title: category.toUpperCase(),
     rows: items.slice(0, 10).map(p => ({
       id: `product_${p.id}`,
-      title: p.name.slice(0, 24), // WA limit 24 chars
+      title: p.name.slice(0, 24),
       description: `RM ${Number(p.price).toFixed(2)}${p.description ? ' — ' + p.description.slice(0, 50) : ''}`,
     })),
   }));
 
-  // WA Interactive List max 10 rows total — kalau lebih, fallback ke teks
   const totalRows = sections.reduce((acc, s) => acc + s.rows.length, 0);
   if (totalRows > 10 || sections.length === 0) {
     const textList = products.map(p => `• *${p.name}*\n  💰 RM ${Number(p.price).toFixed(2)}`).join('\n\n');
     await sendWAText(from, `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Pilih produk yang mau, taip nama dia terus ya bosku!_`);
   } else {
     await sendWAInteractiveList(from, sections);
-    // Follow-up sales nudge selepas tunjuk catalog
     await new Promise(r => setTimeout(r, 1500));
     await sendWAText(
       from,
@@ -316,7 +521,7 @@ async function handleReceipt(from: string) {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, status, payment_status, subtotal, delivery_fee, total, created_at, items')
+    .select('id, status, payment_status, subtotal, delivery_fee, total, created_at, items, customer_name')
     .or(phoneVariants.map(p => `customer_phone.eq.${p}`).join(','))
     .order('created_at', { ascending: false })
     .limit(1);
@@ -357,12 +562,70 @@ async function handleReceipt(from: string) {
     ``,
     `${statusEmoji} Status: ${order.payment_status?.toUpperCase() || 'PENDING'}`,
     ``,
-    `📄 Download PDF:\n${pdfLink}`,
+    `📄 Atau muat turun dari Web:\n${pdfLink}`,
     `━━━━━━━━━━━━━━━`,
     `_Terima kasih kerana memilih Golden Isle! 🙏_`,
   ].filter(Boolean).join('\n');
 
   await sendWAText(from, receiptMsg);
+
+  // --- 2. Generate & Send PDF Document ---
+  try {
+    const cartItems = Array.isArray(order.items) ? order.items.map((item: any) => ({
+      name: item.product?.name || 'Item',
+      category: item.product?.category || 'Umum',
+      price: String(item.price || '0'),
+      priceNum: Number(item.price || 0),
+      quantity: Number(item.qty || 1),
+      total: String((Number(item.price || 0) * Number(item.qty || 1)).toFixed(2))
+    })) : [];
+
+    const orderDataForPdf = {
+      orderId: String(orderId).slice(-6).toUpperCase(),
+      name: order.customer_name || 'Pelanggan VIP',
+      phone: from,
+      cart: cartItems,
+      timestamp: order.created_at
+    };
+
+    const pdfBuffer = await generateInvoicePdf(orderDataForPdf);
+    const pdfMediaId = await uploadWAMedia(pdfBuffer, 'application/pdf', `Resit_${orderDataForPdf.orderId}.pdf`);
+    
+    if (pdfMediaId) {
+      await sendWAMediaById(from, pdfMediaId, 'document', `📄 Resit Rasmi #${orderDataForPdf.orderId}`, `Resit_${orderDataForPdf.orderId}.pdf`);
+    }
+  } catch (pdfErr) {
+    console.error('Failed to generate/send PDF:', pdfErr);
+  }
+
+  // --- 3. Generate & Send Voice Note ---
+  try {
+    const totalMYR = Number(order.total).toFixed(2);
+    // Generate dynamic text using OpenAI Chat to give it a Sabahan flavor based on the order
+    const voicePrompt = `You are Golden AI, a friendly Sabahan wholesaler. The customer just checked their receipt for RM ${totalMYR}. Write a VERY SHORT, enthusiastic Voice Note script (max 2 sentences). Say thanks, mention the total roughly, and end with 'Bereh bosku' or 'Mantap bosku'. STRICTLY use Malaysian/Sabahan slang. No emojis in the spoken text.`;
+    
+    const textRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: voicePrompt }]
+      })
+    });
+    
+    const textData = await textRes.json();
+    const voiceScript = textData.choices?.[0]?.message?.content || `Mantap bosku! Resit RM ${totalMYR} sudah saya hantar. Terima kasih banyak-banyak support Golden Isle, nanti lori gerak saya roger!`;
+    
+    const audioBuffer = await generateVoiceNoteBuffer(voiceScript);
+    if (audioBuffer) {
+      const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/aac', 'voice_note.aac');
+      if (audioMediaId) {
+        await sendWAMediaById(from, audioMediaId, 'audio');
+      }
+    }
+  } catch (voiceErr) {
+    console.error('Failed to generate/send Voice Note:', voiceErr);
+  }
 }
 
 // SUGGESTION BOX: Simpan feedback & notify admin
@@ -413,15 +676,16 @@ async function handleSuggestion(from: string, msgText: string) {
 }
 
 // AI CHAT: Guna OpenAI dengan konteks katalog
+// AI CHAT: Guna OpenAI dengan konteks katalog
 async function handleAIChat(from: string, msgText: string) {
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
-    .select('name, price, category, stock_status')
+    .select('id, name, price, category, stock_status')
     .eq('stock_status', 'in_stock');
 
   if (products && products.length > 0) {
-    catalogText = products.map(p => `- ${p.name} (RM ${p.price})`).join('\n');
+    catalogText = products.map(p => `- ID: ${p.id} | ${p.name} (RM ${p.price}) [Kategori: ${p.category || 'Lain-lain'}]`).join('\n');
   }
 
   const systemPrompt = `You are KIRA, a friendly and persuasive sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
@@ -445,6 +709,8 @@ Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
+- Recommend Products → Call the 'recommend_products' tool when the user asks for specific recommendations, wants to search for beverages, or wants to see certain types of drinks (e.g., whiskies, beers). Do NOT just list them in text.
+- Full Catalog → Call the 'view_full_catalog' tool when the user asks to see all items, browse the shop, or generally wants the full list.
 - Pricing/stock questions → refer to stock list above. Mention best value options.
 - Ordering → encourage them to tap "🛒 Buat Pesanan" or type "order".
 - Receipt → tap "🧾 Semak Resit" or type "resit".
@@ -453,24 +719,124 @@ Business Rules:
 - If they ask what's popular → recommend Whisky and Red Wine as bestsellers.
 - Minimum order → no minimum, but bulk orders get priority processing.`;
 
-  const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+  const tools = [
+    {
+      type: 'function',
+      function: {
+        name: 'recommend_products',
+        description: 'Call this when the user asks for product recommendations, searches for specific beverages, or wants to buy specific items. This will display them as a native interactive Multi-Product List in WhatsApp.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: {
+              type: 'string',
+              description: 'Body message explaining the recommendation in user language / Sabahan slang (max 3 sentences). No markdown or bullet points.'
+            },
+            sections: {
+              type: 'array',
+              description: 'Sections of products to display, grouped by category. Max 2 sections for best layout.',
+              items: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string', description: 'Section title (max 24 characters).' },
+                  product_ids: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Exact product ID strings from the catalog.'
+                  }
+                },
+                required: ['title', 'product_ids']
+              }
+            }
+          },
+          required: ['text', 'sections']
+        }
+      }
     },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: msgText },
-      ],
-    }),
-  });
+    {
+      type: 'function',
+      function: {
+        name: 'view_full_catalog',
+        description: 'Call this when the user wants to browse the entire store catalog generally, or asks to see all products.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: {
+              type: 'string',
+              description: 'Body message inviting them to view the catalog (max 3 sentences).'
+            }
+          },
+          required: ['text']
+        }
+      }
+    }
+  ];
 
-  const openaiData = await openaiRes.json();
-  const reply = openaiData.choices?.[0]?.message?.content || 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!';
-  await sendWAText(from, reply);
+  try {
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: msgText },
+        ],
+        tools,
+        tool_choice: 'auto'
+      }),
+    });
+
+    const openaiData = await openaiRes.json();
+    const choiceMessage = openaiData.choices?.[0]?.message;
+    const toolCalls = choiceMessage?.tool_calls;
+
+    if (toolCalls && toolCalls.length > 0) {
+      const toolCall = toolCalls[0];
+      const functionName = toolCall.function.name;
+      let args: any = {};
+      try {
+        args = JSON.parse(toolCall.function.arguments || '{}');
+      } catch (e) {
+        console.error('Failed to parse tool call arguments:', e);
+      }
+
+      if (functionName === 'recommend_products') {
+        const { text, sections } = args;
+        const formattedSections = (sections || []).map((s: any) => ({
+          title: s.title || 'Cadangan',
+          productIds: s.product_ids || [],
+        }));
+
+        console.log(`🤖 AI recommending products via tool:`, JSON.stringify(formattedSections));
+        const success = await sendWAProductList(from, formattedSections, text);
+        if (!success) {
+          await sendWAText(from, text);
+        }
+        return;
+      }
+
+      if (functionName === 'view_full_catalog') {
+        const { text } = args;
+        const thumbnailId = products && products.length > 0 ? String(products[0].id) : undefined;
+        console.log(`🤖 AI showing full catalog via tool`);
+        const success = await sendWACatalogMessage(from, text, thumbnailId);
+        if (!success) {
+          await sendWAText(from, text);
+        }
+        return;
+      }
+    }
+
+    const reply = choiceMessage?.content || 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!';
+    await sendWAText(from, reply);
+  } catch (err) {
+    console.error('Error in handleAIChat:', err);
+    await sendWAText(from, 'Maaf bosku, ada ralat sikit dalam sistem AI. Cuba lagi ya.');
+  }
 }
 
 // ── VERIFIKASI WEBHOOK (GET) ─────────────────────────────────────────────────

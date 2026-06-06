@@ -3,12 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown, CheckCircle2, GlassWater, Wine } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import PremiumBottle3D from "@/components/ui/PremiumBottle3D";
 import { getWhatsAppLink } from '@/lib/config';
 import { useState, useEffect } from "react";
 
-// @ts-ignore
+// @ts-expect-error - framer-motion types are incompatible with next/link
 const MotionLink = motion.create ? motion.create(Link) : motion(Link);
 
 const fadeInUp = {
