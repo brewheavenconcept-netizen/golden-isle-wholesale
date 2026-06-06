@@ -101,6 +101,56 @@ async function sendWAText(to: string, text: string) {
   });
 }
 
+// Hantar mesej CTA URL interaktif ke WA
+async function sendWACtaUrl(to: string, totalStr: string, paymentLink: string): Promise<boolean> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return false;
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'interactive',
+        interactive: {
+          type: 'cta_url',
+          header: {
+            type: 'text',
+            text: '🎉 Pesanan Diterima!'
+          },
+          body: {
+            text: `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n🛒 Jumlah Keseluruhan: RM ${totalStr}\n\nSila buat bayaran untuk proses pesanan bosku.`
+          },
+          footer: {
+            text: 'Pesanan akan diproses sebaik bayaran disahkan.'
+          },
+          action: {
+            name: 'cta_url',
+            parameters: {
+              display_text: '💳 Bayar Sekarang',
+              url: paymentLink
+            }
+          }
+        }
+      }),
+    });
+    if (!res.ok) {
+      console.error('❌ sendWACtaUrl error:', await res.json());
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error sending CTA URL:', err);
+    return false;
+  }
+}
+
 // Hantar mesej gambar berserta caption ke WA
 async function sendWAImage(to: string, imageUrl: string, caption: string) {
   const waToken = process.env.WHATSAPP_TOKEN;
@@ -1063,15 +1113,19 @@ export async function POST(request: Request) {
           const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
           const paymentLink = `${appUrl}/payment/selection/${orderId}`;
           
-          // Reply to user
-          await sendWAText(from, 
-            `🎉 *Pesanan Diterima!*\n\n` +
-            `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n` +
-            `🛒 *Jumlah Keseluruhan: RM ${total.toFixed(2)}*\n\n` +
-            `Sila klik link di bawah untuk buat bayaran (FPX / Kad Kredit / Upload Resit):\n\n` +
-            `👉 ${paymentLink}\n\n` +
-            `_Pesanan akan diproses sebaik sahaja bayaran disahkan._`
-          );
+          // Reply to user using Interactive CTA URL
+          const ctaSuccess = await sendWACtaUrl(from, total.toFixed(2), paymentLink);
+          if (!ctaSuccess) {
+            // Fallback if CTA URL fails
+            await sendWAText(from, 
+              `🎉 *Pesanan Diterima!*\n\n` +
+              `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n` +
+              `🛒 *Jumlah Keseluruhan: RM ${total.toFixed(2)}*\n\n` +
+              `Sila klik link di bawah untuk buat bayaran (FPX / Kad Kredit / Upload Resit):\n\n` +
+              `👉 ${paymentLink}\n\n` +
+              `_Pesanan akan diproses sebaik sahaja bayaran disahkan._`
+            );
+          }
           
           // Notify Telegram
           await notifyTelegram(
