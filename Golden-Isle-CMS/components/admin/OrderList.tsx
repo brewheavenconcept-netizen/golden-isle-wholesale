@@ -185,7 +185,7 @@ export default function OrderList() {
             order.customer_name,
             order.customer_phone,
             formatDate(order.created_at),
-            order.items?.map(i => `${i.product.name} (x${i.qty})`).join('; ') || '',
+            order.items?.map((i: any) => `${i.product?.name || i.name || 'Unknown'} (x${i.qty ?? i.quantity ?? 1})`).join('; ') || '',
             `RM ${(Number(order.total) || 0).toFixed(2)}`,
             order.status
         ]);
@@ -303,14 +303,19 @@ export default function OrderList() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {orderToPrint.items?.map((item, idx) => (
-                                    <tr key={idx} className="border-b border-slate-200">
-                                        <td className="py-2">{item.product.name}</td>
-                                        <td className="text-center py-2">{item.qty}</td>
-                                        <td className="text-right py-2">RM {item.product.price.toFixed(2)}</td>
-                                        <td className="text-right py-2">RM {(item.product.price * item.qty).toFixed(2)}</td>
-                                    </tr>
-                                ))}
+                                {orderToPrint.items?.map((item: any, idx) => {
+                                    const name = item.product?.name || item.name || 'Unknown Product';
+                                    const qty = Number(item.qty ?? item.quantity ?? 1);
+                                    const price = Number(item.product?.price ?? item.price ?? 0);
+                                    return (
+                                        <tr key={idx} className="border-b border-slate-200">
+                                            <td className="py-2">{name}</td>
+                                            <td className="text-center py-2">{qty}</td>
+                                            <td className="text-right py-2">RM {price.toFixed(2)}</td>
+                                            <td className="text-right py-2">RM {(price * qty).toFixed(2)}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
 
@@ -666,20 +671,26 @@ export default function OrderList() {
                                                     </h4>
                                                     <div className="border border-slate-100 dark:border-white/10 rounded-lg divide-y divide-slate-100 dark:divide-gray-700">
                                                         {order.items && Array.isArray(order.items) ? (
-                                                            order.items.map((item: any, idx: number) => (
-                                                                <div key={idx} className="p-3 flex justify-between items-center">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-10 h-10 bg-slate-100 dark:bg-gray-700 rounded overflow-hidden">
-                                                                            {item.product.images?.[0] && <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />}
+                                                            order.items.map((item: any, idx: number) => {
+                                                                const name = item.product?.name || item.name || 'Unknown Product';
+                                                                const qty = Number(item.qty ?? item.quantity ?? 1);
+                                                                const price = Number(item.product?.price ?? item.price ?? 0);
+                                                                const imgUrl = item.product?.images?.[0] || item.product?.image_url;
+                                                                return (
+                                                                    <div key={idx} className="p-3 flex justify-between items-center">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="w-10 h-10 bg-slate-100 dark:bg-gray-700 rounded overflow-hidden">
+                                                                                {imgUrl && <img src={imgUrl} alt={name} className="w-full h-full object-cover" />}
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="font-medium text-sm text-slate-800 dark:text-gray-200">{name}</p>
+                                                                                <p className="text-xs text-slate-500 dark:text-gray-400">Qty: {qty} × RM {price.toFixed(2)}</p>
+                                                                            </div>
                                                                         </div>
-                                                                        <div>
-                                                                            <p className="font-medium text-sm text-slate-800 dark:text-gray-200">{item.product.name}</p>
-                                                                            <p className="text-xs text-slate-500 dark:text-gray-400">Qty: {item.qty} × RM {item.product.price.toFixed(2)}</p>
-                                                                        </div>
+                                                                        <span className="font-bold text-sm text-slate-600 dark:text-gray-300">RM {(price * qty).toFixed(2)}</span>
                                                                     </div>
-                                                                    <span className="font-bold text-sm text-slate-600 dark:text-gray-300">RM {(item.product.price * item.qty).toFixed(2)}</span>
-                                                                </div>
-                                                            ))
+                                                                );
+                                                            })
                                                         ) : (
                                                             <p className="p-3 text-sm text-slate-400">No item data available.</p>
                                                         )}
