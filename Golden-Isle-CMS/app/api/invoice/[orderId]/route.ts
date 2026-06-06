@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { generateInvoicePdf } from "@/lib/pdfGenerator";
 import { generateInvoiceHTML, type InvoiceData } from "@/app/api/invoice/invoice-template";
+import { generateReceipt, type OrderData } from "@/lib/generateReceipt";
 
 // ── GET: serve PDF ──────────────────────────────────────────────────────────
 export async function GET(
@@ -168,6 +169,66 @@ export async function POST(
 
         const resendData = await emailRes.json();
         console.log(`✅ Invoice email sent to ${customerEmail} (id: ${resendData.id})`);
+
+        // === FEATURE 2: Generate PDF Receipt & Send via WhatsApp ===
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const waToken = process.env.WHATSAPP_TOKEN;
+        const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+        if (url && serviceKey) {
+            const supabase = createClient(url, serviceKey);
+            const { data: order } = await supabase.from('orders').select('customer_phone, customer_name').eq('id', orderId).single();
+
+            if (order && order.customer_phone) {
+                const orderData: OrderData = {
+                    orderId,
+                    name: order.customer_name || customerName,
+                    phone: order.customer_phone,
+                    timestamp: new Date().toISOString(),
+                    cart: items.map((item: any) => ({
+                        name: item.name || "Product",
+                        quantity: Number(item.quantity) || 1,
+                        priceNum: item.priceNum || parseFloat((item.price || "0").replace(/[^0-9.]/g, "")) || 0
+                    }))
+                };
+
+                // Generate PDF
+                const pdfBuffer = await generateReceipt(orderData);
+
+                // Upload to Supabase Storage
+                const filename = `receipt_${orderId}_${Date.now()}.pdf`;
+                await supabase.storage.from('receipts').upload(filename, pdfBuffer, { contentType: 'application/pdf' });
+                const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(filename);
+
+                // Send Document via WA
+                if (waToken && waPhoneId) {
+                    const waRes = await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${waToken}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messaging_product: 'whatsapp',
+                            to: order.customer_phone,
+                            type: 'document',
+                            document: {
+                                link: publicUrl,
+                                filename: `Resit_Golden_Isle_${orderId}.pdf`,
+                                caption: 'Terima kasih bosku!'
+                            }
+                        })
+                    });
+                    
+                    if (waRes.ok) {
+                        console.log(`✅ PDF Receipt sent via WhatsApp to ${order.customer_phone}`);
+                    } else {
+                        console.error('Failed to send WA document', await waRes.text());
+                    }
+                }
+            }
+        }
 
         return NextResponse.json({ success: true, emailId: resendData.id });
 
