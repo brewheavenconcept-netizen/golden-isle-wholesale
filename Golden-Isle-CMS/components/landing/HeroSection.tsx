@@ -7,7 +7,7 @@ import PremiumBottle3D from "@/components/ui/PremiumBottle3D";
 import { getWhatsAppLink } from '@/lib/config';
 import { useState, useEffect } from "react";
 
-// @ts-expect-error - framer-motion types are incompatible with next/link
+// @ts-ignore - framer-motion types are incompatible with next/link
 const MotionLink = motion.create ? motion.create(Link) : motion(Link);
 
 const fadeInUp = {
