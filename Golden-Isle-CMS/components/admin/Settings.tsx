@@ -195,7 +195,7 @@ export default function Settings() {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
 
             {/* 1. STORE INFORMATION */}
-            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-4 transition-all duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Building2 size={20} className="text-blue-600" />
                     Store Information
@@ -208,7 +208,7 @@ export default function Settings() {
                             value={settings.store_name}
                             onChange={(e) => updateSettings({ store_name: e.target.value })}
                             placeholder="My Coffee Shop"
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         />
                     </div>
                     <div>
@@ -218,7 +218,7 @@ export default function Settings() {
                             value={settings.whatsapp_number}
                             onChange={(e) => updateSettings({ whatsapp_number: e.target.value })}
                             placeholder="60123456789"
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         />
                         <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">Format: Numbers only (e.g., 60123456789)</p>
                     </div>
@@ -226,7 +226,7 @@ export default function Settings() {
             </div>
 
             {/* 2. BRANDING */}
-            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-4 transition-all duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <ImageIcon size={20} className="text-blue-600" />
                     Branding
@@ -282,7 +282,7 @@ export default function Settings() {
             </div>
 
             {/* 3. CURRENCY & REGIONAL */}
-            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-4 transition-all duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Globe size={20} className="text-blue-600" />
                     Currency & Regional
@@ -293,7 +293,7 @@ export default function Settings() {
                         <select
                             value={settings.currency}
                             onChange={(e) => updateSettings({ currency: e.target.value })}
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         >
                             <option value="MYR">MYR - Malaysian Ringgit</option>
                             <option value="USD">USD - US Dollar</option>
@@ -306,7 +306,7 @@ export default function Settings() {
                         <select
                             value={settings.timezone}
                             onChange={(e) => updateSettings({ timezone: e.target.value })}
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         >
                             <option value="Asia/Kuala_Lumpur">Asia/Kuala Lumpur (GMT+8)</option>
                             <option value="Asia/Singapore">Asia/Singapore (GMT+8)</option>
@@ -317,7 +317,7 @@ export default function Settings() {
             </div>
 
             {/* 3. DELIVERY SETTINGS */}
-            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-4 transition-all duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Truck size={20} className="text-blue-600" />
                     Delivery Settings
@@ -331,7 +331,7 @@ export default function Settings() {
                             value={settings.delivery_fee}
                             onChange={(e) => updateSettings({ delivery_fee: parseFloat(e.target.value) || 0 })}
                             placeholder="10.00"
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         />
                     </div>
                     <div>
@@ -342,7 +342,7 @@ export default function Settings() {
                             value={settings.free_delivery_threshold}
                             onChange={(e) => updateSettings({ free_delivery_threshold: parseFloat(e.target.value) || 0 })}
                             placeholder="50.00"
-                            className="w-full bg-white dark:bg-[#111111] border border-slate-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all"
                         />
                         <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">Minimum order for free delivery</p>
                     </div>
@@ -362,7 +362,7 @@ export default function Settings() {
             </div>
 
             {/* 5. OPERATING HOURS */}
-            <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
                 <div
                     className="p-6 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors"
                     onClick={() => setIsOperatingHoursExpanded(!isOperatingHoursExpanded)}
@@ -420,7 +420,7 @@ export default function Settings() {
             </div>
 
             {/* 6. NOTIFICATIONS */}
-            <div className="bg-white dark:bg-[#111111] p-6 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-colors duration-300">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-4 transition-all duration-300">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Bell size={20} className="text-blue-600" />
                     Notifications
@@ -443,7 +443,7 @@ export default function Settings() {
             </div>
 
             {/* SAVE BUTTON */}
-            <div className="sticky bottom-0 bg-white dark:bg-[#111111] border-t border-slate-100 dark:border-white/10 p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] -mx-6 -mb-8 mt-6 z-10 transition-colors duration-300">
+            <div className="sticky bottom-0 bg-white/70 dark:bg-black/40 backdrop-blur-xl border-t border-white/40 dark:border-white/10 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] -mx-6 -mb-8 mt-6 z-10 transition-all duration-300">
                 <button
                     onClick={handleSave}
                     disabled={saveLoading}

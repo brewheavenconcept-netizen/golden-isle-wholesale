@@ -238,9 +238,12 @@ export default function OrderList() {
     const isAllSelected = filteredOrders.length > 0 && filteredIds.every(id => selectedOrderIds.has(id));
 
     if (loading) return (
-        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-gray-500">
-            <div className="w-8 h-8 border-2 border-slate-200 dark:border-gray-700 border-t-blue-500 rounded-full animate-spin" />
-            <p className="text-sm font-medium">Loading orders...</p>
+        <div className="p-20 flex flex-col items-center justify-center gap-4 text-slate-500 dark:text-slate-400">
+            <div className="relative flex items-center justify-center">
+                <div className="absolute w-12 h-12 rounded-full border-4 border-slate-200/50 dark:border-white/10" />
+                <div className="w-12 h-12 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" />
+            </div>
+            <p className="text-sm font-medium tracking-wide">Loading orders...</p>
         </div>
     );
 
@@ -360,7 +363,7 @@ export default function OrderList() {
                                 placeholder="Search by name or phone..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 text-sm bg-white dark:bg-[#111111] border border-slate-200 dark:border-white/10 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                                className="w-full h-11 pl-10 pr-4 text-sm bg-white/50 dark:bg-[#111111]/50 backdrop-blur-md border border-white/40 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm focus:shadow-md"
                             />
                         </div>
                         {selectedOrderIds.size > 0 && (
@@ -390,8 +393,8 @@ export default function OrderList() {
                             key={tab.value}
                             onClick={() => setStatusFilter(tab.value)}
                             className={`h-11 px-4 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${statusFilter === tab.value
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'bg-white dark:bg-[#111111] text-slate-600 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-white/10'
+                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 border border-transparent'
+                                : 'bg-white/40 dark:bg-white/5 backdrop-blur-md text-slate-600 dark:text-gray-300 hover:bg-white/70 dark:hover:bg-white/10 border border-white/40 dark:border-white/10 shadow-sm'
                                 }`}
                         >
                             {tab.label}
@@ -400,7 +403,7 @@ export default function OrderList() {
                 </div>
 
                 {/* DATE RANGE FILTER & SELECT ALL */}
-                <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors duration-300">
+                <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-4 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.1)] border border-white/40 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
 
                     {/* Select All */}
                     <button
@@ -414,7 +417,7 @@ export default function OrderList() {
                     </button>
 
                     {/* Date Inputs - Grouped Pill */}
-                    <div className="flex items-center bg-slate-50 dark:bg-[#111111] border border-slate-200 dark:border-white/10 rounded-xl p-1.5 gap-2 w-full md:w-auto overflow-x-auto">
+                    <div className="flex items-center bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-xl p-1.5 gap-2 w-full md:w-auto overflow-x-auto">
                         <div className="flex items-center gap-2 pl-2">
                             <Calendar size={16} className="text-slate-400 dark:text-gray-500 shrink-0" />
                             <span className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider hidden sm:inline">From</span>
@@ -453,7 +456,7 @@ export default function OrderList() {
                 </div>
 
                 {filteredOrders.length === 0 ? (
-                    <div className="bg-slate-50 dark:bg-slate-800/50 p-12 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-center">
+                    <div className="bg-white/30 dark:bg-white/5 backdrop-blur-md p-12 rounded-3xl border border-dashed border-blue-200 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-center">
                         <ShoppingBag className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
                         <p className="text-slate-500 dark:text-gray-400 font-medium">No orders yet</p>
                         <p className="text-slate-400 dark:text-gray-500 text-sm mt-1">Orders from your customers will appear here.</p>
@@ -465,10 +468,10 @@ export default function OrderList() {
                                 id={`order-${order.id}`}
                                 key={`${order.id}-${index}`}
                                 className={`rounded-2xl shadow-sm overflow-hidden transition-all duration-500 ${highlightId === order.id
-                                    ? 'bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700'
+                                    ? 'bg-yellow-500/10 dark:bg-yellow-900/20 backdrop-blur-xl border-2 border-yellow-400 dark:border-yellow-600 shadow-lg'
                                     : selectedOrderIds.has(order.id)
-                                        ? 'bg-white dark:bg-[#111111] ring-2 ring-blue-500'
-                                        : 'bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/10'
+                                        ? 'bg-white/90 dark:bg-white/10 backdrop-blur-xl ring-2 ring-blue-500 shadow-lg'
+                                        : 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 hover:shadow-[0_8px_30px_rgba(59,130,246,0.08)] hover:border-blue-500/30'
                                     }`}
                             >
 
@@ -528,7 +531,7 @@ export default function OrderList() {
 
                                 {/* DETAIL */}
                                 {expandedOrderIds.has(order.id) && (
-                                    <div className="border-t border-slate-100 dark:border-white/10 p-3 bg-white dark:bg-[#111111]/50">
+                                    <div className="border-t border-white/40 dark:border-white/10 p-5 bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-b-3xl">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                             {/* LEFT COLUMN */}
                                             <div className="space-y-6">
@@ -537,7 +540,7 @@ export default function OrderList() {
                                                     <h4 className="font-bold text-sm text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                                                         <User size={16} /> Customer Details
                                                     </h4>
-                                                    <div className="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-lg space-y-2 text-sm">
+                                                    <div className="bg-white/50 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10 p-4 rounded-2xl space-y-2 text-sm shadow-sm">
                                                         <p><span className="text-slate-500 dark:text-gray-400 w-20 inline-block">Name:</span> <span className="text-slate-900 dark:text-white font-medium">{order.customer_name}</span></p>
                                                         <p><span className="text-slate-500 dark:text-gray-400 w-20 inline-block">Phone:</span>
                                                             <a href={`https://wa.me/${order.customer_phone?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
@@ -554,7 +557,7 @@ export default function OrderList() {
                                                         <h4 className="font-bold text-sm text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                                                             <MapPin size={16} /> Delivery Address
                                                         </h4>
-                                                        <div className="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-lg text-sm text-slate-700 dark:text-gray-300">
+                                                        <div className="bg-white/50 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10 p-4 rounded-2xl text-sm text-slate-700 dark:text-gray-300 shadow-sm">
                                                             {order.delivery_address}
                                                         </div>
                                                     </div>
@@ -707,7 +710,7 @@ export default function OrderList() {
                                                             value={editingNotes[order.id] ?? order.admin_notes ?? ''}
                                                             onChange={(e) => setEditingNotes({ ...editingNotes, [order.id]: e.target.value })}
                                                             placeholder="Add internal notes (e.g., 'Called customer, out for delivery')"
-                                                            className="w-full p-3 bg-white dark:bg-[#111111] border border-slate-200 dark:border-white/10 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                                            className="w-full p-3 bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-2xl shadow-inner text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"
                                                             rows={3}
                                                         />
                                                         <button

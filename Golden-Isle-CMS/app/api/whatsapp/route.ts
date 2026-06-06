@@ -458,6 +458,60 @@ async function handleGreeting(from: string) {
   );
 }
 
+// GREETING REPEAT: Hantar repeat order offer kalau returning customer
+async function handleRepeatGreeting(from: string): Promise<boolean> {
+  // 1. Check unpaid orders
+  const { data: unpaidOrder } = await supabase.from('orders')
+    .select('id, total, status')
+    .eq('customer_phone', from)
+    .in('status', ['pending_payment', 'pending', 'unpaid'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (unpaidOrder) {
+    await sendWAButtons(from, `Eh bosku! KIRA nampak ada pesanan yang belum settle lagi ni (RM ${Number(unpaidOrder.total).toFixed(2)}). Settle dulu bosku baru kita borak order baru okay? 😉`, [
+      { id: 'btn_receipt', title: '🧾 Semak Resit' },
+      { id: 'btn_order', title: '🛍️ Tengok Catalog' }
+    ]);
+    return true; // handled
+  }
+
+  // 2. Check last completed order
+  const { data: lastOrder } = await supabase.from('orders')
+    .select('*')
+    .eq('customer_phone', from)
+    .in('status', ['completed', 'paid'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (lastOrder) {
+    const { data: customer } = await supabase.from('customers').select('name').eq('phone', from).single();
+    const name = customer?.name || lastOrder.customer_name || 'bosku';
+    const firstItem = lastOrder.items && lastOrder.items.length > 0 ? lastOrder.items[0] : null;
+    let itemsSummary = 'Pesanan lepas';
+    if (firstItem) {
+      itemsSummary = `${firstItem.name || 'Produk'} x ${firstItem.quantity || 1} kotak`;
+      if (lastOrder.items.length > 1) itemsSummary += ` (+${lastOrder.items.length - 1} lagi)`;
+    }
+    const dateStr = new Date(lastOrder.created_at).toLocaleDateString('ms-MY');
+
+    await sendWAButtons(
+      from,
+      `Eh bosku ${name}! 👋\n\nSaya nampak order terakhir bosku:\n📦 ${itemsSummary}\n📅 ${dateStr}\n💰 Total: RM ${Number(lastOrder.total).toFixed(2)}\n\nNak repeat order sama macam tu? Saya boleh siapkan invoice dalam 30 saat je! ⚡`,
+      [
+        { id: `btn_repeat_confirm_${lastOrder.id}`, title: '✅ Ya, Repeat!' },
+        { id: `btn_repeat_edit_${lastOrder.id}`, title: '✏️ Nak Tukar Sikit' },
+        { id: 'btn_new_order', title: '🛍️ Order Baru' }
+      ]
+    );
+    return true;
+  }
+
+  return false;
+}
+
 // ORDER FLOW: Hantar Katalog terus (Bypass WA Flow sementara waktu)
 async function handleOrder(from: string) {
   // Fallback: tunjuk catalog interaktif terus sebab WA Flow 'draft' tak support WA Web
@@ -603,7 +657,7 @@ async function handleReceipt(from: string) {
   });
 
   const itemsList = Array.isArray(order.items)
-    ? order.items.map((item: any) => `• ${item.product?.name || 'Produk'} x${item.qty}`).join('\n')
+    ? order.items.map((item: any) => `• ${item.name || item.product?.name || 'Produk'} x${item.quantity || item.qty || 1}`).join('\n')
     : '';
 
   const receiptMsg = [
@@ -784,6 +838,21 @@ Business Rules:
     {
       type: 'function',
       function: {
+        name: 'tanya_harga',
+        description: 'Call this ONLY when the user asks for the price of a specific product or asks about Minimum Order Quantity (MOQ).',
+        parameters: {
+          type: 'object',
+          properties: {
+            product_id: { type: 'string', description: 'The ID of the product' },
+            product_name: { type: 'string', description: 'The name of the product' }
+          },
+          required: ['product_id', 'product_name']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
         name: 'recommend_products',
         description: 'Call this when the user asks for product recommendations, searches for specific beverages, or wants to buy specific items. This will display them as a native interactive Multi-Product List in WhatsApp.',
         parameters: {
@@ -898,6 +967,19 @@ Business Rules:
         history.push({ role: 'assistant', content: `[System Note: Successfully sent the full product catalog to user using WhatsApp Catalog UI. The text intro was: ${text}]` });
         return;
       }
+
+      if (functionName === 'tanya_harga') {
+        const { product_id, product_name } = args;
+        console.log(`🤖 AI handling tanya_harga for product: ${product_name} (${product_id})`);
+        
+        await sendWAButtons(from, `Bosku order *${product_name}* ni untuk apa ni?`, [
+          { id: `tanya_qty_event_${product_id}`, title: '🎉 Event/Party' },
+          { id: `tanya_qty_stok_${product_id}`, title: '🏪 Stok Kedai' },
+          { id: `tanya_qty_cuba_${product_id}`, title: '🍺 Cuba Dulu' }
+        ]);
+        history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${product_name}]` });
+        return;
+      }
     }
 
     const reply = choiceMessage?.content || 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!';
@@ -992,6 +1074,135 @@ export async function POST(request: Request) {
           await handleAIChat(from, "Tolong senaraikan rumusan ringkas stok yang available sekarang mengikut kategori.");
         } else if (buttonPayload === 'TANYA_KIRA') {
           await sendWAText(from, "👋 *Hai bosku! KIRA di sini.*\n\nAda mau tanya pasal minuman, harga atau borong? Taip je terus bosku, KIRA sedia membantu!");
+        } else if (buttonPayload === 'btn_new_order') {
+          await handleGreeting(from);
+        } else if (buttonPayload.startsWith('btn_repeat_confirm_')) {
+          const oldOrderId = buttonPayload.replace('btn_repeat_confirm_', '');
+          const { data: oldOrder } = await supabase.from('orders').select('*').eq('id', oldOrderId).single();
+          if (oldOrder) {
+            const { data: newOrder, error } = await supabase.from('orders').insert({
+              customer_phone: from,
+              customer_name: oldOrder.customer_name,
+              status: 'pending',
+              payment_status: 'unpaid',
+              subtotal: oldOrder.subtotal,
+              total: oldOrder.total,
+              items: oldOrder.items
+            }).select().single();
+
+            if (!error && newOrder) {
+              const orderId = newOrder.id;
+              const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+              const paymentLink = `${appUrl}/order-confirmation?orderId=${orderId}`;
+
+              const firstItem = newOrder.items && newOrder.items.length > 0 ? newOrder.items[0] : null;
+              let itemsSummary = 'Pesanan borong';
+              if (firstItem) {
+                itemsSummary = `${firstItem.name || 'Produk'} x ${firstItem.quantity || 1}`;
+                if (newOrder.items.length > 1) itemsSummary += ` (+${newOrder.items.length - 1} lagi)`;
+              }
+
+              const bodyText = `Perfect bosku! 🎉 Invoice dah siap!\n\n📋 Order #${orderId.split('-')[0]}\n📦 ${itemsSummary}\n💰 Total: RM ${Number(newOrder.total).toFixed(2)}\n\nSila settle payment untuk proses order bosku ya!`;
+              
+              const ctaSuccess = await sendWACtaUrl(from, bodyText, paymentLink);
+              if (!ctaSuccess) {
+                await sendWAText(from, `${bodyText}\n\n👉 ${paymentLink}`);
+              }
+            }
+          }
+        } else if (buttonPayload.startsWith('btn_repeat_edit_')) {
+          const oldOrderId = buttonPayload.replace('btn_repeat_edit_', '');
+          const { data: oldOrder } = await supabase.from('orders').select('*').eq('id', oldOrderId).single();
+          if (oldOrder) {
+            let itemsList = '';
+            (oldOrder.items || []).forEach((item: any, idx: number) => {
+              itemsList += `${idx+1}. ${item.name || 'Produk'} x ${item.quantity || 1} — RM ${(item.price * (item.quantity || 1) || 0).toFixed(2)}\n`;
+            });
+            const msg = `Okay bosku! Last order bosku:\n\n${itemsList}\nNak tambah, kurang, atau tukar produk mana satu?`;
+            
+            const systemNote = `[SYSTEM PROMPT FOR KIRA: Customer nak edit repeat order. Previous order ID: ${oldOrderId}. Items: ${JSON.stringify(oldOrder.items)}. Tugas kau: 1. Tanya customer nak tukar apa. 2. Update cart accordingly. 3. Bila customer confirm, generate invoice baru. 4. Send payment link. Jangan tanya soalan lain. Focus on editing order je.]`;
+            
+            if (!chatHistory.has(from)) chatHistory.set(from, []);
+            chatHistory.get(from)!.push({ role: 'system', content: systemNote });
+            
+            await sendWAText(from, msg);
+          }
+        } else if (buttonPayload.startsWith('btn_pay_')) {
+          const orderId = buttonPayload.replace('btn_pay_', '');
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+          const paymentLink = `${appUrl}/order-confirmation?orderId=${orderId}`;
+          const bodyText = `Sila klik butang di bawah untuk buat bayaran bagi order #${orderId.split('-')[0]} bosku ya! 💳`;
+          const ctaSuccess = await sendWACtaUrl(from, bodyText, paymentLink);
+          if (!ctaSuccess) await sendWAText(from, `${bodyText}\n\n👉 ${paymentLink}`);
+        } else if (buttonPayload.startsWith('btn_invoice_')) {
+          // Temporarily use handleReceipt logic by generating a PDF or just showing receipt text
+          const orderId = buttonPayload.replace('btn_invoice_', '');
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+          await sendWAText(from, `Ini link untuk tengok resit penuh bosku:\n${appUrl}/order-confirmation?orderId=${orderId}`);
+        } else if (buttonPayload.startsWith('btn_snooze_')) {
+          const orderId = buttonPayload.replace('btn_snooze_', '');
+          const newTime = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+          await supabase.from('orders').update({ last_chaser_sent: newTime }).eq('id', orderId);
+          await sendWAText(from, "Okay bosku! Saya ingatkan lagi kejap lagi ya 😊");
+        } else if (buttonPayload.startsWith('btn_cancel_')) {
+          const orderId = buttonPayload.replace('btn_cancel_', '');
+          const { data: order } = await supabase.from('orders').select('customer_name, customer_phone, total').eq('id', orderId).single();
+          await supabase.from('orders').update({ status: 'cancelled', chaser_opted_out: true }).eq('id', orderId);
+          await sendWAText(from, "Order dibatalkan bosku. Takpa, nanti nak order lagi boleh WhatsApp saya ya! 🙏");
+          if (order) {
+            await notifyTelegram(`⚠️ <b>ORDER DIBATALKAN</b>\nCustomer: ${order.customer_name || 'bosku'} (+${order.customer_phone})\nOrder ID: #${orderId.split('-')[0]}\nAmount: RM ${Number(order.total).toFixed(2)}\n<i>Dibatalkan melalui WA Reminder.</i>`);
+          }
+        } else if (buttonPayload === 'btn_talk_sales') {
+          await supabase.from('orders').update({ chaser_opted_out: true }).eq('customer_phone', from).in('payment_status', ['unpaid', 'pending_payment', 'pending']);
+          await sendWAText(from, "Okay bosku! Team kami akan hubungi bosku segera ya! 🤝");
+          await notifyTelegram(`📞 <b>SALES ASSIST REQUEST</b>\nPhone: +${from}\n<i>Customer tekan butang Hubungi Sales dari WA Reminder. Sila follow up segera!</i>`);
+        } else if (buttonPayload.startsWith('tanya_qty_')) {
+          // Step 2: Tanya Kuantiti
+          const parts = buttonPayload.split('_');
+          const productId = parts.slice(3).join('_');
+          await sendWAButtons(from, "Selalu ambil berapa kotak sebulan bosku?", [
+            { id: `tanya_tier_1_${productId}`, title: '📦 1-3 Kotak' },
+            { id: `tanya_tier_2_${productId}`, title: '📦 4-10 Kotak' },
+            { id: `tanya_tier_3_${productId}`, title: '📦 10+ Kotak' }
+          ]);
+        } else if (buttonPayload.startsWith('tanya_tier_')) {
+          // Step 3: Harga Tier & Social Proof
+          const parts = buttonPayload.split('_');
+          const tierLevel = parts[2]; // 1, 2, or 3
+          const productId = parts.slice(3).join('_');
+
+          const { data: product } = await supabase.from('products').select('name, price, price_tiers').eq('id', productId).single();
+          
+          if (product) {
+            // Default pricing fallback
+            let price1 = Number(product.price);
+            let price2 = price1 * 0.95; // 5% off
+            let price3 = price1 * 0.90; // 10% off
+
+            if (product.price_tiers) {
+              price1 = Number(product.price_tiers['1-3']) || price1;
+              price2 = Number(product.price_tiers['4-10']) || price2;
+              price3 = Number(product.price_tiers['10+']) || price3;
+            }
+
+            const p1Str = price1.toFixed(2);
+            const p2Str = price2.toFixed(2);
+            const p3Str = price3.toFixed(2);
+
+            const reply = `Untuk pesanan bosku, ini harga borong *${product.name}*:\n\n` +
+              `• 1-3 Kotak: RM ${p1Str}/ktk\n` +
+              `• *4-10 Kotak: RM ${p2Str}/ktk (Paling Popular 🔥)*\n` +
+              `• 10+ Kotak: RM ${p3Str}/ktk\n\n` +
+              `_(Ramai kedai KK ambil tier ni bosku!)_`;
+
+            await sendWAButtons(from, reply, [
+              { id: 'btn_catalog', title: '✅ Confirm Kuantiti' },
+              { id: `tanya_qty_stok_${productId}`, title: '🔄 Tukar Kuantiti' },
+              { id: 'btn_catalog', title: '🛍️ Tengok Lain' }
+            ]);
+          } else {
+            await sendWAText(from, "Maaf bosku, maklumat produk tidak dijumpai.");
+          }
         } else {
           await handleAIChat(from, buttonPayload);
         }
@@ -1189,6 +1400,42 @@ export async function POST(request: Request) {
         const msgText = message.text?.body?.trim() || '';
 
         console.log(`\n📩 MESEJ WA: [${from}] "${msgText}"`);
+
+        // Auto-Stop Chaser on FREE TEXT reply
+        try {
+          await supabase.from('orders')
+            .update({ chaser_opted_out: true })
+            .eq('customer_phone', from)
+            .in('payment_status', ['pending_payment', 'unpaid', 'pending'])
+            .eq('chaser_opted_out', false);
+        } catch (err) {
+          console.error('Error auto-stopping chaser:', err);
+        }
+
+        // 1. Session tracking in DB
+        let isNewSession = false;
+        try {
+          const { data: customer } = await supabase.from('customers').select('last_session_at').eq('phone', from).single();
+          const now = Date.now();
+          if (customer && customer.last_session_at) {
+            const lastTime = new Date(customer.last_session_at).getTime();
+            if (now - lastTime > 8 * 60 * 60 * 1000) isNewSession = true;
+          } else {
+            isNewSession = true;
+          }
+          await supabase.from('customers').upsert({
+            phone: from,
+            last_session_at: new Date().toISOString()
+          }, { onConflict: 'phone' });
+        } catch (err) {
+          console.error('Error tracking session:', err);
+        }
+
+        // 2. If new session, check repeat order
+        if (isNewSession) {
+           const handled = await handleRepeatGreeting(from);
+           if (handled) return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
 
         // Cek dulu kalau user sedang dalam mod suggestion
         if (awaitingSuggestion.has(from)) {

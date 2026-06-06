@@ -109,23 +109,23 @@ export default function AdminProductPage() {
 
             {/* FORM vs TABLE */}
             {isFormOpen ? (
-                <div className="bg-white dark:bg-[#111111] p-6 rounded-xl shadow-sm border border-slate-100 dark:border-white/10 transition-colors duration-300">
+                <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/40 dark:border-white/10 transition-colors duration-300">
                     <ProductForm initialData={editingProduct} onSuccess={handleFormSuccess} onCancel={handleCloseForm} />
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 border-dashed transition-colors duration-300">
-                    <div className="w-16 h-16 bg-slate-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Package className="h-8 w-8 text-slate-400 dark:text-gray-500" />
+                <div className="text-center py-20 bg-white/30 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-blue-200 dark:border-white/10 border-dashed shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300">
+                    <div className="w-16 h-16 bg-white/50 dark:bg-white/10 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Package className="h-8 w-8 text-blue-500 dark:text-blue-400" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">No products found</h3>
                     <p className="text-slate-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">Your inventory is empty. Add your first product to get started.</p>
                     <button onClick={handleCreateNew} className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Create new product</button>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors duration-300">
+                <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 dark:bg-[#111111]/50 border-b border-slate-100 dark:border-white/10">
+                            <thead className="bg-white/40 dark:bg-black/20 backdrop-blur-md border-b border-white/40 dark:border-white/10">
                                 <tr>
                                     <th className="px-6 py-4 w-12 text-center md:table-cell hidden">
                                         <input type="checkbox" className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-[#111111]"

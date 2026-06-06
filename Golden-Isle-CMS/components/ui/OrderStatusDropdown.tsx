@@ -12,14 +12,14 @@ interface OrderStatusDropdownProps {
 }
 
 const statusConfig: Record<Order['status'], { label: string; bgColor: string; textColor: string }> = {
-    pending: { label: '🟡 Pending', bgColor: 'bg-yellow-100', textColor: 'text-yellow-700' },
-    payment_submitted: { label: '💵 Payment Submitted', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
-    verifying_payment: { label: '🔍 Awaiting Verification', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
-    processing: { label: '⚙️ Processing', bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
-    shipped: { label: '🚚 Shipped', bgColor: 'bg-purple-100', textColor: 'text-purple-700' },
-    delivered: { label: '✅ Delivered', bgColor: 'bg-green-100', textColor: 'text-green-700' },
-    confirmed: { label: '✔️ Confirmed', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700' },
-    cancelled: { label: '❌ Cancelled', bgColor: 'bg-red-100', textColor: 'text-red-700' },
+    pending: { label: '🟡 Pending', bgColor: 'bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md', textColor: 'text-yellow-600 dark:text-yellow-400' },
+    payment_submitted: { label: '💵 Payment Submitted', bgColor: 'bg-amber-500/10 border border-amber-500/20 backdrop-blur-md', textColor: 'text-amber-600 dark:text-amber-400' },
+    verifying_payment: { label: '🔍 Awaiting Verification', bgColor: 'bg-amber-500/10 border border-amber-500/20 backdrop-blur-md', textColor: 'text-amber-600 dark:text-amber-400' },
+    processing: { label: '⚙️ Processing', bgColor: 'bg-blue-500/10 border border-blue-500/20 backdrop-blur-md', textColor: 'text-blue-600 dark:text-blue-400' },
+    shipped: { label: '🚚 Shipped', bgColor: 'bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md', textColor: 'text-indigo-600 dark:text-indigo-400' },
+    delivered: { label: '✅ Delivered', bgColor: 'bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md', textColor: 'text-emerald-600 dark:text-emerald-400' },
+    confirmed: { label: '✔️ Confirmed', bgColor: 'bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md', textColor: 'text-emerald-600 dark:text-emerald-400' },
+    cancelled: { label: '❌ Cancelled', bgColor: 'bg-red-500/10 border border-red-500/20 backdrop-blur-md', textColor: 'text-red-600 dark:text-red-400' },
 };
 
 export default function OrderStatusDropdown({ currentStatus, orderId, onStatusChange, isUpdating }: OrderStatusDropdownProps) {

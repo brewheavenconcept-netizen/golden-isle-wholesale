@@ -31,9 +31,9 @@ export default function ProductTableRow({ product, isSelected, onSelect, onEdit,
 
     return (
         <tr className={`
-            md:table-row md:border-b md:border-slate-100 dark:md:border-gray-700 md:hover:bg-slate-50 dark:md:hover:bg-gray-800/50 md:transition-colors md:bg-transparent
-            grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 p-4 border border-slate-200 dark:border-white/10 rounded-xl mb-3 bg-white dark:bg-[#111111] relative shadow-sm hover:shadow-md transition-shadow
-            ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : ''}
+            md:table-row md:border-b md:border-white/20 dark:md:border-white/10 md:hover:bg-white/50 dark:md:hover:bg-white/5 md:transition-colors md:bg-transparent
+            grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 p-4 border border-white/40 dark:border-white/10 rounded-2xl mb-3 bg-white/70 dark:bg-white/5 backdrop-blur-xl relative shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.08)] hover:border-blue-500/30 transition-all
+            ${isSelected ? 'bg-white/90 dark:bg-white/10 ring-2 ring-blue-500 shadow-lg' : ''}
         `}>
             {/* Checkbox */}
             <td className="md:table-cell md:w-12 md:px-6 md:py-4 absolute top-4 left-4 z-10 md:static">

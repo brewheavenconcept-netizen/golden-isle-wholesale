@@ -113,12 +113,12 @@ export default function InquiriesDashboard() {
                         placeholder="Search by business or email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                        className="w-full pl-9 pr-4 py-2 bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-sm focus:shadow-md"
                     />
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#111111] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-colors">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
                 {loading ? (
                     <div className="p-12 flex justify-center items-center">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -133,7 +133,7 @@ export default function InquiriesDashboard() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
+                                <tr className="bg-white/40 dark:bg-black/20 backdrop-blur-md border-b border-white/40 dark:border-white/10 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                                     <th className="p-4">Date</th>
                                     <th className="p-4">Business</th>
                                     <th className="p-4">Contact</th>
@@ -144,7 +144,7 @@ export default function InquiriesDashboard() {
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm text-slate-700 dark:text-slate-300">
                                 {filteredInquiries.map((inquiry) => (
                                     <React.Fragment key={inquiry.id}>
-                                        <tr className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors ${inquiry.status === 'new' ? 'bg-blue-50 dark:bg-blue-500/5' : ''}`}>
+                                        <tr className={`hover:bg-white/50 dark:hover:bg-white/5 transition-colors ${inquiry.status === 'new' ? 'bg-blue-500/10 dark:bg-blue-500/20 shadow-inner' : ''}`}>
                                             <td className="p-4 whitespace-nowrap">
                                                 {new Date(inquiry.created_at).toLocaleDateString()}
                                                 <div className="text-xs text-slate-500">{new Date(inquiry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -161,7 +161,7 @@ export default function InquiriesDashboard() {
                                                 <select
                                                     value={inquiry.status}
                                                     onChange={e => updateStatus(inquiry.id, e.target.value)}
-                                                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                                                    className="bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-white/10 text-slate-900 dark:text-white text-xs rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
                                                 >
                                                     <option value="new">New</option>
                                                     <option value="contacted">Contacted</option>
@@ -187,7 +187,7 @@ export default function InquiriesDashboard() {
                                         </tr>
                                         {/* Expanded Row for Message */}
                                         {expandedRow === inquiry.id && (
-                                            <tr className="bg-slate-50 dark:bg-slate-800/30">
+                                            <tr className="bg-white/40 dark:bg-black/20 backdrop-blur-md">
                                                 <td colSpan={5} className="p-4 border-l-4 border-blue-500">
                                                     <div className="pl-2">
                                                         <h4 className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Message Content</h4>
