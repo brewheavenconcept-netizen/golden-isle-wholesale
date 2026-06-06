@@ -178,7 +178,7 @@ export async function POST(
 
         if (url && serviceKey) {
             const supabase = createClient(url, serviceKey);
-            const { data: order } = await supabase.from('orders').select('customer_phone, customer_name').eq('id', orderId).single();
+            const { data: order } = await supabase.from('orders').select('customer_phone, customer_name, total').eq('id', orderId).single();
 
             if (order && order.customer_phone) {
                 const orderData: OrderData = {
@@ -203,6 +203,24 @@ export async function POST(
 
                 // Send Document via WA
                 if (waToken && waPhoneId) {
+                    // === FEATURE 3: Payment Confirmation WhatsApp ===
+                    const totalAmt = order.total ? Number(order.total).toFixed(2) : '0.00';
+                    const confirmMsg = `🎉 Bosku! Pembayaran RM ${totalAmt} dah disahkan!\nPesanan sedang diproses. Resit dah dihantar ya 📄`;
+                    
+                    await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${waToken}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messaging_product: 'whatsapp',
+                            to: order.customer_phone,
+                            type: 'text',
+                            text: { body: confirmMsg }
+                        })
+                    });
+
                     const waRes = await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
                         method: 'POST',
                         headers: {
