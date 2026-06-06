@@ -102,7 +102,7 @@ async function sendWAText(to: string, text: string) {
 }
 
 // Hantar mesej CTA URL interaktif ke WA
-async function sendWACtaUrl(to: string, totalStr: string, paymentLink: string): Promise<boolean> {
+async function sendWACtaUrl(to: string, bodyText: string, paymentLink: string): Promise<boolean> {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!waToken || !waPhoneId) return false;
@@ -125,7 +125,7 @@ async function sendWACtaUrl(to: string, totalStr: string, paymentLink: string): 
             text: '🎉 Pesanan Diterima!'
           },
           body: {
-            text: `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n🛒 Jumlah Keseluruhan: RM ${totalStr}\n\nSila buat bayaran untuk proses pesanan bosku.`
+            text: bodyText
           },
           footer: {
             text: 'Pesanan akan diproses sebaik bayaran disahkan.'
@@ -449,7 +449,7 @@ function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' |
 async function handleGreeting(from: string) {
   await sendWAButtons(
     from,
-    `👋 *Hai bosku! Selamat datang ke Golden Isle Wholesale* 🥃\n\nKami menyediakan minuman premium borong terbaik di Sabah & Labuan.\n\n*Apa yang boleh kami bantu hari ni?*`,
+    `👋 *Hai bosku! Selamat datang ke Golden Isle Wholesale* 🥃\n\nKIRA sedia bantu bosku cari minuman premium borong terbaik di Sabah & Labuan.\n\n*Apa yang KIRA boleh bantu hari ni bosku?*`,
     [
       { id: 'btn_order',   title: '🛒 Buat Pesanan' },
       { id: 'btn_receipt', title: '🧾 Semak Resit' },
@@ -463,9 +463,9 @@ async function handleOrder(from: string) {
   // Fallback: tunjuk catalog interaktif terus sebab WA Flow 'draft' tak support WA Web
   await sendWAText(
     from,
-    `🛒 *Nak buat pesanan? Pilih produk dulu bosku!*\n\n` +
-    `Tengok senarai produk di bawah, klik untuk tengok detail & harga. ` +
-    `Tim kami akan bantu proses pesanan bosku selepas tu! 👇`
+    `🛒 *Bosku nak buat pesanan? Tengok-tengok katalog dulu ya!*\n\n` +
+    `Pilih produk kat bawah ni, klik untuk tengok harga. ` +
+    `Lepas order, KIRA akan uruskan cepat-cepat untuk bosku! 👇`
   );
   await handleCatalog(from);
 }
@@ -565,9 +565,9 @@ async function handleCatalog(from: string) {
     await new Promise(r => setTimeout(r, 1500));
     await sendWAText(
       from,
-      `💡 *Tip bosku:* Klik pada produk di atas untuk tengok detail & harga penuh!\n\n` +
-      `🔥 Bestseller kami: *Whisky & Red Wine* — selalu habis cepat!\n\n` +
-      `Ada soalan pasal produk atau nak order terus? Taip je bosku, saya sedia bantu! 😊`
+      `💡 *Bosku nampak something menarik?*\n\n` +
+      `Klik produk kat atas tu untuk tengok harga penuh. Kalau pening, KIRA boleh suggest yang best untuk bosku! 😉\n\n` +
+      `Taip je kat sini bosku, KIRA sedia membantu!`
     );
   }
 }
@@ -587,7 +587,7 @@ async function handleReceipt(from: string) {
   if (error || !orders || orders.length === 0) {
     await sendWAText(
       from,
-      '🔍 Kami tidak jumpa rekod order untuk nombor ini.\n\n💡 Mungkin order dibuat dengan nombor lain? Sila hubungi admin untuk semak.'
+      '🔍 Alamak bosku, KIRA tak jumpa rekod order untuk nombor ni.\n\n💡 Bosku pakai nombor lain ka masa order? Jangan risau, taip je kat sini biar KIRA tolong check! 😊'
     );
     return;
   }
@@ -622,7 +622,7 @@ async function handleReceipt(from: string) {
     ``,
     `📄 Atau muat turun dari Web:\n${pdfLink}`,
     `━━━━━━━━━━━━━━━`,
-    `_Terima kasih kerana memilih Golden Isle! 🙏_`,
+    `_Sama-sama bosku! Jangan segan order lagi tau 😊_`,
   ].filter(Boolean).join('\n');
 
   await sendWAText(from, receiptMsg);
@@ -748,36 +748,37 @@ async function handleAIChat(from: string, msgText: string) {
     catalogText = products.map(p => `- ID: ${p.id} | ${p.name} (RM ${p.price}) [Kategori: ${p.category || 'Lain-lain'}]`).join('\n');
   }
 
-  const systemPrompt = `You are KIRA, a friendly and persuasive sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
+  const systemPrompt = `You are KIRA, a PRO sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
 
-LANGUAGE RULES (CRITICAL):
-1. Detect the customer's language and reply in the EXACT SAME language.
-2. Malaysian Malay → casual Sabah style: "bosku", "bah", "ngam", "kin", "la", "ba", "sudah", "pun".
-3. NEVER use Indonesian slang: no "kamu", "dong", "sih", "deh", "gimana", "banget", "aja".
-4. English → friendly, professional, slightly enthusiastic.
-5. Chinese → reply in Simplified or Traditional Chinese based on their input.
-6. Max 3-4 sentences per reply. Be concise.
+1. HUMOR & WARMTH (CRITICAL):
+- ALWAYS call the user "bosku".
+- Use situational humor based on the context.
+- Be warm, friendly, and helpful.
 
-SALES PERSONALITY:
-- Always be warm, enthusiastic, and helpful like a friendly shop owner.
-- If a customer asks about a product, highlight its value and suggest a quantity or bundle.
-- Subtly create urgency: mention limited stock or popular demand when relevant.
-- After answering a question, always end with a soft call-to-action (e.g., "Mau order sekarang?", "Ready to place your order?").
-- If they seem undecided, offer to recommend a popular product.
+2. CONSISTENCY RULES (STRICT):
+- NEVER break character.
+- NEVER say "I am an AI", "Saya AI", or mention being an artificial intelligence.
+- ALWAYS end with a helpful question or Call-To-Action (e.g. "Mau order sekarang bosku?", "KIRA sedia tolong!").
+- If user says thank you, ALWAYS reply: "Sama-sama bosku! Jangan segan order lagi tau 😊"
+
+3. SALES INTELLIGENCE:
+- After a user views the catalog or asks about products, follow up with: "Bosku nampak something menarik? KIRA boleh suggest yang best untuk bosku!"
+- After an order is placed or discussed, upsell: "Bosku, ramai customer ambil [related product] sekali dengan order macam ni. Mau KIRA tambahkan?"
+
+4. LANGUAGE STYLE:
+- Mix Malay + English (Manglish) with Sabah slang ("bah", "ngam", "kin", "la", "ba", "sudah", "pun").
+- Casual, warm, never formal. NEVER use Indonesian slang ("kamu", "dong", "sih", "deh", "banget", "aja").
+- Max 3 sentences per reply unless explaining an order.
+- Use emojis sparingly, only when natural.
 
 Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
 - Recommend Products → STRICT INSTRUCTION: Whenever a user asks for a recommendation, best product, popular item, or ANY product suggestion - you MUST ALWAYS call the 'recommend_products' tool. NEVER reply with text only for recommendations.
-- Full Catalog → Call the 'view_full_catalog' tool when the user asks to see all items, browse the shop, or generally wants the full list.
-- Pricing/stock questions → refer to stock list above. Mention best value options.
-- Ordering → encourage them to tap "🛒 Buat Pesanan" or type "order".
-- Receipt → tap "🧾 Semak Resit" or type "resit".
-- Suggestions → tap "💡 Beri Cadangan" or type "cadangan".
-- Payment → we accept bank transfer & online payment. Fast process after order confirmed!
-- If they ask what's popular → recommend Whisky and Red Wine as bestsellers.
-- Minimum order → no minimum, but bulk orders get priority processing.`;
+- Full Catalog → Call the 'view_full_catalog' tool when the user asks to see all items.
+- Ordering → encourage them to tap "🛒 Buat Pesanan".
+- Payment → we accept bank transfer & FPX.`;
 
   const tools = [
     {
@@ -956,10 +957,10 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
         } else if (buttonPayload === 'SEMAK_STOK') {
-          await sendWAText(from, "📦 *Stok Terkini:*\nSila tunggu sekejap, KIRA sedang semak senarai stok untuk bosku...");
+          await sendWAText(from, "📦 *Stok Terkini:*\nSila tunggu sekejap bosku, KIRA tengah lari pi belakang check stok kejap... 🏃💨");
           await handleAIChat(from, "Tolong senaraikan rumusan ringkas stok yang available sekarang mengikut kategori.");
         } else if (buttonPayload === 'TANYA_KIRA') {
-          await sendWAText(from, "👋 *Hai bosku! Saya KIRA.*\n\nSila taip apa-apa soalan pasal minuman, harga atau borong. KIRA sedia membantu bosku!");
+          await sendWAText(from, "👋 *Hai bosku! KIRA di sini.*\n\nAda mau tanya pasal minuman, harga atau borong? Taip je terus bosku, KIRA sedia membantu!");
         } else {
           await handleAIChat(from, buttonPayload);
         }
@@ -1112,16 +1113,23 @@ export async function POST(request: Request) {
           const orderId = newOrder.id;
           const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
           const paymentLink = `${appUrl}/payment/selection/${orderId}`;
+
+          const hour = (new Date().getUTCHours() + 8) % 24; // Malaysia time
+          let introMsg = "Terima kasih bosku! KIRA dah terima senarai cart bosku.";
+          if (hour >= 22 || hour <= 3) introMsg = "Bosku malam-malam order, party mode ka ni? 🌙🍻 KIRA dah save order bosku.";
+          else if (hour >= 6 && hour <= 10) introMsg = "Bosku pagi-pagi dah semangat! KIRA pun baru bangun ni ☕ KIRA dah terima order bosku.";
+          else if (total < 200) introMsg = "Bosku test air dulu ka? Ngam tu! KIRA dah save order bosku.";
+          else if (total > 1000) introMsg = "Wah bosku! Stock mau habis ni, KIRA mau update catalog dulu 😅 Order bosku selamat diterima!";
+          
+          const bodyText = `${introMsg}\n\n🛒 Jumlah Keseluruhan: RM ${total.toFixed(2)}\n\nSila klik butang di bawah untuk buat bayaran supaya KIRA boleh cepat-cepat proses pesanan bosku.`;
           
           // Reply to user using Interactive CTA URL
-          const ctaSuccess = await sendWACtaUrl(from, total.toFixed(2), paymentLink);
+          const ctaSuccess = await sendWACtaUrl(from, bodyText, paymentLink);
           if (!ctaSuccess) {
             // Fallback if CTA URL fails
             await sendWAText(from, 
               `🎉 *Pesanan Diterima!*\n\n` +
-              `Terima kasih bosku! Kami dah terima senarai cart bosku.\n\n` +
-              `🛒 *Jumlah Keseluruhan: RM ${total.toFixed(2)}*\n\n` +
-              `Sila klik link di bawah untuk buat bayaran (FPX / Kad Kredit / Upload Resit):\n\n` +
+              `${bodyText}\n\n` +
               `👉 ${paymentLink}\n\n` +
               `_Pesanan akan diproses sebaik sahaja bayaran disahkan._`
             );
