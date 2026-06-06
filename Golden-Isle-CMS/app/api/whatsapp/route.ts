@@ -1143,7 +1143,7 @@ export async function POST(request: Request) {
           
           const orderId = newOrder.id;
           const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
-          const paymentLink = `${appUrl}/payment/selection/${orderId}`;
+          const paymentLink = `${appUrl}/order-confirmation?orderId=${orderId}`;
 
           const hour = (new Date().getUTCHours() + 8) % 24; // Malaysia time
           let introMsg = "Terima kasih bosku! KIRA dah terima senarai cart bosku.";
