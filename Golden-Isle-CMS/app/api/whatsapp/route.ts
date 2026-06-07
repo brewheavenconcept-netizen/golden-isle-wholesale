@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateInvoicePdf } from '../../../lib/pdfGenerator';
+import { buildPhoneOrFilter, normalizeOrderItems } from '@/lib/orderCompat';
 
 // Setup Supabase (gunakan Service Role Key untuk bypass RLS dalam API)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -628,13 +629,12 @@ async function handleCatalog(from: string) {
 
 // RECEIPT: Cari order terakhir by phone & hantar resit ringkas
 async function handleReceipt(from: string) {
-  // Format phone: WA hantar "601X..." tapi DB mungkin simpan "+601X..."
-  const phoneVariants = [from, `+${from}`, from.replace(/^60/, '0')];
+  const phoneFilter = buildPhoneOrFilter(['customer_phone', 'phone'], from);
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, status, payment_status, subtotal, delivery_fee, total, created_at, items, customer_name')
-    .or(phoneVariants.map(p => `customer_phone.eq.${p}`).join(','))
+    .select('id, status, payment_status, subtotal, delivery_fee, total, created_at, items, customer_name, customer_phone, phone')
+    .or(phoneFilter)
     .order('created_at', { ascending: false })
     .limit(1);
 
@@ -656,8 +656,9 @@ async function handleReceipt(from: string) {
     day: 'numeric', month: 'long', year: 'numeric'
   });
 
-  const itemsList = Array.isArray(order.items)
-    ? order.items.map((item: any) => `• ${item.name || item.product?.name || 'Produk'} x${item.quantity || item.qty || 1}`).join('\n')
+  const normalizedItems = normalizeOrderItems(order.items);
+  const itemsList = normalizedItems.length > 0
+    ? normalizedItems.map((item: any) => `• ${item.name} x${item.quantity}`).join('\n')
     : '';
 
   const receiptMsg = [
@@ -683,14 +684,14 @@ async function handleReceipt(from: string) {
 
   // --- 2. Generate & Send PDF Document ---
   try {
-    const cartItems = Array.isArray(order.items) ? order.items.map((item: any) => ({
-      name: item.product?.name || 'Item',
-      category: item.product?.category || 'Umum',
-      price: String(item.price || '0'),
-      priceNum: Number(item.price || 0),
-      quantity: Number(item.qty || 1),
-      total: String((Number(item.price || 0) * Number(item.qty || 1)).toFixed(2))
-    })) : [];
+    const cartItems = normalizedItems.map((item: any) => ({
+      name: item.name,
+      category: item.category,
+      price: String(item.priceNum),
+      priceNum: item.priceNum,
+      quantity: item.quantity,
+      total: (item.priceNum * item.quantity).toFixed(2)
+    }));
 
     const orderDataForPdf = {
       orderId: String(orderId).slice(-6).toUpperCase(),
@@ -971,13 +972,33 @@ Business Rules:
       if (functionName === 'tanya_harga') {
         const { product_id, product_name } = args;
         console.log(`🤖 AI handling tanya_harga for product: ${product_name} (${product_id})`);
+
+        let resolvedProduct = null;
         
-        await sendWAButtons(from, `Bosku order *${product_name}* ni untuk apa ni?`, [
-          { id: `tanya_qty_event_${product_id}`, title: '🎉 Event/Party' },
-          { id: `tanya_qty_stok_${product_id}`, title: '🏪 Stok Kedai' },
-          { id: `tanya_qty_cuba_${product_id}`, title: '🍺 Cuba Dulu' }
-        ]);
-        history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${product_name}]` });
+        // Validate against Supabase
+        const { data: byId } = await supabase.from('products').select('id, name').eq('id', product_id).maybeSingle();
+        if (byId) {
+          resolvedProduct = byId;
+        } else {
+          const searchTerm = product_name || product_id;
+          const { data: byName } = await supabase.from('products').select('id, name').ilike('name', `%${searchTerm}%`).limit(1).maybeSingle();
+          if (byName) resolvedProduct = byName;
+        }
+
+        if (resolvedProduct) {
+          await sendWAButtons(from, `Bosku order *${resolvedProduct.name}* ni untuk apa ni?`, [
+            { id: `tanya_qty_event_${resolvedProduct.id}`, title: '🎉 Event/Party' },
+            { id: `tanya_qty_stok_${resolvedProduct.id}`, title: '🏪 Stok Kedai' },
+            { id: `tanya_qty_cuba_${resolvedProduct.id}`, title: '🍺 Cuba Dulu' }
+          ]);
+          history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${resolvedProduct.name}]` });
+        } else {
+          await sendWAButtons(from, 'Maaf bosku, KIRA belum dapat match produk tu dengan catalog. Mau KIRA buka catalog untuk bosku pilih terus?', [
+            { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Catalog' },
+            { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' }
+          ]);
+          history.push({ role: 'assistant', content: `[System Note: Product not found, fallback to catalog prompt.]` });
+        }
         return;
       }
     }
@@ -1070,10 +1091,34 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
         } else if (buttonPayload === 'SEMAK_STOK') {
-          await sendWAText(from, "📦 *Stok Terkini:*\nSila tunggu sekejap bosku, KIRA tengah lari pi belakang check stok kejap... 🏃💨");
-          await handleAIChat(from, "Tolong senaraikan rumusan ringkas stok yang available sekarang mengikut kategori.");
+          await sendWAText(from, "📦 KIRA semak stok terkini untuk bosku.");
+          await handleCatalog(from);
         } else if (buttonPayload === 'TANYA_KIRA') {
-          await sendWAText(from, "👋 *Hai bosku! KIRA di sini.*\n\nAda mau tanya pasal minuman, harga atau borong? Taip je terus bosku, KIRA sedia membantu!");
+          await sendWAButtons(
+            from,
+            "👋 *Hai bosku! KIRA di sini* 😊\n\nApa yang bos cari hari ni?\n\n💰 Tanya harga produk\n📦 Borong untuk kedai\n🍺 Cadangan minuman\n\nAtau taip terus soalan bos.\n\nContoh:\n• Beer paling murah\n• Whisky untuk hadiah\n• Stout yang laku di kedai\n\nKIRA standby 24/7 untuk bantu bosku 🍻",
+            [
+              { id: 'AI_TANYA_HARGA', title: '💰 Tanya Harga' },
+              { id: 'AI_BORONG_KEDAI', title: '📦 Borong Kedai' },
+              { id: 'AI_CADANGAN', title: '🍺 Cadangan Produk' }
+            ]
+          );
+        } else if (buttonPayload === 'AI_TANYA_HARGA') {
+          await sendWAText(from, "💰 Nak check harga produk apa bosku?\n\nContoh:\n• Beer paling murah\n• Harga Heineken\n• Whisky bawah RM200\n\nTaip nama produk atau bajet bos, KIRA carikan yang ngam 😊");
+        } else if (buttonPayload === 'AI_BORONG_KEDAI') {
+          await sendWAText(from, "📦 Bos cari stok untuk kedai, restoran atau event?\n\nKIRA boleh bantu cadangkan ikut bajet, kategori dan kuantiti.\n\nTaip contoh:\n• Kedai runcit\n• Bar / Bistro\n• Event 100 pax\n• Bajet RM500");
+        } else if (buttonPayload === 'AI_CADANGAN') {
+          await sendWAButtons(from, "🍺 KIRA boleh cadangkan minuman ikut keperluan bos.\n\nMau cadangan jenis apa?", [
+            { id: 'AI_POPULAR', title: '🔥 Paling Laku' },
+            { id: 'AI_BUDGET', title: '💰 Bajet Jimat' },
+            { id: 'AI_EVENT', title: '🎉 Untuk Event' }
+          ]);
+        } else if (buttonPayload === 'AI_POPULAR') {
+          await handleAIChat(from, "Cadangkan produk paling laku sekarang. Paparkan sebagai product list jika sesuai.");
+        } else if (buttonPayload === 'AI_BUDGET') {
+          await handleAIChat(from, "Cadangkan produk bajet jimat yang sesuai untuk customer baru. Paparkan sebagai product list jika sesuai.");
+        } else if (buttonPayload === 'AI_EVENT') {
+          await handleAIChat(from, "Cadangkan produk untuk event atau party. Tanya bajet jika perlu, atau paparkan product list jika sesuai.");
         } else if (buttonPayload === 'btn_new_order') {
           await handleGreeting(from);
         } else if (buttonPayload.startsWith('btn_repeat_confirm_')) {
