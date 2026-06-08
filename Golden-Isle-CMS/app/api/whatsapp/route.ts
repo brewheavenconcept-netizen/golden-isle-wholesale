@@ -429,7 +429,7 @@ async function notifyTelegram(msg: string) {
 function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' | 'suggest' | 'ai' {
   const lower = text.toLowerCase().trim();
 
-  const greetKeywords = ['hai', 'hi', 'hello', 'helo', 'hey', 'assalamualaikum', 'salam', 'start', 'mula', 'mulakan', 'apa khabar', 'selamat'];
+  const greetKeywords = ['hai', 'hi', 'hello', 'helo', 'hey', 'assalamualaikum', 'salam', 'start', 'menu', 'mula', 'mulakan', 'apa khabar', 'selamat'];
   const orderKeywords = ['order', 'pesan', 'beli', 'buat pesanan', 'nak beli', 'mau beli', 'nak order', 'mau order', 'tempah'];
   const catalogKeywords = ['catalog', 'katalog', 'senarai', 'produk', 'product', 'list', 'stok', 'stock', 'barang', 'harga semua'];
   const receiptKeywords = ['resit', 'receipt', 'order saya', 'pesanan', 'invois', 'invoice', 'status order', 'order status'];
@@ -468,6 +468,51 @@ function isProductAvailabilityIntent(text: string): boolean {
   ].some(phrase => lower.includes(phrase));
 }
 
+function isProspectQualificationIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'saya berminat',
+    'berminat dengan promo',
+    'saya mau tanya',
+    'nak tahu harga',
+    'mau order',
+    'cari stok',
+    'stok kedai',
+    'untuk kedai',
+    'untuk restoran',
+    'untuk event',
+    'party',
+    'event',
+    'interested',
+    'i am interested',
+    'want to know price',
+    'looking for stock',
+    'for my shop',
+    'for restaurant',
+    'for event',
+    'party supply',
+    'wholesale',
+    '我有兴趣',
+    '想知道价格',
+    '批发',
+    '店',
+    '餐厅',
+    '活动',
+  ].some(phrase => lower.includes(phrase));
+}
+
+async function sendQualificationMenu(from: string) {
+  await sendWAButtons(
+    from,
+    "🔥 Mantap bosku. KIRA bantu cari pilihan yang ngam.\n\nBos cari minuman untuk apa?",
+    [
+      { id: 'QUALIFY_RETAIL', title: '🏪 Kedai / Retail' },
+      { id: 'QUALIFY_RESTAURANT', title: '🍽️ Restoran / Bar' },
+      { id: 'QUALIFY_EVENT', title: '🎉 Event / Party' }
+    ]
+  );
+}
+
 async function sendCatalogFollowUp(from: string) {
   await sendWAButtons(from, "Dah jumpa produk yang menarik bosku?", [
     { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
@@ -495,11 +540,11 @@ async function handleProductAvailability(from: string, text: string) {
 async function handleGreeting(from: string) {
   await sendWAButtons(
     from,
-    `👋 *Hai bosku! Selamat datang ke Golden Isle Wholesale* 🥃\n\nKIRA sedia bantu bosku cari minuman premium borong terbaik di Sabah & Labuan.\n\n*Apa yang KIRA boleh bantu hari ni bosku?*`,
+    `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`,
     [
-      { id: 'btn_order',   title: '🛒 Buat Pesanan' },
-      { id: 'btn_receipt', title: '🧾 Semak Resit' },
-      { id: 'btn_suggest', title: '💡 Beri Cadangan' },
+      { id: 'TANYA_KIRA', title: '🤖 Tanya KIRA' },
+      { id: 'LIHAT_CATALOG', title: '📦 Browse Catalog' },
+      { id: 'SEMAK_RESIT', title: '🧾 Semak Resit' },
     ]
   );
 }
@@ -1171,7 +1216,7 @@ export async function POST(request: Request) {
           await handleOrder(from);
         } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog' || buttonPayload === 'LIHAT_CATALOG') {
           await handleCatalog(from);
-        } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit') {
+        } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit' || buttonPayload === 'SEMAK_RESIT') {
           await handleReceipt(from);
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
@@ -1204,6 +1249,12 @@ export async function POST(request: Request) {
           await handleAIChat(from, "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui.");
         } else if (buttonPayload === 'AI_EVENT') {
           await handleAIChat(from, "Bantu customer pilih minuman untuk event.\nTanya jumlah orang, bajet dan jenis event jika maklumat belum cukup.");
+        } else if (buttonPayload === 'QUALIFY_RETAIL') {
+          await sendWAText(from, "🏪 Untuk kedai, KIRA boleh bantu cadangkan stok yang senang jalan.\n\nBoleh bagitahu:\n• Bajet anggaran\n• Beer / wine / whisky / campuran\n• Customer biasa cari apa\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\"");
+        } else if (buttonPayload === 'QUALIFY_RESTAURANT') {
+          await sendWAText(from, "🍽️ Untuk restoran / bar, KIRA boleh cadangkan minuman ikut menu dan customer style.\n\nBoleh bagitahu:\n• Jenis restoran / bar\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Saya mau wine dan beer untuk restoran, bajet RM2000\"");
+        } else if (buttonPayload === 'QUALIFY_EVENT') {
+          await sendWAText(from, "🎉 Untuk event, KIRA boleh bantu kira cadangan minuman ikut jumlah orang dan bajet.\n\nBoleh bagitahu:\n• Berapa orang\n• Jenis event\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Event 50 orang, bajet RM800\"");
         } else if (buttonPayload === 'btn_new_order') {
           await handleGreeting(from);
         } else if (buttonPayload.startsWith('btn_repeat_confirm_')) {
@@ -1575,6 +1626,11 @@ export async function POST(request: Request) {
 
         if (isProductAvailabilityIntent(msgText)) {
           await handleProductAvailability(from, msgText);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isProspectQualificationIntent(msgText)) {
+          await sendQualificationMenu(from);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
