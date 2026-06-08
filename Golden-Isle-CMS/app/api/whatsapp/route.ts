@@ -33,6 +33,88 @@ async function uploadWAMedia(buffer: Buffer, mimeType: string, filename: string)
   }
 }
 
+async function getWAMediaUrl(mediaId: string): Promise<string | null> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  if (!waToken) return null;
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${mediaId}`, {
+      headers: { 'Authorization': `Bearer ${waToken}` },
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) {
+      console.error('Error getting WA media URL:', JSON.stringify(data));
+      return null;
+    }
+    return data.url;
+  } catch (err) {
+    console.error('Error getting WA media URL:', err);
+    return null;
+  }
+}
+
+async function downloadWAMedia(mediaId: string): Promise<{ buffer: Buffer; mimeType: string } | null> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  if (!waToken) return null;
+
+  try {
+    const mediaUrl = await getWAMediaUrl(mediaId);
+    if (!mediaUrl) return null;
+
+    const res = await fetch(mediaUrl, {
+      headers: { 'Authorization': `Bearer ${waToken}` },
+    });
+    if (!res.ok) {
+      console.error('Error downloading WA media:', res.status, await res.text());
+      return null;
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    return {
+      buffer: Buffer.from(arrayBuffer),
+      mimeType: res.headers.get('content-type') || 'audio/ogg',
+    };
+  } catch (err) {
+    console.error('Error downloading WA media:', err);
+    return null;
+  }
+}
+
+function audioFilenameForMime(mimeType: string): string {
+  if (mimeType.includes('mpeg')) return 'voice-note.mp3';
+  if (mimeType.includes('mp4')) return 'voice-note.m4a';
+  if (mimeType.includes('aac')) return 'voice-note.aac';
+  if (mimeType.includes('wav')) return 'voice-note.wav';
+  if (mimeType.includes('webm')) return 'voice-note.webm';
+  return 'voice-note.ogg';
+}
+
+async function transcribeOpenAIAudio(buffer: Buffer, mimeType: string): Promise<string | null> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const form = new FormData();
+    form.append('model', 'gpt-4o-mini-transcribe');
+    form.append('file', new Blob([new Uint8Array(buffer)], { type: mimeType }), audioFilenameForMime(mimeType));
+
+    const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}` },
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok || !data.text) {
+      console.error('OpenAI transcription error:', JSON.stringify(data));
+      return null;
+    }
+    return String(data.text).trim();
+  } catch (err) {
+    console.error('Error transcribing WA audio:', err);
+    return null;
+  }
+}
+
 async function sendWAMediaById(to: string, mediaId: string, type: 'document' | 'audio', caption?: string, filename?: string) {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
@@ -66,18 +148,46 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'tts-1',
-        voice: 'onyx',
+        model: 'gpt-4o-mini-tts',
+        voice: 'alloy',
         input: text,
+        instructions: 'Speak like a friendly Sabah sales assistant. Use natural Malaysian Malay. Warm, casual, not corporate, not robotic.',
         response_format: 'aac'
       })
     });
-    if (!res.ok) throw new Error('TTS API Error');
+    if (!res.ok) throw new Error(`TTS API Error: ${res.status} ${await res.text()}`);
     const arrayBuffer = await res.arrayBuffer();
     return Buffer.from(arrayBuffer);
   } catch (err) {
     console.error('Error generating voice note:', err);
     return null;
+  }
+}
+
+function trimForVoiceReply(text: string): string {
+  return text
+    .replace(/\s+/g, ' ')
+    .replace(/[*_`~#>]/g, '')
+    .trim()
+    .slice(0, 600);
+}
+
+async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean> {
+  const voiceText = trimForVoiceReply(replyText);
+  if (!voiceText) return false;
+
+  try {
+    const audioBuffer = await generateVoiceNoteBuffer(voiceText);
+    if (!audioBuffer) return false;
+
+    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/aac', 'kira-reply.aac');
+    if (!audioMediaId) return false;
+
+    await sendWAMediaById(to, audioMediaId, 'audio');
+    return true;
+  } catch (err) {
+    console.error('Error sending AI voice reply:', err);
+    return false;
   }
 }
 
@@ -988,7 +1098,8 @@ async function handleSuggestion(from: string, msgText: string) {
 const chatHistory = new Map<string, { role: string, content: string }[]>();
 
 // AI CHAT: Guna OpenAI dengan konteks katalog
-async function handleAIChat(from: string, msgText: string) {
+async function handleAIChat(from: string, msgText: string, options: { sendText?: boolean } = {}): Promise<string | null> {
+  const shouldSendText = options.sendText !== false;
   const language = detectLanguage(msgText);
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
@@ -1176,7 +1287,7 @@ Business Rules:
           await sendWAText(from, text);
         }
         history.push({ role: 'assistant', content: `[System Note: Successfully recommended products to user using WhatsApp Product List UI. The text intro was: ${text}]` });
-        return;
+        return text || null;
       }
 
       if (functionName === 'view_full_catalog') {
@@ -1189,7 +1300,7 @@ Business Rules:
         }
         await sendCatalogFollowUp(from);
         history.push({ role: 'assistant', content: `[System Note: Successfully sent the full product catalog to user using WhatsApp Catalog UI. The text intro was: ${text}]` });
-        return;
+        return text || null;
       }
 
       if (functionName === 'tanya_harga') {
@@ -1221,6 +1332,7 @@ Business Rules:
             { id: `tanya_qty_cuba_${resolvedProduct.id}`, title: language === 'english' ? '🍺 Try First' : language === 'chinese' ? '🍺 先试试' : '🍺 Cuba Dulu' }
           ]);
           history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${resolvedProduct.name}]` });
+          return question;
         } else {
           const notFound =
             language === 'chinese'
@@ -1233,8 +1345,8 @@ Business Rules:
             { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' }
           ]);
           history.push({ role: 'assistant', content: `[System Note: Product not found, fallback to catalog prompt.]` });
+          return notFound;
         }
-        return;
       }
     }
 
@@ -1246,7 +1358,8 @@ Business Rules:
           : 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!'
     );
     history.push({ role: 'assistant', content: reply });
-    await sendWAText(from, reply);
+    if (shouldSendText) await sendWAText(from, reply);
+    return reply;
   } catch (err) {
     console.error('Error in handleAIChat:', err);
     await sendWAText(
@@ -1257,6 +1370,7 @@ Business Rules:
           ? 'Sorry, there was a small AI system error. Please try again.'
           : 'Maaf bosku, ada ralat sikit dalam sistem AI. Cuba lagi ya.'
     );
+    return null;
   }
 }
 
@@ -1840,6 +1954,50 @@ export async function POST(request: Request) {
           await sendWAText(from, "⚠️ Maaf bosku, ada sedikit ralat masa memproses order. Sila hubungi admin.");
         }
         
+        return new NextResponse('EVENT_RECEIVED', { status: 200 });
+      }
+
+      // Handle audio / voice messages through KIRA, then reply with voice when possible.
+      if (message && message.type === 'audio') {
+        const from = message.from;
+        const audioId = message.audio?.id;
+
+        console.log(`\nVOICE NOTE WA: [${from}] media=${audioId || 'missing'}`);
+
+        if (!audioId) {
+          console.error('WA audio message missing media id:', JSON.stringify(message.audio || {}));
+          await sendWAText(from, 'Maaf bosku, voice note tu belum dapat saya baca. Cuba hantar sekali lagi ya.');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const media = await downloadWAMedia(audioId);
+        if (!media) {
+          console.error('Failed to download WA audio media:', audioId);
+          await sendWAText(from, 'Maaf bosku, voice note tu belum dapat saya download. Boleh taip mesej atau hantar semula?');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const transcript = await transcribeOpenAIAudio(media.buffer, media.mimeType);
+        if (!transcript) {
+          console.error('Failed to transcribe WA audio media:', audioId);
+          await sendWAText(from, 'Maaf bosku, saya belum dapat tangkap voice note tu. Boleh taip mesej atau hantar semula?');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        rememberUserLanguage(from, transcript);
+        console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
+
+        const aiReply = await handleAIChat(from, transcript, { sendText: false });
+        if (!aiReply) {
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const voiceSent = await sendAIVoiceReply(from, aiReply);
+        if (!voiceSent) {
+          console.error('Failed to send AI voice reply; falling back to text:', { from });
+          await sendWAText(from, aiReply);
+        }
+
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
 
