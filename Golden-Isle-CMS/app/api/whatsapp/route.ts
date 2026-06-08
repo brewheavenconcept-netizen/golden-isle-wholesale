@@ -310,6 +310,55 @@ async function sendWAProductList(
   }
 }
 
+type CatalogProduct = {
+  id: string;
+  name: string;
+  price: number | string;
+  category?: string | null;
+  stock_quantity?: number | null;
+  is_featured?: boolean | null;
+};
+
+function buildProductSections(products: CatalogProduct[], maxSections = 3, maxPerSection = 10) {
+  const grouped: Record<string, string[]> = {};
+  for (const product of products) {
+    const category = (product.category || 'Lain-lain').toUpperCase();
+    if (!grouped[category]) grouped[category] = [];
+    if (grouped[category].length < maxPerSection) grouped[category].push(String(product.id));
+  }
+
+  return Object.entries(grouped)
+    .slice(0, maxSections)
+    .map(([title, productIds]) => ({ title, productIds }));
+}
+
+function buildProductText(products: CatalogProduct[]) {
+  return products
+    .map((product) => {
+      const stock = typeof product.stock_quantity === 'number' ? ` | Stok: ${product.stock_quantity}` : '';
+      return `• ${product.name} - RM ${Number(product.price).toFixed(2)}${stock}`;
+    })
+    .join('\n');
+}
+
+async function sendRecommendedProducts(
+  to: string,
+  bodyText: string,
+  products: CatalogProduct[],
+  emptyText: string
+) {
+  if (!products.length) {
+    await sendWAText(to, emptyText);
+    return;
+  }
+
+  const sections = buildProductSections(products);
+  const sentList = await sendWAProductList(to, sections, bodyText);
+  if (sentList) return;
+
+  await sendWAText(to, `${bodyText}\n\n${buildProductText(products)}`);
+}
+
 // Hantar mesej dengan 3 Quick Reply Buttons ke WA
 async function sendWAButtons(to: string, bodyText: string, buttons: { id: string; title: string }[]) {
   const waToken = process.env.WHATSAPP_TOKEN;
@@ -669,6 +718,7 @@ async function handleCatalog(from: string) {
       .from('products')
       .select('id, name, category')
       .eq('stock_status', 'in_stock')
+      .gt('stock_quantity', 0)
       .order('category')
       .limit(30);
 
@@ -723,6 +773,7 @@ async function handleCatalog(from: string) {
     .from('products')
     .select('id, name, price, category, description')
     .eq('stock_status', 'in_stock')
+    .gt('stock_quantity', 0)
     .order('category')
     .limit(10);
 
@@ -1344,6 +1395,30 @@ export async function POST(request: Request) {
           ]);
         } else if (buttonPayload === 'AI_POPULAR') {
           const language = getUserLanguage(from);
+          const { data: products } = await supabase
+            .from('products')
+            .select('id, name, price, category, stock_quantity, is_featured')
+            .eq('stock_status', 'in_stock')
+            .gt('stock_quantity', 0)
+            .order('is_featured', { ascending: false })
+            .order('stock_quantity', { ascending: false })
+            .limit(6);
+          await sendRecommendedProducts(
+            from,
+            language === 'chinese'
+              ? "这些是目前有库存的热门产品，可以直接加入购物车。"
+              : language === 'english'
+                ? "Here are popular in-stock products you can add to cart right away."
+                : "Ini produk popular yang ada stok sekarang bosku. Tekan produk untuk Add to Cart terus!",
+            products || [],
+            language === 'chinese'
+              ? "抱歉，目前没有可推荐的库存产品。"
+              : language === 'english'
+                ? "Sorry, there are no in-stock products to recommend right now."
+                : "Maaf bosku, belum ada produk in-stock untuk dicadangkan sekarang."
+          );
+        } else if (false && buttonPayload === 'AI_POPULAR') {
+          const language = getUserLanguage(from);
           await handleAIChat(
             from,
             language === 'chinese'
@@ -1354,6 +1429,29 @@ export async function POST(request: Request) {
           );
         } else if (buttonPayload === 'AI_BUDGET') {
           const language = getUserLanguage(from);
+          const { data: products } = await supabase
+            .from('products')
+            .select('id, name, price, category, stock_quantity, is_featured')
+            .eq('stock_status', 'in_stock')
+            .gt('stock_quantity', 0)
+            .order('price', { ascending: true })
+            .limit(6);
+          await sendRecommendedProducts(
+            from,
+            language === 'chinese'
+              ? "这些是目前比较预算友好的现货产品，可以直接加入购物车。"
+              : language === 'english'
+                ? "These are the best budget-friendly in-stock picks you can add to cart."
+                : "Ini pilihan bajet murah yang ada stok sekarang bosku. Tekan produk untuk Add to Cart terus!",
+            products || [],
+            language === 'chinese'
+              ? "抱歉，目前没有预算友好的库存产品。"
+              : language === 'english'
+                ? "Sorry, there are no budget-friendly in-stock products right now."
+                : "Maaf bosku, belum ada produk bajet yang in-stock sekarang."
+          );
+        } else if (false && buttonPayload === 'AI_BUDGET') {
+          const language = getUserLanguage(from);
           await handleAIChat(
             from,
             language === 'chinese'
@@ -1363,6 +1461,30 @@ export async function POST(request: Request) {
                 : "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui."
           );
         } else if (buttonPayload === 'AI_EVENT') {
+          const language = getUserLanguage(from);
+          const { data: products } = await supabase
+            .from('products')
+            .select('id, name, price, category, stock_quantity, is_featured')
+            .eq('stock_status', 'in_stock')
+            .gt('stock_quantity', 0)
+            .order('category')
+            .order('price', { ascending: true })
+            .limit(9);
+          await sendRecommendedProducts(
+            from,
+            language === 'chinese'
+              ? "这些现货产品适合活动或聚会，可以先加入购物车。"
+              : language === 'english'
+                ? "These in-stock picks are suitable for events and parties. Add what you like to cart."
+                : "Ini pilihan yang ngam untuk event atau party dan ada stok sekarang bosku. Tekan produk untuk Add to Cart!",
+            products || [],
+            language === 'chinese'
+              ? "抱歉，目前没有适合活动推荐的库存产品。"
+              : language === 'english'
+                ? "Sorry, there are no in-stock event picks right now."
+                : "Maaf bosku, belum ada produk event yang in-stock sekarang."
+          );
+        } else if (false && buttonPayload === 'AI_EVENT') {
           const language = getUserLanguage(from);
           await handleAIChat(
             from,
