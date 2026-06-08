@@ -444,6 +444,51 @@ function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' |
   return 'ai';
 }
 
+function detectLanguage(text: string): 'malay' | 'english' | 'chinese' {
+  const lower = text.toLowerCase();
+
+  if (/[\u4e00-\u9fff]/.test(text)) return 'chinese';
+  if (['apa', 'boleh', 'mau', 'saya', 'ada', 'untuk', 'bosku', 'ko', 'ni'].some(word => lower.includes(word))) return 'malay';
+  if (['what', 'how', 'price', 'do you', 'have', 'products'].some(word => lower.includes(word))) return 'english';
+
+  return 'malay';
+}
+
+function isProductAvailabilityIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'apa product ko ada',
+    'apa produk',
+    'produk apa ada',
+    'what products do you have',
+    'what product',
+    'have products',
+    '有什么产品',
+    '什么产品',
+  ].some(phrase => lower.includes(phrase));
+}
+
+async function sendCatalogFollowUp(from: string) {
+  await sendWAButtons(from, "Dah jumpa produk yang menarik bosku?", [
+    { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
+    { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
+    { id: 'LIHAT_CATALOG', title: '🛒 Tengok Semua' }
+  ]);
+}
+
+async function handleProductAvailability(from: string, text: string) {
+  const language = detectLanguage(text);
+  const reply =
+    language === 'chinese'
+      ? "📦 Golden Isle 有几种饮料分类：\n\n🍺 啤酒\n🍷 葡萄酒\n🥃 威士忌\n🍸 烈酒\n\n我现在打开目录给你查看所有产品 👇"
+      : language === 'english'
+        ? "📦 Golden Isle has several drink categories:\n\n🍺 Beer\n🍷 Wine\n🥃 Whisky\n🍸 Spirits\n\nI'll open the catalog so you can browse all products 👇"
+        : "📦 Golden Isle ada beberapa kategori minuman:\n\n🍺 Beer\n🍷 Wine\n🥃 Whisky\n🍸 Spirits\n\nSaya buka catalog untuk bos tengok semua produk ya 👇";
+
+  await sendWAText(from, reply);
+  await handleCatalog(from);
+}
+
 // ── Handlers ─────────────────────────────────────────────────────────────────
 
 // GREETING: Hantar welcome message dengan 3 Quick Reply Buttons
@@ -555,11 +600,7 @@ async function handleCatalog(from: string) {
       const sentList = await sendWAProductList(from, nativeSections);
       if (sentList) {
         await new Promise(r => setTimeout(r, 1000));
-        await sendWAButtons(from, "👆 Boleh tengok katalog di atas bosku. Ada apa-apa lagi KIRA boleh bantu?", [
-          { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
-          { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
-          { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Semua' }
-        ]);
+        await sendCatalogFollowUp(from);
         return;
       }
 
@@ -572,11 +613,7 @@ async function handleCatalog(from: string) {
       );
       if (sentCatalog) {
         await new Promise(r => setTimeout(r, 1000));
-        await sendWAButtons(from, "👆 Boleh tengok katalog di atas bosku. Ada apa-apa lagi KIRA boleh bantu?", [
-          { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
-          { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
-          { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Semua' }
-        ]);
+        await sendCatalogFollowUp(from);
         return;
       }
     }
@@ -615,15 +652,11 @@ async function handleCatalog(from: string) {
   if (totalRows > 10 || sections.length === 0) {
     const textList = products.map(p => `• *${p.name}*\n  💰 RM ${Number(p.price).toFixed(2)}`).join('\n\n');
     await sendWAText(from, `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Pilih produk yang mau, taip nama dia terus ya bosku!_`);
+    await sendCatalogFollowUp(from);
   } else {
     await sendWAInteractiveList(from, sections);
     await new Promise(r => setTimeout(r, 1500));
-    await sendWAText(
-      from,
-      `💡 *Bosku nampak something menarik?*\n\n` +
-      `Klik produk kat atas tu untuk tengok harga penuh. Kalau pening, KIRA boleh suggest yang best untuk bosku! 😉\n\n` +
-      `Taip je kat sini bosku, KIRA sedia membantu!`
-    );
+    await sendCatalogFollowUp(from);
   }
 }
 
@@ -793,6 +826,7 @@ const chatHistory = new Map<string, { role: string, content: string }[]>();
 
 // AI CHAT: Guna OpenAI dengan konteks katalog
 async function handleAIChat(from: string, msgText: string) {
+  const language = detectLanguage(msgText);
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
@@ -803,26 +837,51 @@ async function handleAIChat(from: string, msgText: string) {
     catalogText = products.map(p => `- ID: ${p.id} | ${p.name} (RM ${p.price}) [Kategori: ${p.category || 'Lain-lain'}]`).join('\n');
   }
 
+  const languageRules = {
+    malay: `Reply in friendly Sabah Malay. Use "bosku" naturally. Keep the tone warm, helpful and sales-focused.`,
+    english: `Reply in English only. Be professional, friendly and sales-focused. Do NOT use "bosku" or Malay slang.`,
+    chinese: `Reply in Simplified Chinese only. Do NOT mix Malay or English. Be professional, friendly and sales-focused. Do NOT use "bosku".`,
+  }[language];
+  const ctaExample = {
+    malay: `"Mau order sekarang bosku?", "KIRA sedia tolong!"`,
+    english: `"Would you like to order now?", "KIRA is ready to help."`,
+    chinese: `"你想现在下单吗？", "KIRA 可以帮你。"`
+  }[language];
+  const thankYouReply = {
+    malay: `"Sama-sama bosku! Jangan segan order lagi tau 😊"`,
+    english: `"You're welcome. Feel free to order again anytime 😊"`,
+    chinese: `"不客气。需要下单时随时告诉我 😊"`
+  }[language];
+  const catalogFollowUp = {
+    malay: `"Bosku nampak something menarik? KIRA boleh suggest yang best untuk bosku!"`,
+    english: `"Did anything catch your eye? KIRA can recommend the best options for you."`,
+    chinese: `"有看到感兴趣的产品吗？KIRA 可以为你推荐合适的选择。"`
+  }[language];
+  const upsellExample = {
+    malay: `"Bosku, ramai customer ambil [related product] sekali dengan order macam ni. Mau KIRA tambahkan?"`,
+    english: `"Many customers pair [related product] with this kind of order. Would you like me to add it?"`,
+    chinese: `"很多客户会把 [related product] 和这类订单一起购买。需要我帮你加上吗？"`
+  }[language];
+
   const systemPrompt = `You are KIRA, a PRO sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
 
 1. HUMOR & WARMTH (CRITICAL):
-- ALWAYS call the user "bosku".
 - Use situational humor based on the context.
 - Be warm, friendly, and helpful.
 
 2. CONSISTENCY RULES (STRICT):
 - NEVER break character.
 - NEVER say "I am an AI", "Saya AI", or mention being an artificial intelligence.
-- ALWAYS end with a helpful question or Call-To-Action (e.g. "Mau order sekarang bosku?", "KIRA sedia tolong!").
-- If user says thank you, ALWAYS reply: "Sama-sama bosku! Jangan segan order lagi tau 😊"
+- ALWAYS end with a helpful question or Call-To-Action (e.g. ${ctaExample}).
+- If user says thank you, ALWAYS reply in the detected language with: ${thankYouReply}
 
 3. SALES INTELLIGENCE:
-- After a user views the catalog or asks about products, follow up with: "Bosku nampak something menarik? KIRA boleh suggest yang best untuk bosku!"
-- After an order is placed or discussed, upsell: "Bosku, ramai customer ambil [related product] sekali dengan order macam ni. Mau KIRA tambahkan?"
+- After a user views the catalog or asks about products, follow up with: ${catalogFollowUp}
+- After an order is placed or discussed, upsell with: ${upsellExample}
 
 4. LANGUAGE STYLE:
-- Mix Malay + English (Manglish) with Sabah slang ("bah", "ngam", "kin", "la", "ba", "sudah", "pun").
-- Casual, warm, never formal. NEVER use Indonesian slang ("kamu", "dong", "sih", "deh", "banget", "aja").
+- ${languageRules}
+- NEVER use Indonesian slang ("kamu", "dong", "sih", "deh", "banget", "aja").
 - Max 3 sentences per reply unless explaining an order.
 - Use emojis sparingly, only when natural.
 
@@ -965,6 +1024,7 @@ Business Rules:
         if (!success) {
           await sendWAText(from, text);
         }
+        await sendCatalogFollowUp(from);
         history.push({ role: 'assistant', content: `[System Note: Successfully sent the full product catalog to user using WhatsApp Catalog UI. The text intro was: ${text}]` });
         return;
       }
@@ -986,15 +1046,27 @@ Business Rules:
         }
 
         if (resolvedProduct) {
-          await sendWAButtons(from, `Bosku order *${resolvedProduct.name}* ni untuk apa ni?`, [
+          const question =
+            language === 'chinese'
+              ? `你想买 *${resolvedProduct.name}* 用在什么场合？`
+              : language === 'english'
+                ? `What are you buying *${resolvedProduct.name}* for?`
+                : `Bosku order *${resolvedProduct.name}* ni untuk apa ni?`;
+          await sendWAButtons(from, question, [
             { id: `tanya_qty_event_${resolvedProduct.id}`, title: '🎉 Event/Party' },
-            { id: `tanya_qty_stok_${resolvedProduct.id}`, title: '🏪 Stok Kedai' },
-            { id: `tanya_qty_cuba_${resolvedProduct.id}`, title: '🍺 Cuba Dulu' }
+            { id: `tanya_qty_stok_${resolvedProduct.id}`, title: language === 'english' ? '🏪 Shop Stock' : language === 'chinese' ? '🏪 店铺库存' : '🏪 Stok Kedai' },
+            { id: `tanya_qty_cuba_${resolvedProduct.id}`, title: language === 'english' ? '🍺 Try First' : language === 'chinese' ? '🍺 先试试' : '🍺 Cuba Dulu' }
           ]);
           history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${resolvedProduct.name}]` });
         } else {
-          await sendWAButtons(from, 'Maaf bosku, KIRA belum dapat match produk tu dengan catalog. Mau KIRA buka catalog untuk bosku pilih terus?', [
-            { id: 'LIHAT_CATALOG', title: '🛍️ Tengok Catalog' },
+          const notFound =
+            language === 'chinese'
+              ? '抱歉，KIRA 还不能在目录里匹配这个产品。要我打开目录让你直接选择吗？'
+              : language === 'english'
+                ? 'Sorry, KIRA could not match that product in the catalog. Would you like me to open the catalog so you can choose directly?'
+                : 'Maaf bosku, KIRA belum dapat match produk tu dengan catalog. Mau KIRA buka catalog untuk bosku pilih terus?';
+          await sendWAButtons(from, notFound, [
+            { id: 'LIHAT_CATALOG', title: language === 'english' ? '🛍️ Catalog' : language === 'chinese' ? '🛍️ 目录' : '🛍️ Tengok Catalog' },
             { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' }
           ]);
           history.push({ role: 'assistant', content: `[System Note: Product not found, fallback to catalog prompt.]` });
@@ -1003,12 +1075,25 @@ Business Rules:
       }
     }
 
-    const reply = choiceMessage?.content || 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!';
+    const reply = choiceMessage?.content || (
+      language === 'chinese'
+        ? '抱歉，KIRA 这里暂时卡了一下。请再试一次。'
+        : language === 'english'
+          ? 'Sorry, KIRA got stuck for a moment. Please try again.'
+          : 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!'
+    );
     history.push({ role: 'assistant', content: reply });
     await sendWAText(from, reply);
   } catch (err) {
     console.error('Error in handleAIChat:', err);
-    await sendWAText(from, 'Maaf bosku, ada ralat sikit dalam sistem AI. Cuba lagi ya.');
+    await sendWAText(
+      from,
+      language === 'chinese'
+        ? '抱歉，AI 系统暂时有点问题。请再试一次。'
+        : language === 'english'
+          ? 'Sorry, there was a small AI system error. Please try again.'
+          : 'Maaf bosku, ada ralat sikit dalam sistem AI. Cuba lagi ya.'
+    );
   }
 }
 
@@ -1091,12 +1176,12 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
         } else if (buttonPayload === 'SEMAK_STOK') {
-          await sendWAText(from, "📦 KIRA semak stok terkini untuk bosku.");
+          await sendWAText(from, "📦 KIRA semak stok terkini untuk bosku.\n\nBoleh pilih produk dari catalog atau taip nama produk yang bos mau check.");
           await handleCatalog(from);
         } else if (buttonPayload === 'TANYA_KIRA') {
           await sendWAButtons(
             from,
-            "👋 *Hai bosku! KIRA di sini* 😊\n\nApa yang bos cari hari ni?\n\n💰 Tanya harga produk\n📦 Borong untuk kedai\n🍺 Cadangan minuman\n\nAtau taip terus soalan bos.\n\nContoh:\n• Beer paling murah\n• Whisky untuk hadiah\n• Stout yang laku di kedai\n\nKIRA standby 24/7 untuk bantu bosku 🍻",
+            "🤖 Hai bosku, KIRA boleh bantu:\n\n💰 Tanya harga produk\n📦 Cari stok untuk kedai / restoran\n🍺 Cadang produk ikut bajet\n🎉 Cadang minuman untuk event\n\nApa bos mau buat?",
             [
               { id: 'AI_TANYA_HARGA', title: '💰 Tanya Harga' },
               { id: 'AI_BORONG_KEDAI', title: '📦 Borong Kedai' },
@@ -1106,19 +1191,19 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'AI_TANYA_HARGA') {
           await sendWAText(from, "💰 Nak check harga produk apa bosku?\n\nContoh:\n• Beer paling murah\n• Harga Heineken\n• Whisky bawah RM200\n\nTaip nama produk atau bajet bos, KIRA carikan yang ngam 😊");
         } else if (buttonPayload === 'AI_BORONG_KEDAI') {
-          await sendWAText(from, "📦 Bos cari stok untuk kedai, restoran atau event?\n\nKIRA boleh bantu cadangkan ikut bajet, kategori dan kuantiti.\n\nTaip contoh:\n• Kedai runcit\n• Bar / Bistro\n• Event 100 pax\n• Bajet RM500");
+          await sendWAText(from, "📦 Bos cari stok untuk kedai, restoran atau event?\n\nBeritahu KIRA:\n• Jenis bisnes\n• Anggaran bajet\n• Produk yang biasa customer cari\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\"");
         } else if (buttonPayload === 'AI_CADANGAN') {
-          await sendWAButtons(from, "🍺 KIRA boleh cadangkan minuman ikut keperluan bos.\n\nMau cadangan jenis apa?", [
-            { id: 'AI_POPULAR', title: '🔥 Paling Laku' },
-            { id: 'AI_BUDGET', title: '💰 Bajet Jimat' },
+          await sendWAButtons(from, "🍺 KIRA boleh cadangkan produk ikut situasi bosku.\n\nPilih satu:", [
+            { id: 'AI_POPULAR', title: '🔥 Produk Popular' },
+            { id: 'AI_BUDGET', title: '💸 Bajet Murah' },
             { id: 'AI_EVENT', title: '🎉 Untuk Event' }
           ]);
         } else if (buttonPayload === 'AI_POPULAR') {
-          await handleAIChat(from, "Cadangkan produk paling laku sekarang. Paparkan sebagai product list jika sesuai.");
+          await handleAIChat(from, "Cadangkan produk popular untuk customer baru.\nJawab ringkas, friendly dan sales-focused.");
         } else if (buttonPayload === 'AI_BUDGET') {
-          await handleAIChat(from, "Cadangkan produk bajet jimat yang sesuai untuk customer baru. Paparkan sebagai product list jika sesuai.");
+          await handleAIChat(from, "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui.");
         } else if (buttonPayload === 'AI_EVENT') {
-          await handleAIChat(from, "Cadangkan produk untuk event atau party. Tanya bajet jika perlu, atau paparkan product list jika sesuai.");
+          await handleAIChat(from, "Bantu customer pilih minuman untuk event.\nTanya jumlah orang, bajet dan jenis event jika maklumat belum cukup.");
         } else if (buttonPayload === 'btn_new_order') {
           await handleGreeting(from);
         } else if (buttonPayload.startsWith('btn_repeat_confirm_')) {
@@ -1485,6 +1570,11 @@ export async function POST(request: Request) {
         // Cek dulu kalau user sedang dalam mod suggestion
         if (awaitingSuggestion.has(from)) {
           await handleSuggestion(from, msgText);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isProductAvailabilityIntent(msgText)) {
+          await handleProductAvailability(from, msgText);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
