@@ -543,8 +543,8 @@ async function handleGreeting(from: string) {
     `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`,
     [
       { id: 'TANYA_KIRA', title: '🤖 Tanya KIRA' },
-      { id: 'LIHAT_CATALOG', title: '📦 Browse Catalog' },
-      { id: 'SEMAK_RESIT', title: '🧾 Semak Resit' },
+      { id: 'LIHAT_CATALOG', title: '📦 Browse Products' },
+      { id: 'BUAT_PESANAN', title: '🛒 Buat Pesanan' },
     ]
   );
 }
