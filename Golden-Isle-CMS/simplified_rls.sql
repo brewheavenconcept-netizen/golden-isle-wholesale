@@ -38,6 +38,10 @@ DROP POLICY IF EXISTS "Store owners manage own orders" ON public.orders;
 -- No more store_id checks!
 -- ==========================================
 
+-- Enable RLS for customers and chaser_logs
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chaser_logs ENABLE ROW LEVEL SECURITY;
+
 -- -----------------
 -- stores and store_settings
 -- -----------------
@@ -64,6 +68,18 @@ CREATE POLICY "Admin full manage orders" ON public.orders FOR ALL USING (auth.ro
 -- super_admins
 -- -----------------
 CREATE POLICY "Super admins view own record" ON public.super_admins FOR SELECT USING (auth.uid() = id);
+
+-- -----------------
+-- customers
+-- -----------------
+DROP POLICY IF EXISTS "Admin full manage customers" ON public.customers;
+CREATE POLICY "Admin full manage customers" ON public.customers FOR ALL TO authenticated USING (true);
+
+-- -----------------
+-- chaser_logs
+-- -----------------
+DROP POLICY IF EXISTS "Admin full manage chaser_logs" ON public.chaser_logs;
+CREATE POLICY "Admin full manage chaser_logs" ON public.chaser_logs FOR ALL TO authenticated USING (true);
 
 -- Ensure default single store is there to avoid CMS crashing:
 INSERT INTO public.stores (id, owner_id, name, slug) 

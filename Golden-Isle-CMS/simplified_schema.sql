@@ -84,6 +84,8 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chaser_logs ENABLE ROW LEVEL SECURITY;
 
 -- -----------------
 -- categories
@@ -108,3 +110,13 @@ CREATE POLICY "Admins can manage orders" ON orders FOR ALL USING (auth.role() = 
 -- -----------------
 CREATE POLICY "Anyone can insert inquiries" ON inquiries FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admins can manage inquiries" ON inquiries FOR ALL USING (auth.role() = 'authenticated');
+
+-- -----------------
+-- customers
+-- -----------------
+CREATE POLICY "Admins can manage customers" ON customers FOR ALL USING (auth.role() = 'authenticated');
+
+-- -----------------
+-- chaser_logs
+-- -----------------
+CREATE POLICY "Admins can manage chaser_logs" ON chaser_logs FOR ALL USING (auth.role() = 'authenticated');

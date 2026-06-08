@@ -31,7 +31,7 @@ imagesToCopy.forEach(img => {
 });
 
 // 2. Connect to Supabase and update products
-const envPath = path.join(__dirname, '..', '..', '.env.local');
+const envPath = path.join(__dirname, '..', '.env.local');
 const envContent = fs.readFileSync(envPath, 'utf8');
 
 const getEnvVar = (name) => {
@@ -40,9 +40,9 @@ const getEnvVar = (name) => {
 };
 
 const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const storeId = '00000000-0000-0000-0000-000000000000';
 

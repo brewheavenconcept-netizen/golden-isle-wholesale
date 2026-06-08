@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { AlertCircle, Loader2, Eye, EyeOff, X, Mail, Send, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Capacitor } from '@capacitor/core';
 
 function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     const [email, setEmail] = useState('');
@@ -81,7 +82,87 @@ export default function LoginPage() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [error, setError] = useState('');
     const [showForgot, setShowForgot] = useState(false);
+    
+    // Biometric Login States
+    const [isNative, setIsNative] = useState(false);
+    const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+    const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+    const [hasStoredCredentials, setHasStoredCredentials] = useState(false);
+    const [biometricLoading, setBiometricLoading] = useState(false);
+
     const router = useRouter();
+
+    const triggerBiometricLogin = async () => {
+        if (!Capacitor.isNativePlatform()) return;
+        setBiometricLoading(true);
+        setError('');
+        try {
+            const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+            const credentials = await NativeBiometric.getCredentials({
+                server: 'golden-isle-wholesale'
+            });
+
+            if (credentials && credentials.username && credentials.password) {
+                const { error: authError } = await supabase.auth.signInWithPassword({
+                    email: credentials.username,
+                    password: credentials.password
+                });
+                if (authError) throw authError;
+
+                localStorage.setItem('biometrics_enabled', 'true');
+                toast.success('Welcome back via fingerprint! 🥃', { duration: 3000 });
+                router.push('/admin/dashboard');
+            } else {
+                setError('No credentials found for biometric login.');
+            }
+        } catch (err: any) {
+            console.error('Biometric login error:', err);
+            toast.error('Biometric authentication failed or cancelled');
+        } finally {
+            setBiometricLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const checkBiometricStatus = async () => {
+            const isNativePlatform = Capacitor.isNativePlatform();
+            setIsNative(isNativePlatform);
+
+            if (isNativePlatform) {
+                try {
+                    const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+                    const availability = await NativeBiometric.isAvailable();
+                    if (availability.isAvailable) {
+                        setBiometricsAvailable(true);
+                        
+                        const enabled = localStorage.getItem('biometrics_enabled') === 'true';
+                        setBiometricsEnabled(enabled);
+
+                        if (enabled) {
+                            try {
+                                const credentials = await NativeBiometric.getCredentials({
+                                    server: 'golden-isle-wholesale'
+                                });
+                                if (credentials && credentials.username) {
+                                    setHasStoredCredentials(true);
+                                    // Auto-trigger biometric prompt after render
+                                    setTimeout(() => {
+                                        triggerBiometricLogin();
+                                    }, 800);
+                                }
+                            } catch (e) {
+                                setHasStoredCredentials(false);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to init biometrics:', err);
+                }
+            }
+        };
+
+        checkBiometricStatus();
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,6 +180,31 @@ export default function LoginPage() {
                     options: { persistSession: false } as any
                 });
                 if (reAuthError) throw reAuthError;
+            }
+
+            // Save credentials if biometrics enabled
+            if (Capacitor.isNativePlatform() && biometricsAvailable && biometricsEnabled) {
+                try {
+                    const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+                    await NativeBiometric.setCredentials({
+                        username: email,
+                        password: password,
+                        server: 'golden-isle-wholesale'
+                    });
+                    localStorage.setItem('biometrics_enabled', 'true');
+                } catch (bioErr) {
+                    console.error('Failed to store biometric credentials:', bioErr);
+                }
+            } else {
+                localStorage.removeItem('biometrics_enabled');
+                if (Capacitor.isNativePlatform()) {
+                    try {
+                        const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+                        await NativeBiometric.deleteCredentials({
+                            server: 'golden-isle-wholesale'
+                        });
+                    } catch (e) {}
+                }
             }
 
             toast.success('Welcome back! 🥃', { duration: 3000 });
@@ -180,24 +286,50 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="rememberMe"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4 h-4 rounded border-[#e8e4dd] text-[#c8a84b] focus:ring-[#c8a84b] cursor-pointer"
-                                    style={{ accentColor: '#c8a84b' }}
-                                />
-                                <label htmlFor="rememberMe" className="text-sm font-medium text-[#1a1a1a] cursor-pointer select-none">
-                                    Remember Me
-                                </label>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="rememberMe"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        className="w-4 h-4 rounded border-[#e8e4dd] text-[#c8a84b] focus:ring-[#c8a84b] cursor-pointer"
+                                        style={{ accentColor: '#c8a84b' }}
+                                    />
+                                    <label htmlFor="rememberMe" className="text-sm font-medium text-[#1a1a1a] cursor-pointer select-none">
+                                        Remember Me
+                                    </label>
+                                </div>
+
+                                {isNative && biometricsAvailable && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="checkbox"
+                                            id="biometricsEnabled"
+                                            checked={biometricsEnabled}
+                                            onChange={(e) => setBiometricsEnabled(e.target.checked)}
+                                            className="w-4 h-4 rounded border-[#e8e4dd] text-[#c8a84b] focus:ring-[#c8a84b] cursor-pointer"
+                                            style={{ accentColor: '#c8a84b' }}
+                                        />
+                                        <label htmlFor="biometricsEnabled" className="text-sm font-medium text-[#1a1a1a] cursor-pointer select-none">
+                                            Enable Fingerprint Login
+                                        </label>
+                                    </div>
+                                )}
                             </div>
 
-                            <button type="submit" disabled={loading || googleLoading}
+                            <button type="submit" disabled={loading || googleLoading || biometricLoading}
                                 className="w-full h-12 flex items-center justify-center gap-2 bg-[#b8960c] hover:bg-[#d4af37] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-[0_4px_14px_rgba(184,150,12,0.3)] mt-2">
                                 {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Signing in...</> : 'Sign In'}
                             </button>
+
+                            {isNative && biometricsAvailable && hasStoredCredentials && (
+                                <button type="button" onClick={triggerBiometricLogin} disabled={loading || googleLoading || biometricLoading}
+                                    className="w-full h-12 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-[0_4px_14px_rgba(5,150,105,0.3)] mt-2">
+                                    {biometricLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-fingerprint"><path d="M12 10a2 2 0 0 0-2 2c0 .5-.5 1-1 1s-1-.5-1-1a4 4 0 0 1 8 0c0 1.5-1 2-2 3-.5.5-1 1-1 2"/><path d="M14 22a7 7 0 0 0 5-2c1-1 1.5-2.5 1.5-4a11 11 0 0 0-1-4.5 1 1 0 0 0-1.5-.5 1 1 0 0 0-.5 1.5c.5.5 1 2 1 3.5 0 1-.5 2-1 3a5 5 0 0 1-7.5-1.5c-.5-1-.5-2.5-.5-3.5 0-3 2.5-5.5 5.5-5.5a6 6 0 0 1 6 6v1a1 1 0 0 0 2 0v-1a8 8 0 0 0-8-8 8 8 0 0 0-8 8c0 1.5 0 3.5.5 5a1 1 0 0 0 1.5.5c.5-.5.5-1.5.5-2 0-1 0-2.5.5-3.5a6 6 0 0 1 8.5-3c1.5.5 2.5 2 2.5 4 0 1.5-.5 2.5-1 3.5a7 7 0 0 1-5 2.5"/><path d="M12 2a10 10 0 0 0-10 10c0 2.5.5 5 1.5 7a1 1 0 0 0 1.5-.5 1 1 0 0 0-.5-1.5c-1-1.5-1.5-3.5-1.5-5a8 8 0 0 1 16 0c0 1 0 2.5-.5 3.5a1 1 0 0 0 .5 1.5 1 1 0 0 0 1.5-.5c.5-1 .5-3 .5-4a10 10 0 0 0-10-10Z"/></svg>}
+                                    {biometricLoading ? 'Authenticating...' : 'Sign In with Fingerprint'}
+                                </button>
+                            )}
                         </form>
 
                         <div className="relative my-8">

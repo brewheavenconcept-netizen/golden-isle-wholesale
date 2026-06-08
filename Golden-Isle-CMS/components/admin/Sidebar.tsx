@@ -60,6 +60,18 @@ export default function Sidebar({
     }, []);
 
     const handleLogout = async () => {
+        localStorage.removeItem('biometrics_enabled');
+        try {
+            const { Capacitor } = await import('@capacitor/core');
+            if (Capacitor.isNativePlatform()) {
+                const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+                await NativeBiometric.deleteCredentials({
+                    server: 'golden-isle-wholesale'
+                });
+            }
+        } catch (e) {
+            console.error('Failed to delete biometric credentials on logout:', e);
+        }
         await supabase.auth.signOut();
         router.push('/');
     };

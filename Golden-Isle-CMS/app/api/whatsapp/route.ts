@@ -1163,8 +1163,9 @@ Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
+- Greetings & Small Talk → STRICT INSTRUCTION: Do NOT call any tools for greetings, introductions, or general small talk. Just reply with a friendly greeting and ask how you can help them (e.g., recommend products, check prices, etc.).
 - Recommend Products → STRICT INSTRUCTION: Whenever a user asks for a recommendation, best product, popular item, or ANY product suggestion - you MUST ALWAYS call the 'recommend_products' tool. NEVER reply with text only for recommendations.
-- Full Catalog → Call the 'view_full_catalog' tool when the user asks to see all items.
+- Full Catalog → Call the 'view_full_catalog' tool ONLY when the user asks to see all items or view the catalog generally. Never call it preemptively or for basic greetings.
 - Ordering → encourage them to tap "🛒 Buat Pesanan".
 - Payment → we accept bank transfer & FPX.`;
 
@@ -1188,7 +1189,7 @@ Business Rules:
       type: 'function',
       function: {
         name: 'recommend_products',
-        description: 'Call this when the user asks for product recommendations, searches for specific beverages, or wants to buy specific items. This will display them as a native interactive Multi-Product List in WhatsApp.',
+        description: 'Call this ONLY when the user asks for product recommendations, searches for specific beverages, or wants to buy specific items. This will display them as a native interactive Multi-Product List in WhatsApp.',
         parameters: {
           type: 'object',
           properties: {
@@ -1221,13 +1222,13 @@ Business Rules:
       type: 'function',
       function: {
         name: 'view_full_catalog',
-        description: 'Call this when the user wants to browse the entire store catalog generally, or asks to see all products.',
+        description: 'Call this ONLY when the user explicitly asks to browse the entire store catalog, see all products, or check the full product list.',
         parameters: {
           type: 'object',
           properties: {
             text: {
               type: 'string',
-              description: 'Body message inviting them to view the catalog (max 3 sentences).'
+              description: 'Body message inviting them to view the catalog in the user language / Sabahan slang (max 3 sentences). No markdown or bullet points.'
             }
           },
           required: ['text']
