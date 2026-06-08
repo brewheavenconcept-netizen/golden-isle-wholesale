@@ -1,7 +1,7 @@
 import { Product } from '@/types';
 
 const waToken = process.env.WHATSAPP_TOKEN;
-const catalogId = process.env.META_CATALOG_ID;
+const catalogId = process.env.META_CATALOG_ID || process.env.WHATSAPP_CATALOG_ID;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
 
 interface MetaProductData {
@@ -23,10 +23,17 @@ interface MetaBatchRequest {
   data?: MetaProductData;
 }
 
+type MetaCatalogBatchResponse = {
+  error?: {
+    message?: string;
+  };
+  [key: string]: unknown;
+};
+
 /**
  * Sends a batch of product updates/creates/deletes to Meta Commerce Catalog API.
  */
-export async function sendMetaCatalogBatch(requests: MetaBatchRequest[]): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function sendMetaCatalogBatch(requests: MetaBatchRequest[]): Promise<{ success: boolean; data?: MetaCatalogBatchResponse; error?: string }> {
   if (!waToken) {
     console.warn('⚠️ Meta Catalog Sync skipped: WHATSAPP_TOKEN is not configured.');
     return { success: false, error: 'WHATSAPP_TOKEN not configured' };
@@ -47,7 +54,7 @@ export async function sendMetaCatalogBatch(requests: MetaBatchRequest[]): Promis
       body: JSON.stringify({ requests }),
     });
 
-    const resData = await response.json();
+    const resData = await response.json() as MetaCatalogBatchResponse;
 
     if (!response.ok) {
       console.error('❌ Meta Catalog Batch API Error:', JSON.stringify(resData, null, 2));
@@ -56,9 +63,9 @@ export async function sendMetaCatalogBatch(requests: MetaBatchRequest[]): Promis
 
     console.log('✅ Meta Catalog Batch Sync Success:', JSON.stringify(resData, null, 2));
     return { success: true, data: resData };
-  } catch (err: any) {
+  } catch (err) {
     console.error('❌ Meta Catalog Batch API Connection Error:', err);
-    return { success: false, error: err.message || 'Connection error' };
+    return { success: false, error: err instanceof Error ? err.message : 'Connection error' };
   }
 }
 
@@ -78,6 +85,7 @@ function mapProductToMeta(product: Product): MetaProductData {
   // Meta Catalog requires a description. Fallback if empty.
   const description = product.description?.trim() 
     || `Premium ${product.category || 'beverage'} from Golden Isle Wholesale.`;
+  const stockQuantity = Number(product.stock_quantity ?? product.stock ?? 0);
 
   return {
     title: product.name,
@@ -87,7 +95,7 @@ function mapProductToMeta(product: Product): MetaProductData {
     brand: 'Golden Isle',
     price: Math.round(Number(product.price || 0) * 100), // in cents (e.g. RM 240.00 -> 24000)
     currency: 'MYR',
-    availability: product.stock_status === 'out_of_stock' ? 'out of stock' : 'in stock',
+    availability: product.stock_status === 'in_stock' && stockQuantity > 0 ? 'in stock' : 'out of stock',
     condition: 'new',
     google_product_category: 'Food, Beverages & Tobacco > Beverages > Alcoholic Beverages',
   };

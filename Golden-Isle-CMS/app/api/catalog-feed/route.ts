@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Helper to escape CSV fields correctly
-const escapeCSV = (field: any) => {
+const escapeCSV = (field: unknown) => {
   if (field === null || field === undefined) return '';
   const str = String(field);
   // If the field contains quotes, commas, or newlines, enclose in quotes and escape quotes
@@ -11,6 +11,15 @@ const escapeCSV = (field: any) => {
   }
   return str;
 };
+
+function getPublicAppUrl(request: Request) {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (configuredUrl && !configuredUrl.includes('localhost')) {
+    return configuredUrl.replace(/\/$/, '');
+  }
+
+  return new URL(request.url).origin;
+}
 
 export async function GET(request: Request) {
   try {
@@ -50,8 +59,7 @@ export async function GET(request: Request) {
 
     let csvContent = headers.join(',') + '\n';
     
-    // Default to localhost if NEXT_PUBLIC_APP_URL is not set
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = getPublicAppUrl(request);
 
     products?.forEach((product) => {
       // Mapping Supabase to Meta Commerce schema
@@ -60,7 +68,8 @@ export async function GET(request: Request) {
       const description = product.description || title;
       
       // Stock status mapping
-      const availability = product.stock_status === 'out_of_stock' ? 'out of stock' : 'in stock';
+      const stockQuantity = Number(product.stock_quantity ?? product.stock ?? 0);
+      const availability = product.stock_status === 'in_stock' && stockQuantity > 0 ? 'in stock' : 'out of stock';
       const condition = 'new';
       
       // Meta requires price with ISO 4217 currency code e.g. "9.99 MYR"
@@ -78,7 +87,7 @@ export async function GET(request: Request) {
       }
 
       const brand = 'Golden Isle Wholesale';
-      const inventory = product.stock || product.stock_quantity || 100;
+      const inventory = Math.max(0, stockQuantity);
 
       const row = [
         id,

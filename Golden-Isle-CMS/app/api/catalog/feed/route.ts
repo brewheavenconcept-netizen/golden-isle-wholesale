@@ -6,7 +6,15 @@ export const dynamic = 'force-dynamic';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
+
+function getPublicAppUrl(request: Request) {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (configuredUrl && !configuredUrl.includes('localhost')) {
+    return configuredUrl.replace(/\/$/, '');
+  }
+
+  return new URL(request.url).origin;
+}
 
 function escapeXml(str: string | null | undefined): string {
   if (!str) return '';
@@ -22,8 +30,9 @@ function escapeXml(str: string | null | undefined): string {
   });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const appUrl = getPublicAppUrl(request);
     const { data: products, error } = await supabase
       .from('products')
       .select('*')
@@ -46,7 +55,8 @@ export async function GET() {
       const description = p.description?.trim() 
         || `Premium ${p.category || 'beverage'} from Golden Isle Wholesale.`;
 
-      const availability = p.stock_status === 'out_of_stock' ? 'out of stock' : 'in stock';
+      const stockQuantity = Number(p.stock_quantity ?? p.stock ?? 0);
+      const availability = p.stock_status === 'in_stock' && stockQuantity > 0 ? 'in stock' : 'out of stock';
 
       return `
     <item>
@@ -80,7 +90,7 @@ export async function GET() {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error('❌ Catalog Feed Handler Error:', err);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
