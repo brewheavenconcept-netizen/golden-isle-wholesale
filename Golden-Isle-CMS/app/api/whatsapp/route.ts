@@ -444,14 +444,28 @@ function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' |
   return 'ai';
 }
 
-function detectLanguage(text: string): 'malay' | 'english' | 'chinese' {
+type ChatLanguage = 'malay' | 'english' | 'chinese';
+
+const userLanguages = new Map<string, ChatLanguage>();
+
+function detectLanguage(text: string): ChatLanguage {
   const lower = text.toLowerCase();
 
   if (/[\u4e00-\u9fff]/.test(text)) return 'chinese';
   if (['apa', 'boleh', 'mau', 'saya', 'ada', 'untuk', 'bosku', 'ko', 'ni'].some(word => lower.includes(word))) return 'malay';
-  if (['what', 'how', 'price', 'do you', 'have', 'products'].some(word => lower.includes(word))) return 'english';
+  if (['hello', 'hi', 'what', 'how', 'price', 'do you', 'have', 'products', 'browse', 'order', 'thanks', 'thank you'].some(word => lower.includes(word))) return 'english';
 
   return 'malay';
+}
+
+function rememberUserLanguage(from: string, text: string): ChatLanguage {
+  const language = detectLanguage(text);
+  userLanguages.set(from, language);
+  return language;
+}
+
+function getUserLanguage(from: string): ChatLanguage {
+  return userLanguages.get(from) || 'malay';
 }
 
 function isProductAvailabilityIntent(text: string): boolean {
@@ -502,27 +516,43 @@ function isProspectQualificationIntent(text: string): boolean {
 }
 
 async function sendQualificationMenu(from: string) {
+  const language = getUserLanguage(from);
+  const body =
+    language === 'chinese'
+      ? "🔥 很好。KIRA 会帮你找到合适的选择。\n\n你要找饮料用于什么场景？"
+      : language === 'english'
+        ? "🔥 Great. KIRA can help you find the right options.\n\nWhat are you looking for drinks for?"
+        : "🔥 Mantap bosku. KIRA bantu cari pilihan yang ngam.\n\nBos cari minuman untuk apa?";
+
   await sendWAButtons(
     from,
-    "🔥 Mantap bosku. KIRA bantu cari pilihan yang ngam.\n\nBos cari minuman untuk apa?",
+    body,
     [
-      { id: 'QUALIFY_RETAIL', title: '🏪 Kedai / Retail' },
-      { id: 'QUALIFY_RESTAURANT', title: '🍽️ Restoran / Bar' },
-      { id: 'QUALIFY_EVENT', title: '🎉 Event / Party' }
+      { id: 'QUALIFY_RETAIL', title: language === 'chinese' ? '🏪 店铺 / 零售' : language === 'english' ? '🏪 Shop / Retail' : '🏪 Kedai / Retail' },
+      { id: 'QUALIFY_RESTAURANT', title: language === 'chinese' ? '🍽️ 餐厅 / 酒吧' : language === 'english' ? '🍽️ Restaurant / Bar' : '🍽️ Restoran / Bar' },
+      { id: 'QUALIFY_EVENT', title: language === 'chinese' ? '🎉 活动 / 派对' : language === 'english' ? '🎉 Event / Party' : '🎉 Event / Party' }
     ]
   );
 }
 
 async function sendCatalogFollowUp(from: string) {
-  await sendWAButtons(from, "Dah jumpa produk yang menarik bosku?", [
-    { id: 'SEMAK_STOK', title: '📦 Semak Stok' },
-    { id: 'TANYA_KIRA', title: '💬 Tanya KIRA' },
-    { id: 'LIHAT_CATALOG', title: '🛒 Tengok Semua' }
+  const language = getUserLanguage(from);
+  const body =
+    language === 'chinese'
+      ? "有看到感兴趣的产品吗？"
+      : language === 'english'
+        ? "Found anything interesting?"
+        : "Dah jumpa produk yang menarik bosku?";
+
+  await sendWAButtons(from, body, [
+    { id: 'SEMAK_STOK', title: language === 'chinese' ? '📦 查询库存' : language === 'english' ? '📦 Check Stock' : '📦 Semak Stok' },
+    { id: 'TANYA_KIRA', title: language === 'chinese' ? '💬 问 KIRA' : language === 'english' ? '💬 Ask KIRA' : '💬 Tanya KIRA' },
+    { id: 'LIHAT_CATALOG', title: language === 'chinese' ? '🛒 查看全部' : language === 'english' ? '🛒 View All' : '🛒 Tengok Semua' }
   ]);
 }
 
 async function handleProductAvailability(from: string, text: string) {
-  const language = detectLanguage(text);
+  const language = rememberUserLanguage(from, text);
   const reply =
     language === 'chinese'
       ? "📦 Golden Isle 有几种饮料分类：\n\n🍺 啤酒\n🍷 葡萄酒\n🥃 威士忌\n🍸 烈酒\n\n我现在打开目录给你查看所有产品 👇"
@@ -538,13 +568,21 @@ async function handleProductAvailability(from: string, text: string) {
 
 // GREETING: Hantar welcome message dengan 3 Quick Reply Buttons
 async function handleGreeting(from: string) {
+  const language = getUserLanguage(from);
+  const body =
+    language === 'chinese'
+      ? "👋 欢迎来到 Golden Isle Wholesale 🥃\n\nKIRA 可以帮你为店铺、餐厅、活动或个人用途找到合适的饮料。\n\n你今天想做什么？"
+      : language === 'english'
+        ? "👋 Welcome to Golden Isle Wholesale 🥃\n\nKIRA can help you find the right drinks for your shop, restaurant, event, or personal use.\n\nWhat would you like to do today?"
+        : `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`;
+
   await sendWAButtons(
     from,
-    `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`,
+    body,
     [
-      { id: 'TANYA_KIRA', title: '🤖 Tanya KIRA' },
-      { id: 'LIHAT_CATALOG', title: '📦 Browse Products' },
-      { id: 'BUAT_PESANAN', title: '🛒 Buat Pesanan' },
+      { id: 'TANYA_KIRA', title: language === 'chinese' ? '🤖 问 KIRA' : language === 'english' ? '🤖 Ask KIRA' : '🤖 Tanya KIRA' },
+      { id: 'LIHAT_CATALOG', title: language === 'chinese' ? '📦 浏览产品' : language === 'english' ? '📦 Browse Products' : '📦 Browse Products' },
+      { id: 'BUAT_PESANAN', title: language === 'chinese' ? '🛒 下单' : language === 'english' ? '🛒 Order Now' : '🛒 Buat Pesanan' },
     ]
   );
 }
@@ -605,18 +643,24 @@ async function handleRepeatGreeting(from: string): Promise<boolean> {
 
 // ORDER FLOW: Hantar Katalog terus (Bypass WA Flow sementara waktu)
 async function handleOrder(from: string) {
+  const language = getUserLanguage(from);
+  const text =
+    language === 'chinese'
+      ? "🛒 想下单吗？我先打开产品目录给你看看。\n\n你可以选择产品查看价格，然后把产品加入购物车。👇"
+      : language === 'english'
+        ? "🛒 Ready to order? I'll open the product catalog for you first.\n\nChoose a product to view details, then add it to cart when you're ready. 👇"
+        : `🛒 *Bosku nak buat pesanan? Tengok-tengok katalog dulu ya!*\n\n` +
+          `Pilih produk kat bawah ni, klik untuk tengok harga. ` +
+          `Lepas order, KIRA akan uruskan cepat-cepat untuk bosku! 👇`;
+
   // Fallback: tunjuk catalog interaktif terus sebab WA Flow 'draft' tak support WA Web
-  await sendWAText(
-    from,
-    `🛒 *Bosku nak buat pesanan? Tengok-tengok katalog dulu ya!*\n\n` +
-    `Pilih produk kat bawah ni, klik untuk tengok harga. ` +
-    `Lepas order, KIRA akan uruskan cepat-cepat untuk bosku! 👇`
-  );
+  await sendWAText(from, text);
   await handleCatalog(from);
 }
 
 // CATALOG: Cuba native Meta catalog dulu, fallback ke interactive list
 async function handleCatalog(from: string) {
+  const language = getUserLanguage(from);
   const catalogId = process.env.WHATSAPP_CATALOG_ID;
 
   // ── 1. Cuba Native Meta Catalog (Add to Cart butang) ──────────────────────
@@ -642,7 +686,13 @@ async function handleCatalog(from: string) {
         .map(([title, productIds]) => ({ title, productIds }));
 
       // Cuba product_list (tunjuk produk mengikut kategori)
-      const sentList = await sendWAProductList(from, nativeSections);
+      const productListText =
+        language === 'chinese'
+          ? '以下是 Golden Isle 的产品。你可以选择产品并加入购物车。'
+          : language === 'english'
+            ? 'Here are Golden Isle products. Select an item to view details and add it to cart.'
+            : undefined;
+      const sentList = await sendWAProductList(from, nativeSections, productListText);
       if (sentList) {
         await new Promise(r => setTimeout(r, 1000));
         await sendCatalogFollowUp(from);
@@ -653,7 +703,11 @@ async function handleCatalog(from: string) {
       const thumbnailId = String(products[0].id);
       const sentCatalog = await sendWACatalogMessage(
         from,
-        '🛍️ Tengok semua produk Golden Isle bosku! Tekan produk untuk Add to Cart terus! 🛒🍻',
+        language === 'chinese'
+          ? '🛍️ 浏览 Golden Isle 所有产品。选择产品后可以直接加入购物车。'
+          : language === 'english'
+            ? '🛍️ Browse all Golden Isle products. Select a product to add it to cart.'
+            : '🛍️ Tengok semua produk Golden Isle bosku! Tekan produk untuk Add to Cart terus! 🛒🍻',
         thumbnailId
       );
       if (sentCatalog) {
@@ -673,7 +727,14 @@ async function handleCatalog(from: string) {
     .limit(10);
 
   if (error || !products || products.length === 0) {
-    await sendWAText(from, '⚠️ Maaf bosku, stok sedang dikemaskini. Sila hubungi admin untuk info terbaru.');
+    await sendWAText(
+      from,
+      language === 'chinese'
+        ? '⚠️ 抱歉，库存正在更新。请联系管理员获取最新信息。'
+        : language === 'english'
+          ? '⚠️ Sorry, stock is being updated. Please contact admin for the latest info.'
+          : '⚠️ Maaf bosku, stok sedang dikemaskini. Sila hubungi admin untuk info terbaru.'
+    );
     return;
   }
 
@@ -696,7 +757,13 @@ async function handleCatalog(from: string) {
   const totalRows = sections.reduce((acc, s) => acc + s.rows.length, 0);
   if (totalRows > 10 || sections.length === 0) {
     const textList = products.map(p => `• *${p.name}*\n  💰 RM ${Number(p.price).toFixed(2)}`).join('\n\n');
-    await sendWAText(from, `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Pilih produk yang mau, taip nama dia terus ya bosku!_`);
+    const text =
+      language === 'chinese'
+        ? `🛍️ *Golden Isle 产品目录*\n\n${textList}\n\n_请选择产品，或直接输入产品名称。_`
+        : language === 'english'
+          ? `🛍️ *Golden Isle Product Catalog*\n\n${textList}\n\n_Select a product or type the product name directly._`
+          : `🛍️ *Golden Isle — Catalog Produk*\n\n${textList}\n\n_Pilih produk yang mau, taip nama dia terus ya bosku!_`;
+    await sendWAText(from, text);
     await sendCatalogFollowUp(from);
   } else {
     await sendWAInteractiveList(from, sections);
@@ -1221,40 +1288,120 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
         } else if (buttonPayload === 'SEMAK_STOK') {
-          await sendWAText(from, "📦 KIRA semak stok terkini untuk bosku.\n\nBoleh pilih produk dari catalog atau taip nama produk yang bos mau check.");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "📦 KIRA 会帮你查询最新库存。\n\n你可以从目录选择产品，或直接输入想查询的产品名称。"
+              : language === 'english'
+                ? "📦 KIRA will help you check the latest stock.\n\nYou can choose a product from the catalog or type the product name you want to check."
+                : "📦 KIRA semak stok terkini untuk bosku.\n\nBoleh pilih produk dari catalog atau taip nama produk yang bos mau check."
+          );
           await handleCatalog(from);
         } else if (buttonPayload === 'TANYA_KIRA') {
+          const language = getUserLanguage(from);
+          const body =
+            language === 'chinese'
+              ? "🤖 KIRA 可以帮你：\n\n💰 查询产品价格\n📦 为店铺 / 餐厅找库存\n🍺 按预算推荐产品\n🎉 为活动推荐饮料\n\n你想做什么？"
+              : language === 'english'
+                ? "🤖 KIRA can help you:\n\n💰 Ask product prices\n📦 Find stock for a shop / restaurant\n🍺 Recommend products by budget\n🎉 Recommend drinks for an event\n\nWhat would you like to do?"
+                : "🤖 Hai bosku, KIRA boleh bantu:\n\n💰 Tanya harga produk\n📦 Cari stok untuk kedai / restoran\n🍺 Cadang produk ikut bajet\n🎉 Cadang minuman untuk event\n\nApa bos mau buat?";
           await sendWAButtons(
             from,
-            "🤖 Hai bosku, KIRA boleh bantu:\n\n💰 Tanya harga produk\n📦 Cari stok untuk kedai / restoran\n🍺 Cadang produk ikut bajet\n🎉 Cadang minuman untuk event\n\nApa bos mau buat?",
+            body,
             [
-              { id: 'AI_TANYA_HARGA', title: '💰 Tanya Harga' },
-              { id: 'AI_BORONG_KEDAI', title: '📦 Borong Kedai' },
-              { id: 'AI_CADANGAN', title: '🍺 Cadangan Produk' }
+              { id: 'AI_TANYA_HARGA', title: language === 'chinese' ? '💰 查询价格' : language === 'english' ? '💰 Ask Price' : '💰 Tanya Harga' },
+              { id: 'AI_BORONG_KEDAI', title: language === 'chinese' ? '📦 店铺采购' : language === 'english' ? '📦 Shop Stock' : '📦 Borong Kedai' },
+              { id: 'AI_CADANGAN', title: language === 'chinese' ? '🍺 产品推荐' : language === 'english' ? '🍺 Recommend' : '🍺 Cadangan Produk' }
             ]
           );
         } else if (buttonPayload === 'AI_TANYA_HARGA') {
-          await sendWAText(from, "💰 Nak check harga produk apa bosku?\n\nContoh:\n• Beer paling murah\n• Harga Heineken\n• Whisky bawah RM200\n\nTaip nama produk atau bajet bos, KIRA carikan yang ngam 😊");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "💰 你想查询什么产品的价格？\n\n例子：\n• 最便宜的啤酒\n• Heineken 价格\n• RM200 以下的威士忌\n\n请输入产品名称或预算，KIRA 会帮你找合适的。"
+              : language === 'english'
+                ? "💰 Which product price would you like to check?\n\nExamples:\n• Cheapest beer\n• Heineken price\n• Whisky under RM200\n\nType the product name or your budget, and KIRA will find the right match."
+                : "💰 Nak check harga produk apa bosku?\n\nContoh:\n• Beer paling murah\n• Harga Heineken\n• Whisky bawah RM200\n\nTaip nama produk atau bajet bos, KIRA carikan yang ngam 😊"
+          );
         } else if (buttonPayload === 'AI_BORONG_KEDAI') {
-          await sendWAText(from, "📦 Bos cari stok untuk kedai, restoran atau event?\n\nBeritahu KIRA:\n• Jenis bisnes\n• Anggaran bajet\n• Produk yang biasa customer cari\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\"");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "📦 你是要为店铺、餐厅还是活动找库存？\n\n请告诉 KIRA：\n• 生意类型\n• 大概预算\n• 顾客常找的产品\n\n例子：\n“我要为店铺补啤酒库存，预算 RM1000”"
+              : language === 'english'
+                ? "📦 Are you looking for stock for a shop, restaurant, or event?\n\nTell KIRA:\n• Business type\n• Estimated budget\n• Products customers usually ask for\n\nExample:\n\"I need beer stock for my shop, budget RM1000\""
+                : "📦 Bos cari stok untuk kedai, restoran atau event?\n\nBeritahu KIRA:\n• Jenis bisnes\n• Anggaran bajet\n• Produk yang biasa customer cari\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\""
+          );
         } else if (buttonPayload === 'AI_CADANGAN') {
-          await sendWAButtons(from, "🍺 KIRA boleh cadangkan produk ikut situasi bosku.\n\nPilih satu:", [
-            { id: 'AI_POPULAR', title: '🔥 Produk Popular' },
-            { id: 'AI_BUDGET', title: '💸 Bajet Murah' },
-            { id: 'AI_EVENT', title: '🎉 Untuk Event' }
+          const language = getUserLanguage(from);
+          await sendWAButtons(from, language === 'chinese' ? "🍺 KIRA 可以根据你的情况推荐产品。\n\n请选择：" : language === 'english' ? "🍺 KIRA can recommend products based on your situation.\n\nChoose one:" : "🍺 KIRA boleh cadangkan produk ikut situasi bosku.\n\nPilih satu:", [
+            { id: 'AI_POPULAR', title: language === 'chinese' ? '🔥 热门产品' : language === 'english' ? '🔥 Popular' : '🔥 Produk Popular' },
+            { id: 'AI_BUDGET', title: language === 'chinese' ? '💸 预算推荐' : language === 'english' ? '💸 Budget Picks' : '💸 Bajet Murah' },
+            { id: 'AI_EVENT', title: language === 'chinese' ? '🎉 活动用途' : language === 'english' ? '🎉 For Event' : '🎉 Untuk Event' }
           ]);
         } else if (buttonPayload === 'AI_POPULAR') {
-          await handleAIChat(from, "Cadangkan produk popular untuk customer baru.\nJawab ringkas, friendly dan sales-focused.");
+          const language = getUserLanguage(from);
+          await handleAIChat(
+            from,
+            language === 'chinese'
+              ? "为新客户推荐热门产品。回答要简短、友好，并以销售为导向。"
+              : language === 'english'
+                ? "Recommend popular products for a new customer. Keep it brief, friendly, and sales-focused."
+                : "Cadangkan produk popular untuk customer baru.\nJawab ringkas, friendly dan sales-focused."
+          );
         } else if (buttonPayload === 'AI_BUDGET') {
-          await handleAIChat(from, "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui.");
+          const language = getUserLanguage(from);
+          await handleAIChat(
+            from,
+            language === 'chinese'
+              ? "推荐最划算或预算友好的产品。如果还不知道客户预算，请先询问预算。"
+              : language === 'english'
+                ? "Recommend the best value or budget-friendly products. Ask for the customer's budget if it is not known yet."
+                : "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui."
+          );
         } else if (buttonPayload === 'AI_EVENT') {
-          await handleAIChat(from, "Bantu customer pilih minuman untuk event.\nTanya jumlah orang, bajet dan jenis event jika maklumat belum cukup.");
+          const language = getUserLanguage(from);
+          await handleAIChat(
+            from,
+            language === 'chinese'
+              ? "帮助客户为活动选择饮料。如果资料不足，请询问人数、预算和活动类型。"
+              : language === 'english'
+                ? "Help the customer choose drinks for an event. Ask for the number of people, budget, and event type if there is not enough information."
+                : "Bantu customer pilih minuman untuk event.\nTanya jumlah orang, bajet dan jenis event jika maklumat belum cukup."
+          );
         } else if (buttonPayload === 'QUALIFY_RETAIL') {
-          await sendWAText(from, "🏪 Untuk kedai, KIRA boleh bantu cadangkan stok yang senang jalan.\n\nBoleh bagitahu:\n• Bajet anggaran\n• Beer / wine / whisky / campuran\n• Customer biasa cari apa\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\"");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "🏪 针对店铺，KIRA 可以推荐比较容易销售的库存。\n\n请告诉我：\n• 大概预算\n• 啤酒 / 葡萄酒 / 威士忌 / 混合\n• 顾客平时常找什么\n\n例子：\n“我要为店铺补啤酒库存，预算 RM1000”"
+              : language === 'english'
+                ? "🏪 For a shop, KIRA can recommend stock that is easier to sell.\n\nTell me:\n• Estimated budget\n• Beer / wine / whisky / mixed products\n• What your customers usually ask for\n\nExample:\n\"I need beer stock for my shop, budget RM1000\""
+                : "🏪 Untuk kedai, KIRA boleh bantu cadangkan stok yang senang jalan.\n\nBoleh bagitahu:\n• Bajet anggaran\n• Beer / wine / whisky / campuran\n• Customer biasa cari apa\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\""
+          );
         } else if (buttonPayload === 'QUALIFY_RESTAURANT') {
-          await sendWAText(from, "🍽️ Untuk restoran / bar, KIRA boleh cadangkan minuman ikut menu dan customer style.\n\nBoleh bagitahu:\n• Jenis restoran / bar\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Saya mau wine dan beer untuk restoran, bajet RM2000\"");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "🍽️ 针对餐厅 / 酒吧，KIRA 可以根据菜单和顾客风格推荐饮料。\n\n请告诉我：\n• 餐厅 / 酒吧类型\n• 大概预算\n• 想要啤酒、葡萄酒、威士忌还是混合\n\n例子：\n“我要为餐厅采购葡萄酒和啤酒，预算 RM2000”"
+              : language === 'english'
+                ? "🍽️ For a restaurant / bar, KIRA can recommend drinks based on your menu and customer style.\n\nTell me:\n• Type of restaurant / bar\n• Estimated budget\n• Beer, wine, whisky, or mixed products\n\nExample:\n\"I need wine and beer for my restaurant, budget RM2000\""
+                : "🍽️ Untuk restoran / bar, KIRA boleh cadangkan minuman ikut menu dan customer style.\n\nBoleh bagitahu:\n• Jenis restoran / bar\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Saya mau wine dan beer untuk restoran, bajet RM2000\""
+          );
         } else if (buttonPayload === 'QUALIFY_EVENT') {
-          await sendWAText(from, "🎉 Untuk event, KIRA boleh bantu kira cadangan minuman ikut jumlah orang dan bajet.\n\nBoleh bagitahu:\n• Berapa orang\n• Jenis event\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Event 50 orang, bajet RM800\"");
+          const language = getUserLanguage(from);
+          await sendWAText(
+            from,
+            language === 'chinese'
+              ? "🎉 针对活动，KIRA 可以按人数和预算推荐饮料。\n\n请告诉我：\n• 多少人\n• 活动类型\n• 大概预算\n• 想要啤酒、葡萄酒、威士忌还是混合\n\n例子：\n“活动 50 人，预算 RM800”"
+              : language === 'english'
+                ? "🎉 For an event, KIRA can recommend drinks based on the number of people and budget.\n\nTell me:\n• Number of people\n• Event type\n• Estimated budget\n• Beer, wine, whisky, or mixed products\n\nExample:\n\"Event for 50 people, budget RM800\""
+                : "🎉 Untuk event, KIRA boleh bantu kira cadangan minuman ikut jumlah orang dan bajet.\n\nBoleh bagitahu:\n• Berapa orang\n• Jenis event\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Event 50 orang, bajet RM800\""
+          );
         } else if (buttonPayload === 'btn_new_order') {
           await handleGreeting(from);
         } else if (buttonPayload.startsWith('btn_repeat_confirm_')) {
@@ -1579,6 +1726,7 @@ export async function POST(request: Request) {
       if (message && message.type === 'text') {
         const from = message.from;
         const msgText = message.text?.body?.trim() || '';
+        rememberUserLanguage(from, msgText);
 
         console.log(`\n📩 MESEJ WA: [${from}] "${msgText}"`);
 
