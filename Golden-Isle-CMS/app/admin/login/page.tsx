@@ -98,6 +98,12 @@ export default function LoginPage() {
         setError('');
         try {
             const { NativeBiometric } = await import('@capgo/capacitor-native-biometric');
+            
+            await NativeBiometric.verifyIdentity({
+                reason: "Sign in to Golden Isle",
+                title: "Authentication Required"
+            });
+
             const credentials = await NativeBiometric.getCredentials({
                 server: 'golden-isle-wholesale'
             });
