@@ -139,6 +139,10 @@ async function sendWAMediaById(to: string, mediaId: string, type: 'document' | '
   });
 }
 
+const GREETING_VOICE_TEXT = 'Hello boss, apa khabar hari ni? KIRA sini boleh bantu cari produk, suggest package, dan urus order bos.';
+const HIGH_IMPACT_VOICE_MOMENTS = new Set(['greeting', 'checkout_confirmation', 'thank_you']);
+type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you';
+
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
   try {
     const res = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -149,9 +153,9 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini-tts',
-        voice: 'alloy',
+        voice: 'coral',
         input: text,
-        instructions: 'Speak like a friendly Sabah sales assistant. Use natural Malaysian Malay. Warm, casual, not corporate, not robotic.',
+        instructions: 'Speak like a friendly female ASEAN/Sabah sales assistant. Use natural Malaysian Malay. Warm, casual, not corporate, not robotic.',
         response_format: 'opus'
       })
     });
@@ -189,6 +193,12 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
     console.error('Error sending AI voice reply:', err);
     return false;
   }
+}
+
+async function sendHighImpactVoiceReply(to: string, replyText: string, moment: VoiceMoment): Promise<boolean> {
+  const shouldSendVoice = HIGH_IMPACT_VOICE_MOMENTS.has(moment);
+  if (!shouldSendVoice) return false;
+  return sendAIVoiceReply(to, replyText);
 }
 
 // Generate lifestyle image using DALL-E 3
@@ -935,6 +945,8 @@ async function handleGreeting(from: string) {
         ? "👋 Welcome to Golden Isle Wholesale 🥃\n\nKIRA can help you find the right drinks for your shop, restaurant, event, or personal use.\n\nWhat would you like to do today?"
         : `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`;
 
+  await sendHighImpactVoiceReply(from, GREETING_VOICE_TEXT, 'greeting');
+
   await sendWAButtons(
     from,
     body,
@@ -1234,14 +1246,7 @@ async function handleReceipt(from: string) {
     
     const textData = await textRes.json();
     const voiceScript = textData.choices?.[0]?.message?.content || `Mantap bosku! Resit RM ${totalMYR} sudah saya hantar. Terima kasih banyak-banyak support Golden Isle, nanti lori gerak saya roger!`;
-    
-    const audioBuffer = await generateVoiceNoteBuffer(voiceScript);
-    if (audioBuffer) {
-      const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/aac', 'voice_note.aac');
-      if (audioMediaId) {
-        await sendWAMediaById(from, audioMediaId, 'audio');
-      }
-    }
+    await sendHighImpactVoiceReply(from, voiceScript, 'thank_you');
   } catch (voiceErr) {
     console.error('Failed to generate/send Voice Note:', voiceErr);
   }
@@ -1360,6 +1365,11 @@ async function handleAIChat(
 - ALWAYS guide customer toward the next action: ask budget, recommend product, check stock, view catalog, or place order.
 - After a user views the catalog or asks about products, follow up with: ${catalogFollowUp}
 - After an order is placed or discussed, upsell with: ${upsellExample}
+- For package suggestions, write clear text packages only. Use this format:
+  Package A — RM...
+  Package B — RM...
+  Package C — RM...
+- Keep package details in text. Do not ask for package details to be converted into TTS.
 
 3. IMAGES & VISUALS (CRITICAL):
 - When user asks for images (e.g. "ada gambar?", "show product", "macam mana rupa?", "recommend untuk party", "gift set ada?", "promo ada?", "tunjuk yang nampak premium"):
@@ -2290,23 +2300,10 @@ export async function POST(request: Request) {
         rememberUserLanguage(from, transcript);
         console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
 
-        const recommendedProductCollector: RecommendedProductCollector = { products: [] };
-        const aiReply = await handleAIChat(from, transcript, {
-          sendText: false,
-          sendProductImages: false,
-          recommendedProductCollector,
-        });
+        const aiReply = await handleAIChat(from, transcript);
         if (!aiReply) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
-
-        const voiceSent = await sendAIVoiceReply(from, aiReply);
-        if (!voiceSent) {
-          console.error('Failed to send AI voice reply; falling back to text:', { from });
-          await sendWAText(from, aiReply);
-        }
-
-        await sendRecommendedProductImages(from, recommendedProductCollector.products);
 
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
