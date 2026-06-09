@@ -152,7 +152,7 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
         voice: 'alloy',
         input: text,
         instructions: 'Speak like a friendly Sabah sales assistant. Use natural Malaysian Malay. Warm, casual, not corporate, not robotic.',
-        response_format: 'aac'
+        response_format: 'opus'
       })
     });
     if (!res.ok) throw new Error(`TTS API Error: ${res.status} ${await res.text()}`);
@@ -180,7 +180,7 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
     const audioBuffer = await generateVoiceNoteBuffer(voiceText);
     if (!audioBuffer) return false;
 
-    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/aac', 'kira-reply.aac');
+    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/ogg; codecs=opus', 'voice-note.ogg');
     if (!audioMediaId) return false;
 
     await sendWAMediaById(to, audioMediaId, 'audio');
@@ -188,6 +188,30 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
   } catch (err) {
     console.error('Error sending AI voice reply:', err);
     return false;
+  }
+}
+
+// Generate lifestyle image using DALL-E 3
+async function generatePromoImage(promptText: string): Promise<string | null> {
+  try {
+    const res = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: promptText + ' photorealistic, luxury premium lighting, suitable for WhatsApp promo sales.',
+        n: 1,
+        size: '1024x1024'
+      })
+    });
+    const data = await res.json();
+    return data?.data?.[0]?.url || null;
+  } catch (err) {
+    console.error('Error generating promo image:', err);
+    return null;
   }
 }
 
@@ -1137,35 +1161,39 @@ async function handleAIChat(from: string, msgText: string, options: { sendText?:
     chinese: `"很多客户会把 [related product] 和这类订单一起购买。需要我帮你加上吗？"`
   }[language];
 
-  const systemPrompt = `You are KIRA, a PRO sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order.
+  const systemPrompt = `You are KIRA, a friendly, funny, warm, and sales-driven AI sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order. You must reply like a helpful human salesperson, not a robotic chatbot.
 
 1. HUMOR & WARMTH (CRITICAL):
-- Use situational humor based on the context.
-- Be warm, friendly, and helpful.
-
-2. CONSISTENCY RULES (STRICT):
+- Use light humour, emojis, and local casual sales language.
+- Be warm, friendly, and highly sales-focused.
 - NEVER break character.
 - NEVER say "I am an AI", "Saya AI", or mention being an artificial intelligence.
 - ALWAYS end with a helpful question or Call-To-Action (e.g. ${ctaExample}).
 - If user says thank you, ALWAYS reply in the detected language with: ${thankYouReply}
 
-3. SALES INTELLIGENCE:
+2. SALES INTELLIGENCE & NEXT ACTION:
+- ALWAYS guide customer toward the next action: ask budget, recommend product, check stock, view catalog, or place order.
 - After a user views the catalog or asks about products, follow up with: ${catalogFollowUp}
 - After an order is placed or discussed, upsell with: ${upsellExample}
+
+3. IMAGES & VISUALS (CRITICAL):
+- When user asks for images (e.g. "ada gambar?", "show product", "macam mana rupa?", "recommend untuk party", "gift set ada?", "promo ada?", "tunjuk yang nampak premium"):
+- If recommending a specific product, call 'recommend_products' (it automatically handles images).
+- If showing a general promotional lifestyle image as a demo, you MUST call 'generate_promo_image' tool. Don't generate for every message, only when it helps sales.
 
 4. LANGUAGE STYLE:
 - ${languageRules}
 - NEVER use Indonesian slang ("kamu", "dong", "sih", "deh", "banget", "aja").
 - Max 3 sentences per reply unless explaining an order.
-- Use emojis sparingly, only when natural.
+- Use emojis naturally.
 
 Current Stock & Prices:
 ${catalogText}
 
 Business Rules:
-- Greetings & Small Talk → STRICT INSTRUCTION: Do NOT call any tools for greetings, introductions, or general small talk. Just reply with a friendly greeting and ask how you can help them (e.g., recommend products, check prices, etc.).
-- Recommend Products → STRICT INSTRUCTION: Whenever a user asks for a recommendation, best product, popular item, or ANY product suggestion - you MUST ALWAYS call the 'recommend_products' tool. NEVER reply with text only for recommendations.
-- Full Catalog → Call the 'view_full_catalog' tool ONLY when the user asks to see all items or view the catalog generally. Never call it preemptively or for basic greetings.
+- Greetings & Small Talk → Do NOT call any tools for greetings.
+- Recommend Products → ALWAYS call 'recommend_products' for recommendations.
+- Full Catalog → Call 'view_full_catalog' ONLY when explicitly requested.
 - Ordering → encourage them to tap "🛒 Buat Pesanan".
 - Payment → we accept bank transfer & FPX.`;
 
@@ -1215,6 +1243,27 @@ Business Rules:
             }
           },
           required: ['text', 'sections']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'generate_promo_image',
+        description: 'Call this ONLY when the user asks to see a promo image, gift set, premium setup, party setup, or general visual demo of our offerings.',
+        parameters: {
+          type: 'object',
+          properties: {
+            theme_prompt: {
+              type: 'string',
+              description: 'A short visual prompt for the image (e.g. "Premium whisky bottle on luxury bar counter", "Craft beer party setup")'
+            },
+            caption: {
+              type: 'string',
+              description: 'Catchy sales caption for the image in the user language / Sabahan slang.'
+            }
+          },
+          required: ['theme_prompt', 'caption']
         }
       }
     },
@@ -1289,6 +1338,23 @@ Business Rules:
         }
         history.push({ role: 'assistant', content: `[System Note: Successfully recommended products to user using WhatsApp Product List UI. The text intro was: ${text}]` });
         return text || null;
+      }
+
+      if (functionName === 'generate_promo_image') {
+        const { theme_prompt, caption } = args;
+        console.log(`🤖 AI generating promo image for: ${theme_prompt}`);
+        
+        await sendWAText(from, "Sekejap bosku, KIRA tengah sediakan gambar yang paling ngam untuk bosku... 📸✨");
+        
+        const imageUrl = await generatePromoImage(theme_prompt);
+        if (imageUrl) {
+          await sendWAImage(from, imageUrl, caption);
+          history.push({ role: 'assistant', content: `[System Note: Successfully sent generated promotional image with caption: ${caption}]` });
+        } else {
+          await sendWAText(from, caption);
+          history.push({ role: 'assistant', content: `[System Note: Sent text caption because image generation failed: ${caption}]` });
+        }
+        return caption || null;
       }
 
       if (functionName === 'view_full_catalog') {
