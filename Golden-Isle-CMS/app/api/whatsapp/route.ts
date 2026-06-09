@@ -139,7 +139,7 @@ async function sendWAMediaById(to: string, mediaId: string, type: 'document' | '
   });
 }
 
-const HIGH_IMPACT_VOICE_MOMENTS = new Set(['voice_input_summary']);
+const HIGH_IMPACT_VOICE_MOMENTS = new Set(['greeting', 'voice_input_summary']);
 type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_input_summary';
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
@@ -805,6 +805,74 @@ async function sendWAFlow(to: string, flowId: string, mode: 'published' | 'draft
   }
 }
 
+async function sendWAAppointmentFlow(to: string, language: ChatLanguage, mode: 'published' | 'draft' = 'published'): Promise<boolean> {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const flowId = process.env.WHATSAPP_APPOINTMENT_FLOW_ID;
+
+  if (!waToken || !waPhoneId || !flowId) {
+    console.error('❌ Missing WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, or WHATSAPP_APPOINTMENT_FLOW_ID.');
+    return false;
+  }
+
+  const flowToken = `gi_appointment_${to}_${Date.now()}`;
+  const bodyText =
+    language === 'english'
+      ? 'Book a quick appointment with Golden Isle. Choose your date, time, and purpose directly in WhatsApp.'
+      : language === 'chinese'
+        ? '预约 Golden Isle 团队。你可以直接在 WhatsApp 选择日期、时间和预约目的。'
+        : 'Buat appointment cepat dengan team Golden Isle. Pilih tarikh, masa, dan tujuan terus dalam WhatsApp.';
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'flow',
+      header: { type: 'text', text: '📅 Book Appointment' },
+      body: { text: bodyText },
+      footer: { text: 'Golden Isle Wholesale' },
+      action: {
+        name: 'flow',
+        parameters: {
+          flow_message_version: '3',
+          flow_action: 'navigate',
+          flow_token: flowToken,
+          flow_id: flowId,
+          flow_cta: language === 'chinese' ? '填写预约' : 'Book Appointment',
+          mode,
+          flow_action_payload: {
+            screen: 'APPOINTMENT_FORM',
+          },
+        },
+      },
+    },
+  };
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const resData = await res.json();
+    if (!res.ok) {
+      console.error('❌ sendWAAppointmentFlow error:', JSON.stringify(resData));
+      return false;
+    }
+
+    console.log('✅ Appointment flow sent!', JSON.stringify(resData));
+    return true;
+  } catch (err) {
+    console.error('❌ Fetch error during sendWAAppointmentFlow:', err);
+    return false;
+  }
+}
+
 // Notify Telegram Admin
 async function notifyTelegram(msg: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -953,14 +1021,13 @@ function getMalaysiaTimeGreeting(language: ChatLanguage) {
 }
 
 function buildGreetingVoiceText(language: ChatLanguage) {
-  const greeting = getMalaysiaTimeGreeting(language);
   if (language === 'english') {
-    return `${greeting} boss, how are you today? KIRA here can help find products, suggest packages, set an appointment, and handle your order.`;
+    return 'Hey there, glad you texted Golden Isle. Ask me anything you need, and I will do my best to help.';
   }
   if (language === 'chinese') {
-    return `${greeting} boss, KIRA 可以帮你找产品、推荐配套、安排预约，也可以处理订单。`;
+    return '你好，很高兴你联系 Golden Isle。你可以直接问我任何问题，我会尽量帮你。';
   }
-  return `${greeting} boss, apa khabar hari ni? KIRA sini boleh bantu cari produk, suggest package, set appointment, dan urus order bos.`;
+  return 'Hai boss, glad bos WhatsApp Golden Isle. Tanya saja apa-apa yang bos perlu, saya cuba bantu sampai ngam.';
 }
 
 function detectRequestedLanguage(text: string): ChatLanguage | null {
@@ -1143,6 +1210,9 @@ async function handleStoreLocation(from: string) {
 
 async function handleAppointmentSuggestion(from: string) {
   const language = getUserLanguage(from);
+  const sentFlow = await sendWAAppointmentFlow(from, language);
+  if (sentFlow) return;
+
   const body =
     language === 'english'
       ? "Boss, this sounds like something worth planning properly. KIRA can suggest a quick appointment with the Golden Isle team so we can match the right stock, budget, and delivery timing.\n\nTell me your preferred day/time, or tap below and our sales team can follow up."
@@ -1246,7 +1316,7 @@ async function handleGreeting(from: string) {
     [
       { id: 'TANYA_KIRA', title: language === 'chinese' ? '🤖 问 KIRA' : language === 'english' ? '🤖 Ask KIRA' : '🤖 Tanya KIRA' },
       { id: 'LIHAT_CATALOG', title: language === 'chinese' ? '📦 浏览产品' : language === 'english' ? '📦 Browse Products' : '📦 Browse Products' },
-      { id: 'BUAT_PESANAN', title: language === 'chinese' ? '🛒 下单' : language === 'english' ? '🛒 Order Now' : '🛒 Buat Pesanan' },
+      { id: 'MAKE_APPOINTMENT', title: language === 'chinese' ? '📅 预约' : language === 'english' ? '📅 Appointment' : '📅 Appointment' },
     ]
   );
 }
@@ -2077,6 +2147,8 @@ export async function POST(request: Request) {
           await handleOrder(from);
         } else if (buttonPayload === 'btn_catalog' || buttonPayload === '🛍️ Lihat Katalog' || buttonPayload === 'LIHAT_CATALOG') {
           await handleCatalog(from);
+        } else if (buttonPayload === 'MAKE_APPOINTMENT') {
+          await handleAppointmentSuggestion(from);
         } else if (buttonPayload === 'btn_receipt' || buttonPayload === '🧾 Semak Resit' || buttonPayload === 'SEMAK_RESIT') {
           await handleReceipt(from);
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
@@ -2410,6 +2482,49 @@ export async function POST(request: Request) {
           console.log('\n📋 FLOW SUBMISSION received from:', from);
           try {
             const responseJson = JSON.parse(message.interactive?.nfm_reply?.response_json || '{}');
+            const {
+              appointment_name,
+              appointment_phone,
+              appointment_email,
+              appointment_date,
+              appointment_time,
+              appointment_purpose,
+              appointment_notes,
+            } = responseJson;
+
+            if (appointment_date || appointment_time || appointment_name) {
+              await supabase.from('inquiries').insert({
+                message: `APPOINTMENT VIA WA FLOW — Nama: ${appointment_name || '-'} | Phone: ${appointment_phone || from} | Email: ${appointment_email || '-'} | Tarikh: ${appointment_date || '-'} | Masa: ${appointment_time || '-'} | Tujuan: ${appointment_purpose || '-'} | Nota: ${appointment_notes || '-'}`,
+                channel: 'whatsapp_appointment_flow',
+                phone: from,
+                status: 'new',
+                created_at: new Date().toISOString(),
+              });
+
+              await notifyTelegram(
+                `📅 <b>APPOINTMENT BARU via WhatsApp Flow</b>\n\n` +
+                `📱 WhatsApp: +${from}\n` +
+                `👤 Nama: ${appointment_name || '-'}\n` +
+                `☎️ Phone: ${appointment_phone || from}\n` +
+                `✉️ Email: ${appointment_email || '-'}\n` +
+                `📅 Tarikh: ${appointment_date || '-'}\n` +
+                `🕒 Masa: ${appointment_time || '-'}\n` +
+                `🎯 Tujuan: ${appointment_purpose || '-'}\n` +
+                `📝 Nota: ${appointment_notes || '-'}\n\n` +
+                `<i>Sila confirm slot appointment dengan customer.</i>`
+              );
+
+              await sendWAText(
+                from,
+                `✅ Appointment request received${appointment_name ? `, ${appointment_name}` : ''}.\n\n` +
+                `📅 Date: ${appointment_date || '-'}\n` +
+                `🕒 Time: ${appointment_time || '-'}\n\n` +
+                `Golden Isle team will confirm your slot shortly.`
+              );
+
+              return new NextResponse('EVENT_RECEIVED', { status: 200 });
+            }
+
             const { product_id, quantity, customer_name, delivery_address, notes } = responseJson;
 
             // Lookup product name from id
