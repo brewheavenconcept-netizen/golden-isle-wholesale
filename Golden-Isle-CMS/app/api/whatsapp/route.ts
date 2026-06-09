@@ -139,9 +139,8 @@ async function sendWAMediaById(to: string, mediaId: string, type: 'document' | '
   });
 }
 
-const GREETING_VOICE_TEXT = 'Hello boss, apa khabar hari ni? KIRA sini boleh bantu cari produk, suggest package, dan urus order bos.';
-const HIGH_IMPACT_VOICE_MOMENTS = new Set(['greeting', 'checkout_confirmation', 'thank_you']);
-type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you';
+const HIGH_IMPACT_VOICE_MOMENTS = new Set(['greeting', 'checkout_confirmation', 'thank_you', 'voice_input_summary']);
+type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_input_summary';
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
   try {
@@ -199,6 +198,35 @@ async function sendHighImpactVoiceReply(to: string, replyText: string, moment: V
   const shouldSendVoice = HIGH_IMPACT_VOICE_MOMENTS.has(moment);
   if (!shouldSendVoice) return false;
   return sendAIVoiceReply(to, replyText);
+}
+
+function buildVoiceInputSummary(transcript: string, replyText: string, language: ChatLanguage) {
+  const lower = `${transcript} ${replyText}`.toLowerCase();
+  const hasPackageDetails =
+    lower.includes('package a') ||
+    lower.includes('package b') ||
+    lower.includes('package c') ||
+    lower.includes('rm') ||
+    lower.includes('whisky') ||
+    lower.includes('beer') ||
+    lower.includes('recommend') ||
+    lower.includes('cadang');
+
+  if (language === 'english') {
+    return hasPackageDetails
+      ? 'Got it boss. I found a few solid options for you, and I put the details clearly in the chat so you can compare properly.'
+      : 'Got it boss. I replied in the chat with the next best step for you.';
+  }
+
+  if (language === 'chinese') {
+    return hasPackageDetails
+      ? '明白 boss。我已经把适合的选择放在聊天里，方便你比较价格和库存。'
+      : '明白 boss。我已经在聊天里回复你下一步。';
+  }
+
+  return hasPackageDetails
+    ? 'Ngam boss. KIRA sudah carikan pilihan yang ngam, detail saya letak dalam chat supaya bos senang compare.'
+    : 'Ngam boss. KIRA sudah reply dalam chat dengan next step yang paling sesuai.';
 }
 
 // Generate lifestyle image using DALL-E 3
@@ -817,12 +845,86 @@ type ChatLanguage = 'malay' | 'english' | 'chinese';
 
 const userLanguages = new Map<string, ChatLanguage>();
 
+function getMalaysiaTimeGreeting(language: ChatLanguage) {
+  const hour = (new Date().getUTCHours() + 8) % 24;
+  if (hour >= 5 && hour < 12) {
+    return language === 'english' ? 'Good morning' : language === 'chinese' ? '早上好' : 'Selamat pagi';
+  }
+  if (hour >= 12 && hour < 18) {
+    return language === 'english' ? 'Good afternoon' : language === 'chinese' ? '下午好' : 'Selamat petang';
+  }
+  if (hour >= 18 && hour < 22) {
+    return language === 'english' ? 'Good evening' : language === 'chinese' ? '晚上好' : 'Selamat malam';
+  }
+  return language === 'english' ? 'Good night' : language === 'chinese' ? '晚安' : 'Selamat malam';
+}
+
+function buildGreetingVoiceText(language: ChatLanguage) {
+  const greeting = getMalaysiaTimeGreeting(language);
+  if (language === 'english') {
+    return `${greeting} boss, how are you today? KIRA here can help find products, suggest packages, set an appointment, and handle your order.`;
+  }
+  if (language === 'chinese') {
+    return `${greeting} boss, KIRA 可以帮你找产品、推荐配套、安排预约，也可以处理订单。`;
+  }
+  return `${greeting} boss, apa khabar hari ni? KIRA sini boleh bantu cari produk, suggest package, set appointment, dan urus order bos.`;
+}
+
+function detectRequestedLanguage(text: string): ChatLanguage | null {
+  const lower = text.toLowerCase();
+
+  if (
+    lower.includes('can speak english') ||
+    lower.includes('speak in english') ||
+    lower.includes('english please') ||
+    lower.includes('reply in english') ||
+    lower.includes('bahasa english') ||
+    lower.includes('use english') ||
+    lower.includes('in english')
+  ) {
+    return 'english';
+  }
+
+  if (
+    lower.includes('speak chinese') ||
+    lower.includes('reply in chinese') ||
+    lower.includes('mandarin please') ||
+    lower.includes('中文') ||
+    lower.includes('华语')
+  ) {
+    return 'chinese';
+  }
+
+  if (
+    lower.includes('bahasa melayu') ||
+    lower.includes('cakap melayu') ||
+    lower.includes('malay please') ||
+    lower.includes('speak malay')
+  ) {
+    return 'malay';
+  }
+
+  return null;
+}
+
+async function handleLanguageSwitch(from: string, language: ChatLanguage) {
+  userLanguages.set(from, language);
+  const reply =
+    language === 'english'
+      ? 'Yes boss, I can speak English. What are you looking for today: shop stock, party drinks, gift ideas, or a package recommendation?'
+      : language === 'chinese'
+        ? '可以 boss，KIRA 可以用中文回复。你今天想找店铺库存、派对饮料、礼物，还是配套推荐？'
+        : 'Boleh boss, KIRA boleh cakap Melayu. Bos cari stok kedai, party, hadiah, atau mau saya suggest package?';
+
+  await sendWAText(from, reply);
+}
+
 function detectLanguage(text: string): ChatLanguage {
   const lower = text.toLowerCase();
 
   if (/[\u4e00-\u9fff]/.test(text)) return 'chinese';
   if (['apa', 'boleh', 'mau', 'saya', 'ada', 'untuk', 'bosku', 'ko', 'ni'].some(word => lower.includes(word))) return 'malay';
-  if (['hello', 'hi', 'what', 'how', 'price', 'do you', 'have', 'products', 'browse', 'order', 'thanks', 'thank you'].some(word => lower.includes(word))) return 'english';
+  if (['hello', 'hi', 'what', 'how', 'price', 'do you', 'have', 'products', 'browse', 'order', 'thanks', 'thank you', 'english'].some(word => lower.includes(word))) return 'english';
 
   return 'malay';
 }
@@ -884,6 +986,91 @@ function isProspectQualificationIntent(text: string): boolean {
   ].some(phrase => lower.includes(phrase));
 }
 
+function isAppointmentIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'appointment',
+    'appoint',
+    'meeting',
+    'meet',
+    'jumpa',
+    'berjumpa',
+    'datang kedai',
+    'datang office',
+    'mau discuss',
+    'nak discuss',
+    'set appointment',
+    'book appointment',
+    'bulk order',
+    'borong',
+    'untuk kedai',
+    'untuk restoran',
+    'restaurant',
+    'restoran',
+    'event besar',
+    'corporate',
+  ].some(phrase => lower.includes(phrase));
+}
+
+function isLocationIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'location',
+    'alamat',
+    'kedai di mana',
+    'di mana kedai',
+    'where is your shop',
+    'where are you',
+    'shop location',
+    'store location',
+    'showroom',
+    'google map',
+    'google maps',
+    'maps',
+    'waze',
+  ].some(phrase => lower.includes(phrase));
+}
+
+function buildStoreLocationText(language: ChatLanguage) {
+  const locationText = process.env.WHATSAPP_STORE_LOCATION_TEXT || 'Golden Isle Wholesale, Labuan, Malaysia';
+  const mapUrl = process.env.WHATSAPP_STORE_MAP_URL || process.env.NEXT_PUBLIC_STORE_MAP_URL || 'https://www.google.com/maps/search/?api=1&query=Golden%20Isle%20Wholesale%20Labuan';
+
+  if (language === 'english') {
+    return `📍 *Golden Isle location*\n\n${locationText}\n\nGoogle Maps:\n${mapUrl}\n\nBoss, if you want to visit, tell me your preferred day/time and KIRA can suggest an appointment with the team.`;
+  }
+
+  if (language === 'chinese') {
+    return `📍 *Golden Isle location*\n\n${locationText}\n\nGoogle Maps:\n${mapUrl}\n\nIf you want to visit, send KIRA your preferred day/time and the team can follow up.`;
+  }
+
+  return `📍 *Location Golden Isle*\n\n${locationText}\n\nGoogle Maps:\n${mapUrl}\n\nKalau bos mau datang, bagitahu hari/masa yang ngam. KIRA boleh suggest appointment dengan team.`;
+}
+
+async function handleStoreLocation(from: string) {
+  const language = getUserLanguage(from);
+  await sendWAButtons(from, buildStoreLocationText(language), [
+    { id: 'btn_talk_sales', title: 'Set Appointment' },
+    { id: 'LIHAT_CATALOG', title: language === 'english' ? 'View Catalog' : 'Tengok Catalog' },
+    { id: 'TANYA_KIRA', title: language === 'english' ? 'Ask KIRA' : 'Tanya KIRA' }
+  ]);
+}
+
+async function handleAppointmentSuggestion(from: string) {
+  const language = getUserLanguage(from);
+  const body =
+    language === 'english'
+      ? "Boss, this sounds like something worth planning properly. KIRA can suggest a quick appointment with the Golden Isle team so we can match the right stock, budget, and delivery timing.\n\nTell me your preferred day/time, or tap below and our sales team can follow up."
+      : language === 'chinese'
+        ? "Boss, this sounds like a good one to plan with the team. Send KIRA your preferred day/time, or tap below and Golden Isle sales can follow up."
+        : "Boss, ni nampak macam order yang bagus untuk plan betul-betul. KIRA boleh suggest appointment cepat dengan team Golden Isle supaya stok, bajet, dan delivery timing semua ngam.\n\nBos boleh reply hari/masa yang sesuai, atau tekan bawah biar sales team follow up.";
+
+  await sendWAButtons(from, body, [
+    { id: 'btn_talk_sales', title: 'Set Appointment' },
+    { id: 'LIHAT_CATALOG', title: language === 'english' ? 'View Catalog' : 'Tengok Catalog' },
+    { id: 'SEMAK_STOK', title: language === 'english' ? 'Check Stock' : 'Semak Stok' }
+  ]);
+}
+
 async function sendQualificationMenu(from: string) {
   const language = getUserLanguage(from);
   const body =
@@ -938,14 +1125,15 @@ async function handleProductAvailability(from: string, text: string) {
 // GREETING: Hantar welcome message dengan 3 Quick Reply Buttons
 async function handleGreeting(from: string) {
   const language = getUserLanguage(from);
+  const timeGreeting = getMalaysiaTimeGreeting(language);
   const body =
     language === 'chinese'
-      ? "👋 欢迎来到 Golden Isle Wholesale 🥃\n\nKIRA 可以帮你为店铺、餐厅、活动或个人用途找到合适的饮料。\n\n你今天想做什么？"
+      ? `👋 ${timeGreeting}, welcome to Golden Isle Wholesale 🥃\n\nKIRA can help with shop stock, party drinks, gift ideas, package suggestions, appointments, and orders.\n\nWhat are you planning today?`
       : language === 'english'
-        ? "👋 Welcome to Golden Isle Wholesale 🥃\n\nKIRA can help you find the right drinks for your shop, restaurant, event, or personal use.\n\nWhat would you like to do today?"
-        : `👋 Hai bosku! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari minuman yang ngam untuk kedai, restoran, event atau kegunaan sendiri.\n\nBos cari untuk apa hari ni?`;
+        ? `👋 ${timeGreeting} boss! Welcome to Golden Isle Wholesale 🥃\n\nKIRA can help with shop stock, party drinks, gift ideas, package suggestions, appointments, and orders.\n\nWhat are you planning today?`
+        : `👋 ${timeGreeting} boss! Selamat datang ke Golden Isle Wholesale 🥃\n\nKIRA boleh bantu bos cari stok kedai, minuman party, hadiah, suggest package, set appointment, dan urus order.\n\nBos cari untuk apa hari ni?`;
 
-  await sendHighImpactVoiceReply(from, GREETING_VOICE_TEXT, 'greeting');
+  await sendHighImpactVoiceReply(from, buildGreetingVoiceText(language), 'greeting');
 
   await sendWAButtons(
     from,
@@ -1314,7 +1502,9 @@ async function handleAIChat(
 ): Promise<string | null> {
   const shouldSendText = options.sendText !== false;
   const shouldSendProductImages = options.sendProductImages !== false;
-  const language = detectLanguage(msgText);
+  const requestedLanguage = detectRequestedLanguage(msgText);
+  const language = requestedLanguage || userLanguages.get(from) || detectLanguage(msgText);
+  userLanguages.set(from, language);
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
@@ -1362,7 +1552,9 @@ async function handleAIChat(
 - If user says thank you, ALWAYS reply in the detected language with: ${thankYouReply}
 
 2. SALES INTELLIGENCE & NEXT ACTION:
-- ALWAYS guide customer toward the next action: ask budget, recommend product, check stock, view catalog, or place order.
+- Think like a consultative salesperson: infer budget, category, purpose, urgency, and stock fit from the message before replying.
+- Be lightly funny and warm, but never cringe or too long. One small human line is enough.
+- ALWAYS guide customer toward the next action: ask budget, recommend product, check stock, view catalog, suggest appointment, or place order.
 - After a user views the catalog or asks about products, follow up with: ${catalogFollowUp}
 - After an order is placed or discussed, upsell with: ${upsellExample}
 - For package suggestions, write clear text packages only. Use this format:
@@ -1370,6 +1562,8 @@ async function handleAIChat(
   Package B — RM...
   Package C — RM...
 - Keep package details in text. Do not ask for package details to be converted into TTS.
+- If the user sounds B2B/serious (shop, restaurant, borong, bulk, event, corporate), suggest a short appointment with the Golden Isle team.
+- If the user asks for shop address/location/showroom/maps, tell them KIRA can send the location.
 
 3. IMAGES & VISUALS (CRITICAL):
 - When user asks for images (e.g. "ada gambar?", "show product", "macam mana rupa?", "recommend untuk party", "gift set ada?", "promo ada?", "tunjuk yang nampak premium"):
@@ -2297,13 +2491,51 @@ export async function POST(request: Request) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        rememberUserLanguage(from, transcript);
+        const requestedLanguage = detectRequestedLanguage(transcript);
+        if (requestedLanguage) {
+          await handleLanguageSwitch(from, requestedLanguage);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const language = rememberUserLanguage(from, transcript);
         console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
 
-        const aiReply = await handleAIChat(from, transcript);
+        if (isLocationIntent(transcript)) {
+          const summary =
+            language === 'english'
+              ? 'Sure boss, I sent the Golden Isle location in the chat.'
+              : language === 'chinese'
+                ? '可以 boss，我已经把 Golden Isle 的位置发到聊天里。'
+                : 'Boleh boss, KIRA sudah hantar location Golden Isle dalam chat.';
+          await sendHighImpactVoiceReply(from, summary, 'voice_input_summary');
+          await handleStoreLocation(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isAppointmentIntent(transcript)) {
+          const summary =
+            language === 'english'
+              ? 'Good idea boss. I sent an appointment option in the chat so the team can help you plan properly.'
+              : language === 'chinese'
+                ? '好主意 boss。我已经在聊天里发了预约选项，方便团队跟进。'
+                : 'Bagus boss. KIRA sudah hantar option appointment dalam chat supaya team boleh bantu plan elok-elok.';
+          await sendHighImpactVoiceReply(from, summary, 'voice_input_summary');
+          await handleAppointmentSuggestion(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const recommendedProductCollector: RecommendedProductCollector = { products: [] };
+        const aiReply = await handleAIChat(from, transcript, {
+          sendText: true,
+          sendProductImages: false,
+          recommendedProductCollector,
+        });
         if (!aiReply) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
+
+        await sendHighImpactVoiceReply(from, buildVoiceInputSummary(transcript, aiReply, language), 'voice_input_summary');
+        await sendRecommendedProductImages(from, recommendedProductCollector.products);
 
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
@@ -2313,6 +2545,12 @@ export async function POST(request: Request) {
       if (message && message.type === 'text') {
         const from = message.from;
         const msgText = message.text?.body?.trim() || '';
+        const requestedLanguage = detectRequestedLanguage(msgText);
+        if (requestedLanguage) {
+          await handleLanguageSwitch(from, requestedLanguage);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
         rememberUserLanguage(from, msgText);
 
         console.log(`\n📩 MESEJ WA: [${from}] "${msgText}"`);
@@ -2356,6 +2594,16 @@ export async function POST(request: Request) {
         // Cek dulu kalau user sedang dalam mod suggestion
         if (awaitingSuggestion.has(from)) {
           await handleSuggestion(from, msgText);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isLocationIntent(msgText)) {
+          await handleStoreLocation(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isAppointmentIntent(msgText)) {
+          await handleAppointmentSuggestion(from);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
