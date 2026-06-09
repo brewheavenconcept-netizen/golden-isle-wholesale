@@ -139,7 +139,7 @@ async function sendWAMediaById(to: string, mediaId: string, type: 'document' | '
   });
 }
 
-const HIGH_IMPACT_VOICE_MOMENTS = new Set(['greeting', 'checkout_confirmation', 'thank_you', 'voice_input_summary']);
+const HIGH_IMPACT_VOICE_MOMENTS = new Set(['voice_input_summary']);
 type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_input_summary';
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
@@ -152,9 +152,9 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini-tts',
-        voice: 'coral',
+        voice: 'onyx',
         input: text,
-        instructions: 'Speak like a friendly female ASEAN/Sabah sales assistant. Use natural Malaysian Malay. Warm, casual, not corporate, not robotic.',
+        instructions: 'Speak like a calm, confident male Sabah/Malaysia senior sales consultant. Natural Malay, English, or Chinese depending on the text. Warm, concise, not corporate, not robotic, not over-excited.',
         response_format: 'opus'
       })
     });
@@ -556,11 +556,11 @@ async function sendRecommendedProductImages(
   products: CatalogProduct[],
   options: { sendButtons?: boolean } = {}
 ) {
-  const shouldSendButtons = options.sendButtons !== false;
+  const shouldSendButtons = options.sendButtons === true;
   let sentCount = 0;
 
   for (const product of products) {
-    if (sentCount >= 3) break;
+    if (sentCount >= 1) break;
 
     if (!product.image_url) {
       console.log('[WA_IMAGE_SKIP] product has no image_url', product.name, product.id);
@@ -834,11 +834,104 @@ function detectIntent(text: string): 'greet' | 'order' | 'catalog' | 'receipt' |
 
   // Greet only if short message (≤4 words) to avoid false positives
   if (greetKeywords.some(k => lower.includes(k)) && lower.split(' ').length <= 4) return 'greet';
+  if (receiptKeywords.some(k => lower.includes(k))) return 'receipt';
   if (orderKeywords.some(k => lower.includes(k))) return 'order';
   if (catalogKeywords.some(k => lower.includes(k))) return 'catalog';
-  if (receiptKeywords.some(k => lower.includes(k))) return 'receipt';
   if (suggestKeywords.some(k => lower.includes(k))) return 'suggest';
   return 'ai';
+}
+
+function isCheckoutIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'checkout',
+    'pay',
+    'payment',
+    'bayar',
+    'buat bayaran',
+    'order now',
+    'place order',
+    'confirm order',
+    'confirm pesanan',
+    'confirm',
+    'reserve',
+    'booking',
+    'book this',
+    'ambil',
+    'saya ambil',
+    'i take',
+    'i want to buy',
+    'want to buy',
+    'mau beli',
+    'nak beli',
+    'mau order',
+    'nak order',
+    'buat pesanan',
+    'tempah',
+    'bulk order'
+  ].some(phrase => lower.includes(phrase));
+}
+
+function isReceiptStatusIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'resit',
+    'receipt',
+    'invoice',
+    'invois',
+    'status order',
+    'order status',
+    'status pesanan',
+    'order saya',
+    'pesanan saya',
+    'mana order',
+    'mana pesanan',
+    'sudah bayar',
+    'paid already'
+  ].some(phrase => lower.includes(phrase));
+}
+
+function isHumanHandoffIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'human',
+    'real person',
+    'talk to sales',
+    'sales person',
+    'salesman',
+    'sales team',
+    'admin',
+    'staff',
+    'agent',
+    'call me',
+    'contact me',
+    'hubungi saya',
+    'orang sebenar',
+    'orang sales',
+    'mau cakap dengan orang',
+    'nak cakap dengan orang',
+    '\u4eba\u5de5',
+    '\u5ba2\u670d',
+    '\u9500\u552e'
+  ].some(phrase => lower.includes(phrase));
+}
+
+function isChaserOptOutIntent(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return [
+    'stop reminder',
+    'stop follow up',
+    'jangan remind',
+    'jangan follow up',
+    'cancel order',
+    'cancel pesanan',
+    'batalkan order',
+    'batalkan pesanan',
+    'tak jadi',
+    'tidak jadi',
+    'not interested',
+    'no need'
+  ].some(phrase => lower.includes(phrase));
 }
 
 type ChatLanguage = 'malay' | 'english' | 'chinese';
@@ -960,7 +1053,6 @@ function isProspectQualificationIntent(text: string): boolean {
     'berminat dengan promo',
     'saya mau tanya',
     'nak tahu harga',
-    'mau order',
     'cari stok',
     'stok kedai',
     'untuk kedai',
@@ -1001,12 +1093,6 @@ function isAppointmentIntent(text: string): boolean {
     'nak discuss',
     'set appointment',
     'book appointment',
-    'bulk order',
-    'borong',
-    'untuk kedai',
-    'untuk restoran',
-    'restaurant',
-    'restoran',
     'event besar',
     'corporate',
   ].some(phrase => lower.includes(phrase));
@@ -1069,6 +1155,25 @@ async function handleAppointmentSuggestion(from: string) {
     { id: 'LIHAT_CATALOG', title: language === 'english' ? 'View Catalog' : 'Tengok Catalog' },
     { id: 'SEMAK_STOK', title: language === 'english' ? 'Check Stock' : 'Semak Stok' }
   ]);
+}
+
+async function handleHumanHandoff(from: string, reason = 'Customer requested human handoff') {
+  const language = getUserLanguage(from);
+
+  await supabase.from('orders')
+    .update({ chaser_opted_out: true })
+    .eq('customer_phone', from)
+    .in('payment_status', ['unpaid', 'pending_payment', 'pending']);
+
+  const reply =
+    language === 'english'
+      ? 'Okay boss. I will get the Golden Isle sales team to follow up with you shortly.'
+      : language === 'chinese'
+        ? 'Okay boss. Golden Isle sales team will follow up with you shortly.'
+        : 'Okay boss. Saya roger team Golden Isle untuk follow up bos sekejap lagi.';
+
+  await sendWAText(from, reply);
+  await notifyTelegram(`📞 <b>SALES HANDOFF REQUEST</b>\nPhone: +${from}\nReason: ${reason}\n<i>Please follow up as soon as possible.</i>`);
 }
 
 async function sendQualificationMenu(from: string) {
@@ -1445,6 +1550,8 @@ async function handleReceipt(from: string) {
 const awaitingSuggestion = new Set<string>();
 
 async function handleSuggestion(from: string, msgText: string) {
+  const language = getUserLanguage(from);
+
   // Kalau user dalam mod "tunggu jawapan suggestion"
   if (awaitingSuggestion.has(from)) {
     awaitingSuggestion.delete(from);
@@ -1466,25 +1573,28 @@ async function handleSuggestion(from: string, msgText: string) {
       `<i>Sila semak di Dashboard Admin Golden Isle.</i>`
     );
 
-    // Balas pelanggan
-    await sendWAText(
-      from,
-      `✅ *Terima kasih kerana cadangan anda!*\n\n` +
-      `Kami sangat menghargai maklum balas ini. Tim Golden Isle akan mengkaji cadangan anda dengan serius. 🙏\n\n` +
-      `_Ada perkara lain yang boleh kami bantu?_`
-    );
+    const thanksText =
+      language === 'english'
+        ? 'Thanks for the suggestion. The Golden Isle team will review it.'
+        : language === 'chinese'
+          ? '谢谢你的建议。Golden Isle 团队会认真查看。'
+          : 'Terima kasih boss. Team Golden Isle akan semak cadangan bos.';
+
+    await sendWAText(from, thanksText);
     return;
   }
 
   // Mulakan sesi suggestion — minta input dulu
   awaitingSuggestion.add(from);
-  await sendWAText(
-    from,
-    `✍️ *Kami suka dengar pendapat anda!*\n\n` +
-    `Sila tulis cadangan, maklum balas, atau idea anda sekarang.\n\n` +
-    `_Contoh: "Boleh tambah produk wine Perancis", "Packaging lebih cantik", dll._\n\n` +
-    `👇 *Sila taip & hantar cadangan anda di ruangan chat di bawah:*`
-  );
+  const promptText =
+    language === 'english'
+      ? 'Sure boss. Please send your suggestion or feedback here.'
+      : language === 'chinese'
+        ? '可以 boss。请直接在这里发送你的建议或反馈。'
+        : 'Boleh boss. Tulis cadangan atau feedback bos di sini.';
+
+  await sendWAText(from, promptText);
+  return;
 }
 
 // In-memory chat history for KIRA
@@ -1541,22 +1651,24 @@ async function handleAIChat(
     chinese: `"很多客户会把 [related product] 和这类订单一起购买。需要我帮你加上吗？"`
   }[language];
 
-  const systemPrompt = `You are KIRA, a friendly, funny, warm, and sales-driven AI sales assistant for Golden Isle Wholesale — a premium beverage wholesaler in Sabah & Labuan, Malaysia. Your job is to help customers find the right products AND gently encourage them to place an order. You must reply like a helpful human salesperson, not a robotic chatbot.
+  const systemPrompt = `You are KIRA, Golden Isle Wholesale's calm, confident male senior sales consultant for Sabah & Labuan, Malaysia. You know the products well, speak naturally, and help customers buy without sounding pushy. Reply like a sharp human salesperson, not a robotic chatbot and not an excited new hire.
 
 1. HUMOR & WARMTH (CRITICAL):
-- Use light humour, emojis, and local casual sales language.
+- Use light humour only when it feels natural. One emoji max unless the customer is playful first.
 - Be warm, friendly, and highly sales-focused.
 - NEVER break character.
 - NEVER say "I am an AI", "Saya AI", or mention being an artificial intelligence.
-- ALWAYS end with a helpful question or Call-To-Action (e.g. ${ctaExample}).
+- Do NOT force a question or CTA on every reply. Use one only when it moves the customer forward.
+- When a CTA is useful, keep it short like: ${ctaExample}
 - If user says thank you, ALWAYS reply in the detected language with: ${thankYouReply}
 
 2. SALES INTELLIGENCE & NEXT ACTION:
 - Think like a consultative salesperson: infer budget, category, purpose, urgency, and stock fit from the message before replying.
-- Be lightly funny and warm, but never cringe or too long. One small human line is enough.
-- ALWAYS guide customer toward the next action: ask budget, recommend product, check stock, view catalog, suggest appointment, or place order.
-- After a user views the catalog or asks about products, follow up with: ${catalogFollowUp}
-- After an order is placed or discussed, upsell with: ${upsellExample}
+- Be direct, calm, and short. One small human line is enough.
+- If the customer shows buying signal, switch to cashier mode: stop recommending and guide them to order/payment/details.
+- Buying signal means quantity, budget, "mau order", "nak beli", "reserve", "confirm", "bayar", or a specific product choice.
+- After a user views the catalog or asks about products, follow up only when helpful: ${catalogFollowUp}
+- After an order is placed or discussed, upsell only if it does not delay checkout: ${upsellExample}
 - For package suggestions, write clear text packages only. Use this format:
   Package A — RM...
   Package B — RM...
@@ -1565,16 +1677,26 @@ async function handleAIChat(
 - If the user sounds B2B/serious (shop, restaurant, borong, bulk, event, corporate), suggest a short appointment with the Golden Isle team.
 - If the user asks for shop address/location/showroom/maps, tell them KIRA can send the location.
 
-3. IMAGES & VISUALS (CRITICAL):
+3. RESPONSE DISCIPLINE RULES:
+- Answer ONLY what was asked. Nothing more.
+- Target 1 message per reply. Maximum 2 messages if a product image or catalog UI is truly useful.
+- Do NOT send voice notes unless the user sent a voice note first.
+- Do NOT send images unless the user asks for images or you are recommending a specific product.
+- Do NOT repeat CTAs. One CTA maximum, at the end only.
+- If user asks location, send location only and stop.
+- If user asks for human/sales/admin, hand off and stop.
+- If user says thank you, say thank you and stop.
+
+4. IMAGES & VISUALS (CRITICAL):
 - When user asks for images (e.g. "ada gambar?", "show product", "macam mana rupa?", "recommend untuk party", "gift set ada?", "promo ada?", "tunjuk yang nampak premium"):
-- If recommending a specific product, call 'recommend_products' (it automatically handles images).
+- If recommending a specific product, call 'recommend_products'. Keep it to the best few options.
 - If showing a general promotional lifestyle image as a demo, you MUST call 'generate_promo_image' tool. Don't generate for every message, only when it helps sales.
 
-4. LANGUAGE STYLE:
+5. LANGUAGE STYLE:
 - ${languageRules}
 - NEVER use Indonesian slang ("kamu", "dong", "sih", "deh", "banget", "aja").
 - Max 3 sentences per reply unless explaining an order.
-- Use emojis naturally.
+- Use emojis sparingly.
 
 Current Stock & Prices:
 ${catalogText}
@@ -2210,6 +2332,8 @@ export async function POST(request: Request) {
           const orderId = buttonPayload.replace('btn_invoice_', '');
           const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goldenisle-wholesale.vercel.app';
           await sendWAText(from, `Ini link untuk tengok resit penuh bosku:\n${appUrl}/order-confirmation?orderId=${orderId}`);
+        } else if (buttonPayload === 'btn_talk_sales') {
+          await handleHumanHandoff(from, 'Customer tapped sales handoff button');
         } else if (buttonPayload.startsWith('btn_snooze_')) {
           const orderId = buttonPayload.replace('btn_snooze_', '');
           const newTime = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
@@ -2223,10 +2347,6 @@ export async function POST(request: Request) {
           if (order) {
             await notifyTelegram(`⚠️ <b>ORDER DIBATALKAN</b>\nCustomer: ${order.customer_name || 'bosku'} (+${order.customer_phone})\nOrder ID: #${orderId.split('-')[0]}\nAmount: RM ${Number(order.total).toFixed(2)}\n<i>Dibatalkan melalui WA Reminder.</i>`);
           }
-        } else if (buttonPayload === 'btn_talk_sales') {
-          await supabase.from('orders').update({ chaser_opted_out: true }).eq('customer_phone', from).in('payment_status', ['unpaid', 'pending_payment', 'pending']);
-          await sendWAText(from, "Okay bosku! Team kami akan hubungi bosku segera ya! 🤝");
-          await notifyTelegram(`📞 <b>SALES ASSIST REQUEST</b>\nPhone: +${from}\n<i>Customer tekan butang Hubungi Sales dari WA Reminder. Sila follow up segera!</i>`);
         } else if (buttonPayload.startsWith('tanya_qty_')) {
           // Step 2: Tanya Kuantiti
           const parts = buttonPayload.split('_');
@@ -2500,6 +2620,30 @@ export async function POST(request: Request) {
         const language = rememberUserLanguage(from, transcript);
         console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
 
+        if (isCheckoutIntent(transcript)) {
+          const summary =
+            language === 'english'
+              ? 'Okay boss. I will open the order flow so you can choose and proceed.'
+              : language === 'chinese'
+                ? 'Okay boss. I will open the order flow for you now.'
+                : 'Okay boss. Saya buka order flow supaya bos boleh pilih dan proceed.';
+          await sendHighImpactVoiceReply(from, summary, 'voice_input_summary');
+          await handleOrder(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (isHumanHandoffIntent(transcript)) {
+          const summary =
+            language === 'english'
+              ? 'Okay boss. I will get the Golden Isle sales team to follow up with you.'
+              : language === 'chinese'
+                ? 'Okay boss. Golden Isle sales team will follow up with you shortly.'
+                : 'Okay boss. Saya roger team Golden Isle untuk follow up bos.';
+          await sendHighImpactVoiceReply(from, summary, 'voice_input_summary');
+          await handleHumanHandoff(from, `Voice transcript: ${transcript.slice(0, 160)}`);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
         if (isLocationIntent(transcript)) {
           const summary =
             language === 'english'
@@ -2526,7 +2670,7 @@ export async function POST(request: Request) {
 
         const recommendedProductCollector: RecommendedProductCollector = { products: [] };
         const aiReply = await handleAIChat(from, transcript, {
-          sendText: true,
+          sendText: false,
           sendProductImages: false,
           recommendedProductCollector,
         });
@@ -2534,8 +2678,8 @@ export async function POST(request: Request) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        await sendHighImpactVoiceReply(from, buildVoiceInputSummary(transcript, aiReply, language), 'voice_input_summary');
-        await sendRecommendedProductImages(from, recommendedProductCollector.products);
+        const fallbackVoiceReply = buildVoiceInputSummary(transcript, aiReply, language);
+        await sendHighImpactVoiceReply(from, aiReply || fallbackVoiceReply, 'voice_input_summary');
 
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
@@ -2555,15 +2699,23 @@ export async function POST(request: Request) {
 
         console.log(`\n📩 MESEJ WA: [${from}] "${msgText}"`);
 
-        // Auto-Stop Chaser on FREE TEXT reply
-        try {
-          await supabase.from('orders')
-            .update({ chaser_opted_out: true })
-            .eq('customer_phone', from)
-            .in('payment_status', ['pending_payment', 'unpaid', 'pending'])
-            .eq('chaser_opted_out', false);
-        } catch (err) {
-          console.error('Error auto-stopping chaser:', err);
+        const wantsCheckout = isCheckoutIntent(msgText);
+        const wantsReceiptStatus = isReceiptStatusIntent(msgText);
+        const wantsHumanHandoff = isHumanHandoffIntent(msgText);
+        const wantsLocation = isLocationIntent(msgText);
+        const wantsAppointment = isAppointmentIntent(msgText);
+
+        // Only stop payment chasers when the customer clearly opts out or asks for human takeover.
+        if (isChaserOptOutIntent(msgText) || wantsHumanHandoff) {
+          try {
+            await supabase.from('orders')
+              .update({ chaser_opted_out: true })
+              .eq('customer_phone', from)
+              .in('payment_status', ['pending_payment', 'unpaid', 'pending'])
+              .eq('chaser_opted_out', false);
+          } catch (err) {
+            console.error('Error auto-stopping chaser:', err);
+          }
         }
 
         // 1. Session tracking in DB
@@ -2586,7 +2738,7 @@ export async function POST(request: Request) {
         }
 
         // 2. If new session, check repeat order
-        if (isNewSession) {
+        if (isNewSession && !wantsCheckout && !wantsReceiptStatus && !wantsHumanHandoff && !wantsLocation && !wantsAppointment) {
            const handled = await handleRepeatGreeting(from);
            if (handled) return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
@@ -2597,12 +2749,27 @@ export async function POST(request: Request) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        if (isLocationIntent(msgText)) {
+        if (wantsCheckout) {
+          await handleOrder(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (wantsReceiptStatus) {
+          await handleReceipt(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (wantsHumanHandoff) {
+          await handleHumanHandoff(from, `Customer text: ${msgText.slice(0, 160)}`);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        if (wantsLocation) {
           await handleStoreLocation(from);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        if (isAppointmentIntent(msgText)) {
+        if (wantsAppointment) {
           await handleAppointmentSuggestion(from);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
