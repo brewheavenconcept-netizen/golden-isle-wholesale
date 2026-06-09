@@ -287,10 +287,10 @@ async function sendWACtaUrl(to: string, bodyText: string, paymentLink: string): 
 }
 
 // Hantar mesej gambar berserta caption ke WA
-async function sendWAImage(to: string, imageUrl: string, caption: string) {
+async function sendWAImage(to: string, imageUrl: string, caption: string): Promise<boolean> {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  if (!waToken || !waPhoneId) return;
+  if (!waToken || !waPhoneId) return false;
 
   // Handle Supabase relative paths if needed, but usually image_url should be absolute or we format it.
   // Assuming imageUrl is a full valid URL here.
@@ -300,22 +300,34 @@ async function sendWAImage(to: string, imageUrl: string, caption: string) {
     finalImageUrl = `${appUrl}${imageUrl}`;
   }
 
-  await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${waToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'image',
-      image: {
-        link: finalImageUrl,
-        caption: caption,
+  try {
+    const res = await fetch(`https://graph.facebook.com/v17.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
       },
-    }),
-  });
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'image',
+        image: {
+          link: finalImageUrl,
+          caption: caption,
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      console.error('[WA_IMAGE_ERROR]', res.status, await res.text());
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('[WA_IMAGE_ERROR]', 'fetch_failed', err);
+    return false;
+  }
 }
 
 // Hantar WA Interactive List (Catalog) — fallback lama
@@ -450,7 +462,13 @@ type CatalogProduct = {
   price: number | string;
   category?: string | null;
   stock_quantity?: number | null;
+  stock_status?: string | null;
   is_featured?: boolean | null;
+  image_url?: string | null;
+};
+
+type RecommendedProductCollector = {
+  products: CatalogProduct[];
 };
 
 function buildProductSections(products: CatalogProduct[], maxSections = 3, maxPerSection = 10) {
@@ -475,12 +493,161 @@ function buildProductText(products: CatalogProduct[]) {
     .join('\n');
 }
 
+function formatProductPrice(price: CatalogProduct['price']) {
+  const amount = Number(price);
+  if (Number.isFinite(amount)) return `RM${amount.toFixed(2)}`;
+  return `RM${price}`;
+}
+
+function formatProductStockStatus(product: CatalogProduct) {
+  if (product.stock_status === 'in_stock') return 'In stock';
+  if (product.stock_status) return product.stock_status.replace(/_/g, ' ');
+  if (typeof product.stock_quantity === 'number') return product.stock_quantity > 0 ? 'In stock' : 'Out of stock';
+  return 'Check with KIRA';
+}
+
+function buildRecommendedProductImageCaption(product: CatalogProduct) {
+  return `🥃 ${product.name}\n` +
+    `${formatProductPrice(product.price)}\n` +
+    `Status: ${formatProductStockStatus(product)}\n\n` +
+    `Mau KIRA reserve 1 untuk bos?`;
+}
+
+async function sendRecommendedProductImages(
+  to: string,
+  products: CatalogProduct[],
+  options: { sendButtons?: boolean } = {}
+) {
+  const shouldSendButtons = options.sendButtons !== false;
+  let sentCount = 0;
+
+  for (const product of products) {
+    if (sentCount >= 3) break;
+
+    if (!product.image_url) {
+      console.log('[WA_IMAGE_SKIP] product has no image_url', product.name, product.id);
+      continue;
+    }
+
+    console.log('[WA_IMAGE_SEND]', product.name, product.image_url);
+    const sent = await sendWAImage(to, product.image_url, buildRecommendedProductImageCaption(product));
+    if (sent) sentCount += 1;
+  }
+
+  if (!sentCount || !shouldSendButtons) return;
+
+  await sendWAButtons(to, 'Mau KIRA bantu teruskan yang mana bosku?', [
+    { id: 'btn_order', title: 'Reserve 1' },
+    { id: 'AI_TANYA_HARGA', title: 'Tanya Harga' },
+    { id: 'btn_catalog', title: 'Tengok Lagi' }
+  ]);
+}
+
+function isRecommendationImageFallbackIntent(text: string) {
+  const lower = text.toLowerCase();
+  const keywords = [
+    'ada rm',
+    'bajet',
+    'budget',
+    'recommend',
+    'cadang',
+    'paling murah',
+    'murah',
+    'whisky',
+    'beer',
+    'party',
+    'hadiah',
+    'boss',
+    'bos',
+    'borong',
+    'kedai',
+  ];
+
+  return keywords.some((keyword) => lower.includes(keyword));
+}
+
+function extractBudgetAmount(text: string) {
+  const match = text.match(/rm\s*([0-9]+(?:\.[0-9]+)?)/i);
+  if (!match) return null;
+
+  const amount = Number(match[1]);
+  return Number.isFinite(amount) ? amount : null;
+}
+
+function productMatchesRecommendationText(product: CatalogProduct, text: string) {
+  const lower = text.toLowerCase();
+  const searchable = `${product.name} ${product.category || ''}`.toLowerCase();
+  const categoryTerms: string[] = [];
+
+  if (lower.includes('whisky') || lower.includes('whiskey')) categoryTerms.push('whisky', 'whiskey');
+  if (lower.includes('beer')) categoryTerms.push('beer');
+
+  if (!categoryTerms.length) return true;
+  return categoryTerms.some((term) => searchable.includes(term));
+}
+
+async function getFallbackRecommendationProducts(msgText: string): Promise<CatalogProduct[]> {
+  const lower = msgText.toLowerCase();
+  const budgetAmount = extractBudgetAmount(msgText);
+  const cheapIntent = lower.includes('murah') || lower.includes('paling murah');
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, name, price, category, stock_status, stock_quantity, image_url')
+    .eq('stock_status', 'in_stock')
+    .gt('stock_quantity', 0)
+    .order('price', { ascending: true })
+    .limit(30);
+
+  if (error) {
+    console.error('[AI_RECOMMENDATION_PRODUCTS]', 0, error.message);
+    return [];
+  }
+
+  let candidates = ((data || []) as CatalogProduct[])
+    .filter((product) => productMatchesRecommendationText(product, msgText));
+
+  if (budgetAmount !== null) {
+    candidates = candidates.filter((product) => Number(product.price) <= budgetAmount);
+  }
+
+  if (!cheapIntent) {
+    candidates = candidates.sort((a, b) => Number(b.price) - Number(a.price));
+  }
+
+  console.log('[AI_RECOMMENDATION_PRODUCTS]', candidates.length);
+  return candidates;
+}
+
+async function sendFallbackRecommendationImages(
+  to: string,
+  msgText: string,
+  options: {
+    sendImages?: boolean;
+    recommendedProductCollector?: RecommendedProductCollector;
+  } = {}
+) {
+  if (!isRecommendationImageFallbackIntent(msgText)) return;
+
+  const products = await getFallbackRecommendationProducts(msgText);
+  if (options.recommendedProductCollector) {
+    options.recommendedProductCollector.products.push(...products);
+  }
+
+  if (options.sendImages !== false) {
+    await sendRecommendedProductImages(to, products);
+  }
+}
+
 async function sendRecommendedProducts(
   to: string,
   bodyText: string,
   products: CatalogProduct[],
-  emptyText: string
+  emptyText: string,
+  options: { sendImages?: boolean } = {}
 ) {
+  const shouldSendImages = options.sendImages !== false;
+
   if (!products.length) {
     await sendWAText(to, emptyText);
     return;
@@ -488,9 +655,18 @@ async function sendRecommendedProducts(
 
   const sections = buildProductSections(products);
   const sentList = await sendWAProductList(to, sections, bodyText);
-  if (sentList) return;
+  if (sentList) {
+    if (shouldSendImages) {
+      await sendRecommendedProductImages(to, products);
+    }
+    return;
+  }
 
   await sendWAText(to, `${bodyText}\n\n${buildProductText(products)}`);
+
+  if (shouldSendImages) {
+    await sendRecommendedProductImages(to, products);
+  }
 }
 
 // Hantar mesej dengan 3 Quick Reply Buttons ke WA
@@ -1122,13 +1298,22 @@ async function handleSuggestion(from: string, msgText: string) {
 const chatHistory = new Map<string, { role: string, content: string }[]>();
 
 // AI CHAT: Guna OpenAI dengan konteks katalog
-async function handleAIChat(from: string, msgText: string, options: { sendText?: boolean } = {}): Promise<string | null> {
+async function handleAIChat(
+  from: string,
+  msgText: string,
+  options: {
+    sendText?: boolean;
+    sendProductImages?: boolean;
+    recommendedProductCollector?: RecommendedProductCollector;
+  } = {}
+): Promise<string | null> {
   const shouldSendText = options.sendText !== false;
+  const shouldSendProductImages = options.sendProductImages !== false;
   const language = detectLanguage(msgText);
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
-    .select('id, name, price, category, stock_status')
+    .select('id, name, price, category, stock_status, stock_quantity, image_url')
     .eq('stock_status', 'in_stock');
 
   if (products && products.length > 0) {
@@ -1300,7 +1485,7 @@ Business Rules:
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           ...history
@@ -1326,16 +1511,53 @@ Business Rules:
 
       if (functionName === 'recommend_products') {
         const { text, sections } = args;
+        const availableProducts = (products || []) as CatalogProduct[];
+        const productById = new Map(availableProducts.map((product) => [String(product.id), product]));
+        const recommendedProducts: CatalogProduct[] = [];
+        const seenProductIds = new Set<string>();
         const formattedSections = (sections || []).map((s: any) => ({
           title: s.title || 'Cadangan',
-          productIds: s.product_ids || [],
-        }));
+          productIds: (s.product_ids || [])
+            .map((id: string | number) => String(id))
+            .filter((id: string) => {
+              const product = productById.get(id);
+              if (!product) return false;
+              if (seenProductIds.has(id)) return false;
+              recommendedProducts.push(product);
+              seenProductIds.add(id);
+              return true;
+            }),
+        })).filter((s: { productIds: string[] }) => s.productIds.length > 0);
 
         console.log(`🤖 AI recommending products via tool:`, JSON.stringify(formattedSections));
+        console.log('[AI_RECOMMENDATION_PRODUCTS]', recommendedProducts.length);
+        if (!recommendedProducts.length) {
+          const fallback =
+            language === 'english'
+              ? 'Sorry, KIRA could not match that recommendation to current in-stock catalog products. Want to view the catalog?'
+              : 'Maaf bosku, KIRA belum dapat match cadangan tu dengan produk in-stock dalam catalog. Mau tengok catalog dulu?';
+
+          await sendWAButtons(from, fallback, [
+            { id: 'btn_catalog', title: language === 'english' ? 'View Catalog' : 'Tengok Lagi' },
+            { id: 'TANYA_KIRA', title: 'Tanya KIRA' }
+          ]);
+          history.push({ role: 'assistant', content: `[System Note: Recommendation IDs were not found in Supabase catalog; sent catalog fallback.]` });
+          return fallback;
+        }
+
         const success = await sendWAProductList(from, formattedSections, text);
         if (!success) {
           await sendWAText(from, text);
         }
+
+        if (options.recommendedProductCollector) {
+          options.recommendedProductCollector.products.push(...recommendedProducts);
+        }
+
+        if (shouldSendProductImages) {
+          await sendRecommendedProductImages(from, recommendedProducts);
+        }
+
         history.push({ role: 'assistant', content: `[System Note: Successfully recommended products to user using WhatsApp Product List UI. The text intro was: ${text}]` });
         return text || null;
       }
@@ -1374,15 +1596,24 @@ Business Rules:
         const { product_id, product_name } = args;
         console.log(`🤖 AI handling tanya_harga for product: ${product_name} (${product_id})`);
 
-        let resolvedProduct = null;
+        let resolvedProduct: CatalogProduct | null = null;
         
         // Validate against Supabase
-        const { data: byId } = await supabase.from('products').select('id, name').eq('id', product_id).maybeSingle();
+        const { data: byId } = await supabase
+          .from('products')
+          .select('id, name, price, category, stock_status, stock_quantity, image_url')
+          .eq('id', product_id)
+          .maybeSingle();
         if (byId) {
           resolvedProduct = byId;
         } else {
           const searchTerm = product_name || product_id;
-          const { data: byName } = await supabase.from('products').select('id, name').ilike('name', `%${searchTerm}%`).limit(1).maybeSingle();
+          const { data: byName } = await supabase
+            .from('products')
+            .select('id, name, price, category, stock_status, stock_quantity, image_url')
+            .ilike('name', `%${searchTerm}%`)
+            .limit(1)
+            .maybeSingle();
           if (byName) resolvedProduct = byName;
         }
 
@@ -1398,6 +1629,7 @@ Business Rules:
             { id: `tanya_qty_stok_${resolvedProduct.id}`, title: language === 'english' ? '🏪 Shop Stock' : language === 'chinese' ? '🏪 店铺库存' : '🏪 Stok Kedai' },
             { id: `tanya_qty_cuba_${resolvedProduct.id}`, title: language === 'english' ? '🍺 Try First' : language === 'chinese' ? '🍺 先试试' : '🍺 Cuba Dulu' }
           ]);
+          await sendRecommendedProductImages(from, [resolvedProduct], { sendButtons: false });
           history.push({ role: 'assistant', content: `[System Note: Successfully sent the Tiered Pricing Step 1 options to user for product: ${resolvedProduct.name}]` });
           return question;
         } else {
@@ -1426,6 +1658,10 @@ Business Rules:
     );
     history.push({ role: 'assistant', content: reply });
     if (shouldSendText) await sendWAText(from, reply);
+    await sendFallbackRecommendationImages(from, msgText, {
+      sendImages: shouldSendProductImages,
+      recommendedProductCollector: options.recommendedProductCollector,
+    });
     return reply;
   } catch (err) {
     console.error('Error in handleAIChat:', err);
@@ -1578,7 +1814,7 @@ export async function POST(request: Request) {
           const language = getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
-            .select('id, name, price, category, stock_quantity, is_featured')
+            .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
             .eq('stock_status', 'in_stock')
             .gt('stock_quantity', 0)
             .order('is_featured', { ascending: false })
@@ -1612,7 +1848,7 @@ export async function POST(request: Request) {
           const language = getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
-            .select('id, name, price, category, stock_quantity, is_featured')
+            .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
             .eq('stock_status', 'in_stock')
             .gt('stock_quantity', 0)
             .order('price', { ascending: true })
@@ -1645,7 +1881,7 @@ export async function POST(request: Request) {
           const language = getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
-            .select('id, name, price, category, stock_quantity, is_featured')
+            .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
             .eq('stock_status', 'in_stock')
             .gt('stock_quantity', 0)
             .order('category')
@@ -2054,7 +2290,12 @@ export async function POST(request: Request) {
         rememberUserLanguage(from, transcript);
         console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
 
-        const aiReply = await handleAIChat(from, transcript, { sendText: false });
+        const recommendedProductCollector: RecommendedProductCollector = { products: [] };
+        const aiReply = await handleAIChat(from, transcript, {
+          sendText: false,
+          sendProductImages: false,
+          recommendedProductCollector,
+        });
         if (!aiReply) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
@@ -2064,6 +2305,8 @@ export async function POST(request: Request) {
           console.error('Failed to send AI voice reply; falling back to text:', { from });
           await sendWAText(from, aiReply);
         }
+
+        await sendRecommendedProductImages(from, recommendedProductCollector.products);
 
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
