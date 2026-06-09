@@ -805,10 +805,11 @@ async function sendWAFlow(to: string, flowId: string, mode: 'published' | 'draft
   }
 }
 
-async function sendWAAppointmentFlow(to: string, language: ChatLanguage, mode: 'published' | 'draft' = 'published'): Promise<boolean> {
+async function sendWAAppointmentFlow(to: string, language: ChatLanguage, mode?: 'published' | 'draft'): Promise<boolean> {
   const waToken = process.env.WHATSAPP_TOKEN;
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const flowId = process.env.WHATSAPP_APPOINTMENT_FLOW_ID;
+  const flowMode: 'published' | 'draft' = mode || (process.env.WHATSAPP_APPOINTMENT_FLOW_MODE === 'published' ? 'published' : 'draft');
 
   if (!waToken || !waPhoneId || !flowId) {
     console.error('❌ Missing WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, or WHATSAPP_APPOINTMENT_FLOW_ID.');
@@ -840,7 +841,7 @@ async function sendWAAppointmentFlow(to: string, language: ChatLanguage, mode: '
           flow_token: flowToken,
           flow_id: flowId,
           flow_cta: language === 'chinese' ? '填写预约' : 'Book Appointment',
-          mode,
+          mode: flowMode,
           flow_action_payload: {
             screen: 'APPOINTMENT_FORM',
           },
