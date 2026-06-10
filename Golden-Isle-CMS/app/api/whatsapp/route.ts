@@ -2882,27 +2882,36 @@ export async function POST(request: Request) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        const visionPrompt = `You are analyzing a supplier invoice or purchase receipt for a liquor/beverage wholesale business.
-Extract the following information as JSON:
+        const visionPrompt = `You are KIRA, a specialized AI assistant for Golden Isle Wholesale (liquor/beverage). 
+Analyze the image provided and return ONLY a valid JSON object.
+
+If the image is a supplier invoice or purchase receipt:
 {
-  "supplier": "supplier company name (string or null)",
-  "invoiceDate": "date in YYYY-MM-DD format (string or null)",  
-  "items": [
-    {
-      "name": "product name",
-      "quantity": number,
-      "unitPrice": number (in RM),
-      "total": number
-    }
-  ],
-  "invoiceTotal": number (total amount in RM)
+  "type": "invoice",
+  "data": {
+    "supplier": "supplier company name (string or null)",
+    "invoiceDate": "date in YYYY-MM-DD format (string or null)",  
+    "items": [
+      {
+        "name": "product name",
+        "quantity": number,
+        "unitPrice": number (in RM),
+        "total": number
+      }
+    ],
+    "invoiceTotal": number (total amount in RM)
+  }
+}
+
+If the image is NOT an invoice (e.g. a bottle, a drink, a person, a screenshot, etc.):
+{
+  "type": "other",
+  "description": "Provide a very detailed description of the image in English. If it is an alcohol bottle, identify the brand, type (whisky, beer, wine, etc.), age, and any details visible."
 }
 
 Rules:
-- Extract ALL line items visible in the invoice
-- If a price is in another currency, convert to RM
-- Return ONLY valid JSON, no explanation text
-- If this is clearly NOT an invoice/receipt, return: {"error": "not_invoice"}`;
+- For invoices, extract ALL line items visible and convert foreign currencies to RM.
+- Return ONLY valid JSON, no explanation text or markdown wrappers.`;
 
         try {
           const visionRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -2928,20 +2937,23 @@ Rules:
           const visionData = await visionRes.json();
           const rawContent = visionData.choices?.[0]?.message?.content || "";
           
-          let extractedInvoice: any;
+          let extractedVision: any;
           try {
             const cleaned = rawContent.replace(/```json\n?/gi, "").replace(/```\n?/g, "").trim();
-            extractedInvoice = JSON.parse(cleaned);
+            extractedVision = JSON.parse(cleaned);
           } catch (e) {
             await sendWAText(from, 'Hmm... gambar ni macam kurang jelas atau KIRA tak dapat baca tulisan dia. Boleh ambil gambar yang lebih terang sikit bos? 🧐');
             return new NextResponse('EVENT_RECEIVED', { status: 200 });
           }
 
-          if (extractedInvoice.error === "not_invoice") {
-            await sendWAText(from, 'Cantik gambar bosku! KIRA ingat gambar resit tadi. Boleh KIRA bantu order apa-apa hari ni? 🍻');
+          if (extractedVision.type === "other" || !extractedVision.data) {
+            const desc = extractedVision.description || "Sebuah gambar yang tidak jelas.";
+            const aiPrompt = `[Customer sent an image. Vision AI Description: "${desc}"] Reply naturally as KIRA based on this image. If it's an alcohol bottle, show your expertise and ask if they want to check stock or buy it!`;
+            await handleAIChat(from, aiPrompt, { sendText: true });
             return new NextResponse('EVENT_RECEIVED', { status: 200 });
           }
 
+          const extractedInvoice = extractedVision.data;
           const items: InvoiceItem[] = (extractedInvoice.items || []).map((item: any) => ({
             name: item.name || "Unknown Product",
             quantity: Number(item.quantity) || 1,
