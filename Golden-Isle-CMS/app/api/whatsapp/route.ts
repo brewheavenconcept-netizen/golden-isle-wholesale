@@ -1094,7 +1094,7 @@ function detectLanguage(text: string): ChatLanguage {
 async function rememberUserLanguage(from: string, text: string): Promise<ChatLanguage> {
   const language = detectLanguage(text);
   // Simpan ke Supabase tanpa sekat (fire and forget boleh, atau await untuk pasti)
-  await supabase.from('customers').update({ preferred_language: language }).eq('phone', from);
+  await supabase.from('customers').upsert({ phone: from, preferred_language: language }, { onConflict: 'phone' });
   return language;
 }
 
@@ -1686,7 +1686,7 @@ async function handleAIChat(
   const requestedLanguage = detectRequestedLanguage(msgText);
   const detectedLanguage = requestedLanguage || await getUserLanguage(from) || detectLanguage(msgText);
   const language = detectedLanguage as ChatLanguage;
-  await supabase.from('customers').update({ preferred_language: language }).eq('phone', from);
+  await supabase.from('customers').upsert({ phone: from, preferred_language: language }, { onConflict: 'phone' });
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
