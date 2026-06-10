@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateInvoicePdf } from '../../../lib/pdfGenerator';
 import { buildPhoneOrFilter, normalizeOrderItems } from '@/lib/orderCompat';
+import { createEmptyContext, extractContextFromMessage, buildContextBlock, InvoiceItem } from '@/lib/contextBuilder';
+import { matchInvoiceToCatalog } from '@/lib/catalogMatcher';
+import crypto from 'crypto';
 
 // Setup Supabase (gunakan Service Role Key untuk bypass RLS dalam API)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -1005,8 +1008,6 @@ function isChaserOptOutIntent(text: string): boolean {
 
 type ChatLanguage = 'malay' | 'english' | 'chinese';
 
-const userLanguages = new Map<string, ChatLanguage>();
-
 function getMalaysiaTimeGreeting(language: ChatLanguage) {
   const hour = (new Date().getUTCHours() + 8) % 24;
   if (hour >= 5 && hour < 12) {
@@ -1069,7 +1070,7 @@ function detectRequestedLanguage(text: string): ChatLanguage | null {
 }
 
 async function handleLanguageSwitch(from: string, language: ChatLanguage) {
-  userLanguages.set(from, language);
+  await supabase.from('customers').update({ preferred_language: language }).eq('phone', from);
   const reply =
     language === 'english'
       ? 'Yes boss, I can speak English. What are you looking for today: shop stock, party drinks, gift ideas, or a package recommendation?'
@@ -1090,14 +1091,16 @@ function detectLanguage(text: string): ChatLanguage {
   return 'malay';
 }
 
-function rememberUserLanguage(from: string, text: string): ChatLanguage {
+async function rememberUserLanguage(from: string, text: string): Promise<ChatLanguage> {
   const language = detectLanguage(text);
-  userLanguages.set(from, language);
+  // Simpan ke Supabase tanpa sekat (fire and forget boleh, atau await untuk pasti)
+  await supabase.from('customers').update({ preferred_language: language }).eq('phone', from);
   return language;
 }
 
-function getUserLanguage(from: string): ChatLanguage {
-  return userLanguages.get(from) || 'malay';
+async function getUserLanguage(from: string): Promise<ChatLanguage> {
+  const { data } = await supabase.from('customers').select('preferred_language').eq('phone', from).single();
+  return (data?.preferred_language as ChatLanguage) || 'malay';
 }
 
 function isProductAvailabilityIntent(text: string): boolean {
@@ -1201,7 +1204,7 @@ function buildStoreLocationText(language: ChatLanguage) {
 }
 
 async function handleStoreLocation(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   await sendWAButtons(from, buildStoreLocationText(language), [
     { id: 'btn_talk_sales', title: 'Set Appointment' },
     { id: 'LIHAT_CATALOG', title: language === 'english' ? 'View Catalog' : 'Tengok Catalog' },
@@ -1210,7 +1213,7 @@ async function handleStoreLocation(from: string) {
 }
 
 async function handleAppointmentSuggestion(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const sentFlow = await sendWAAppointmentFlow(from, language);
   if (sentFlow) return;
 
@@ -1229,7 +1232,7 @@ async function handleAppointmentSuggestion(from: string) {
 }
 
 async function handleHumanHandoff(from: string, reason = 'Customer requested human handoff') {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
 
   await supabase.from('orders')
     .update({ chaser_opted_out: true })
@@ -1248,7 +1251,7 @@ async function handleHumanHandoff(from: string, reason = 'Customer requested hum
 }
 
 async function sendQualificationMenu(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const body =
     language === 'chinese'
       ? "🔥 很好。KIRA 会帮你找到合适的选择。\n\n你要找饮料用于什么场景？"
@@ -1268,7 +1271,7 @@ async function sendQualificationMenu(from: string) {
 }
 
 async function sendCatalogFollowUp(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const body =
     language === 'chinese'
       ? "有看到感兴趣的产品吗？"
@@ -1284,7 +1287,7 @@ async function sendCatalogFollowUp(from: string) {
 }
 
 async function handleProductAvailability(from: string, text: string) {
-  const language = rememberUserLanguage(from, text);
+  const language = await rememberUserLanguage(from, text);
   const reply =
     language === 'chinese'
       ? "📦 Golden Isle 有几种饮料分类：\n\n🍺 啤酒\n🍷 葡萄酒\n🥃 威士忌\n🍸 烈酒\n\n我现在打开目录给你查看所有产品 👇"
@@ -1300,7 +1303,7 @@ async function handleProductAvailability(from: string, text: string) {
 
 // GREETING: Hantar welcome message dengan 3 Quick Reply Buttons
 async function handleGreeting(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const timeGreeting = getMalaysiaTimeGreeting(language);
   const body =
     language === 'chinese'
@@ -1378,7 +1381,7 @@ async function handleRepeatGreeting(from: string): Promise<boolean> {
 
 // ORDER FLOW: Hantar Katalog terus (Bypass WA Flow sementara waktu)
 async function handleOrder(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const text =
     language === 'chinese'
       ? "🛒 想下单吗？我先打开产品目录给你看看。\n\n你可以选择产品查看价格，然后把产品加入购物车。👇"
@@ -1395,7 +1398,7 @@ async function handleOrder(from: string) {
 
 // CATALOG: Cuba native Meta catalog dulu, fallback ke interactive list
 async function handleCatalog(from: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
   const catalogId = process.env.WHATSAPP_CATALOG_ID;
 
   // ── 1. Cuba Native Meta Catalog (Add to Cart butang) ──────────────────────
@@ -1617,15 +1620,13 @@ async function handleReceipt(from: string) {
 }
 
 // SUGGESTION BOX: Simpan feedback & notify admin
-// State management ringkas pakai in-memory (untuk production pakai Redis/Supabase)
-const awaitingSuggestion = new Set<string>();
-
 async function handleSuggestion(from: string, msgText: string) {
-  const language = getUserLanguage(from);
+  const language = await getUserLanguage(from);
+  const { data: customer } = await supabase.from('customers').select('is_awaiting_suggestion').eq('phone', from).single();
 
   // Kalau user dalam mod "tunggu jawapan suggestion"
-  if (awaitingSuggestion.has(from)) {
-    awaitingSuggestion.delete(from);
+  if (customer?.is_awaiting_suggestion) {
+    await supabase.from('customers').update({ is_awaiting_suggestion: false }).eq('phone', from);
 
     // Simpan ke Supabase (table inquiries)
     await supabase.from('inquiries').insert({
@@ -1656,7 +1657,7 @@ async function handleSuggestion(from: string, msgText: string) {
   }
 
   // Mulakan sesi suggestion — minta input dulu
-  awaitingSuggestion.add(from);
+  await supabase.from('customers').update({ is_awaiting_suggestion: true }).eq('phone', from);
   const promptText =
     language === 'english'
       ? 'Sure boss. Please send your suggestion or feedback here.'
@@ -1668,8 +1669,7 @@ async function handleSuggestion(from: string, msgText: string) {
   return;
 }
 
-// In-memory chat history for KIRA
-const chatHistory = new Map<string, { role: string, content: string }[]>();
+
 
 // AI CHAT: Guna OpenAI dengan konteks katalog
 async function handleAIChat(
@@ -1684,8 +1684,9 @@ async function handleAIChat(
   const shouldSendText = options.sendText !== false;
   const shouldSendProductImages = options.sendProductImages !== false;
   const requestedLanguage = detectRequestedLanguage(msgText);
-  const language = requestedLanguage || userLanguages.get(from) || detectLanguage(msgText);
-  userLanguages.set(from, language);
+  const detectedLanguage = requestedLanguage || await getUserLanguage(from) || detectLanguage(msgText);
+  const language = detectedLanguage as ChatLanguage;
+  await supabase.from('customers').update({ preferred_language: language }).eq('phone', from);
   let catalogText = 'Tiada maklumat stok terkini.';
   const { data: products } = await supabase
     .from('products')
@@ -1772,12 +1773,19 @@ async function handleAIChat(
 Current Stock & Prices:
 ${catalogText}
 
-Business Rules:
-- Greetings & Small Talk → Do NOT call any tools for greetings.
-- Recommend Products → ALWAYS call 'recommend_products' for recommendations.
+Business Rules (CRITICAL — you are the SOLE decision-maker):
+- Greetings & Small Talk → Do NOT call any tools. Reply with friendly text only.
+- Recommend Products → ALWAYS call 'recommend_products'. Do NOT list products in plain text.
 - Full Catalog → Call 'view_full_catalog' ONLY when explicitly requested.
-- Ordering → encourage them to tap "🛒 Buat Pesanan".
-- Payment → we accept bank transfer & FPX.`;
+- Order/Checkout/Buy → Call 'start_order' to open the catalog for them.
+- Receipt/Invoice/Order Status → Call 'check_order_status'.
+- Location/Address/Maps/Waze → Call 'send_location'.
+- Appointment/Meeting/Visit → Call 'book_appointment'.
+- Human/Salesman/Admin Request → Call 'escalate_to_human'.
+- Price Inquiry → Call 'tanya_harga' with the product ID.
+- Promo Images → Call 'generate_promo_image' ONLY when visual demo helps sales.
+- Payment → we accept bank transfer & FPX.
+- You must call EXACTLY ONE tool per response when an action is needed. Do NOT combine text reply with a tool call.`;
 
   const tools = [
     {
@@ -1865,14 +1873,99 @@ Business Rules:
           required: ['text']
         }
       }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'escalate_to_human',
+        description: 'Call when the customer is frustrated, explicitly asks for a real person/salesman/admin, or when you truly cannot help them after trying.',
+        parameters: {
+          type: 'object',
+          properties: {
+            reason: { type: 'string', description: 'Brief reason for escalation' }
+          },
+          required: ['reason']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'check_order_status',
+        description: 'Call when the user asks about their order status, receipt, invoice, or payment status.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: { type: 'string', description: 'Brief acknowledgement message in user language.' }
+          },
+          required: ['text']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'send_location',
+        description: 'Call when the user asks for the shop address, location, Google Maps, Waze, or showroom directions.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: { type: 'string', description: 'Brief message in user language.' }
+          },
+          required: ['text']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'book_appointment',
+        description: 'Call when the user wants to set up a meeting, appointment, visit the office, or discuss a large/corporate order in person.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: { type: 'string', description: 'Brief message in user language.' }
+          },
+          required: ['text']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'start_order',
+        description: 'Call when the user wants to place an order, checkout, buy, or proceed to payment.',
+        parameters: {
+          type: 'object',
+          properties: {
+            text: { type: 'string', description: 'Brief message inviting them to browse and order.' }
+          },
+          required: ['text']
+        }
+      }
     }
   ];
 
-  if (!chatHistory.has(from)) chatHistory.set(from, []);
-  const history = chatHistory.get(from)!;
-  
+  const { data: pastMsgs } = await supabase
+    .from('wa_messages')
+    .select('role, content')
+    .eq('phone', from)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  const history = (pastMsgs || []).reverse().map(m => ({ role: m.role, content: m.content }));
   history.push({ role: 'user', content: msgText });
-  if (history.length > 10) history.splice(0, history.length - 10); // Keep only last 10 messages
+
+  await supabase.from('wa_messages').insert({ phone: from, role: 'user', content: msgText });
+
+  // ── Build Customer Context (from contextBuilder.ts) ──
+  const ctx = createEmptyContext();
+  for (const msg of history) {
+    if (msg.role === 'user') {
+      Object.assign(ctx, extractContextFromMessage(msg.content, ctx));
+    }
+  }
+  const contextBlock = buildContextBlock(ctx);
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1884,7 +1977,7 @@ Business Rules:
       body: JSON.stringify({
         model: 'gpt-5-mini',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + (contextBlock ? '\n\n' + contextBlock : '') },
           ...history
         ],
         tools,
@@ -2044,6 +2137,51 @@ Business Rules:
           return notFound;
         }
       }
+
+      // ── NEW TOOL: escalate_to_human ──
+      if (functionName === 'escalate_to_human') {
+        const { reason } = args;
+        console.log(`🤖 AI escalating to human: ${reason}`);
+        await handleHumanHandoff(from, reason || 'AI decided escalation was needed');
+        history.push({ role: 'assistant', content: `[System Note: Escalated to human sales team. Reason: ${reason}]` });
+        return null;
+      }
+
+      // ── NEW TOOL: check_order_status ──
+      if (functionName === 'check_order_status') {
+        const { text } = args;
+        console.log(`🤖 AI checking order status`);
+        if (text) await sendWAText(from, text);
+        await handleReceipt(from);
+        history.push({ role: 'assistant', content: `[System Note: Showed order status/receipt to user.]` });
+        return text || null;
+      }
+
+      // ── NEW TOOL: send_location ──
+      if (functionName === 'send_location') {
+        console.log(`🤖 AI sending store location`);
+        await handleStoreLocation(from);
+        history.push({ role: 'assistant', content: `[System Note: Sent store location to user.]` });
+        return null;
+      }
+
+      // ── NEW TOOL: book_appointment ──
+      if (functionName === 'book_appointment') {
+        console.log(`🤖 AI booking appointment`);
+        await handleAppointmentSuggestion(from);
+        history.push({ role: 'assistant', content: `[System Note: Sent appointment booking flow to user.]` });
+        return null;
+      }
+
+      // ── NEW TOOL: start_order ──
+      if (functionName === 'start_order') {
+        const { text } = args;
+        console.log(`🤖 AI starting order flow`);
+        if (text) await sendWAText(from, text);
+        await handleCatalog(from);
+        history.push({ role: 'assistant', content: `[System Note: Opened catalog/order flow for user.]` });
+        return text || null;
+      }
     }
 
     const reply = choiceMessage?.content || (
@@ -2054,11 +2192,10 @@ Business Rules:
           : 'Maaf bosku, otak saya sangkut sikit kejap. Cuba lagi ya!'
     );
     history.push({ role: 'assistant', content: reply });
+    await supabase.from('wa_messages').insert({ phone: from, role: 'assistant', content: reply });
     if (shouldSendText) await sendWAText(from, reply);
-    await sendFallbackRecommendationImages(from, msgText, {
-      sendImages: shouldSendProductImages,
-      recommendedProductCollector: options.recommendedProductCollector,
-    });
+    // ❌ REMOVED: sendFallbackRecommendationImages — was causing "phantom catalog" spam.
+    // KIRA now controls product display exclusively via recommend_products tool.
     return reply;
   } catch (err) {
     console.error('Error in handleAIChat:', err);
@@ -2089,47 +2226,65 @@ export async function GET(request: Request) {
   return new NextResponse('Forbidden', { status: 403 });
 }
 
-// ── SPAM TRACKER ─────────────────────────────────────────────────────────────
-const spamTracker = new Map<string, {count: number, resetAt: number}>();
+
+// ── VERIFIKASI WEBHOOK SIGNATURE (ANTI-HACKER) ──────────────────────────────
+function verifyWebhookSignature(req: Request, bodyText: string): boolean {
+  const secret = process.env.WHATSAPP_APP_SECRET;
+  if (!secret) return true; // Skip sekuriti kalau takde (untuk dev)
+
+  const signature = req.headers.get('x-hub-signature-256');
+  if (!signature) {
+    console.error('❌ Tiada signature X-Hub-Signature-256');
+    return false;
+  }
+
+  try {
+    const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(bodyText, 'utf8').digest('hex');
+    if (signature.length !== expected.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  } catch (err) {
+    console.error('❌ Ralat semasa verify signature:', err);
+    return false;
+  }
+}
 
 // ── TANGKAP MESEJ MASUK (POST) ───────────────────────────────────────────────
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const bodyText = await request.text();
+    
+    // 1. VERIFIKASI SIGNATURE
+    if (!verifyWebhookSignature(request, bodyText)) {
+      console.error('❌ Webhook Signature Gagal! Permintaan ditolak.');
+      return new NextResponse('Forbidden', { status: 403 });
+    }
+
+    const body = JSON.parse(bodyText);
 
     if (body.object === 'whatsapp_business_account' || body.field === 'messages') {
       const entry = body.entry?.[0];
       const changes = entry?.changes?.[0];
       const value = changes?.value;
       const message = value?.messages?.[0];
-
-      // === FEATURE 1: Spam Detector ===
-      if (message && message.from) {
-        const from = message.from;
-        const now = Date.now();
-        const record = spamTracker.get(from);
-
-        if (record) {
-          if (now < record.resetAt) {
-            record.count += 1;
-          } else {
-            record.count = 1;
-            record.resetAt = now + 30000;
-          }
-        } else {
-          spamTracker.set(from, { count: 1, resetAt: now + 30000 });
+      
+      // 2. IDEMPOTENCY CHECK (ANTI-DOUBLE REPLY)
+      const messageId = message?.id;
+      if (messageId) {
+        const { data: existingMsg } = await supabase
+          .from('wa_webhooks')
+          .select('message_id')
+          .eq('message_id', messageId)
+          .single();
+        
+        if (existingMsg) {
+          console.log('⚡ Duplicate webhook event received, skipping:', messageId);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 }); // Meta berhenti hantar
         }
-
-        const updatedRecord = spamTracker.get(from)!;
-        if (updatedRecord.count >= 5) {
-          // If exactly 5, send the warning. If > 5, just ignore and return early to avoid spamming the warning itself.
-          if (updatedRecord.count === 5) {
-            await sendWAText(from, "Eh bosku, KIRA pun ada had laju tau 😅 Sekejap ya! Cuba lagi dalam 30 saat.");
-          }
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
+        
+        // Simpan message_id supaya tak proses lagi
+        const fromNumber = message.from || 'unknown';
+        await supabase.from('wa_webhooks').insert({ message_id: messageId, phone: fromNumber }).select();
       }
-
 
       // Handle Quick Reply Button tap (user tekan butang)
       let buttonPayload = '';
@@ -2155,7 +2310,7 @@ export async function POST(request: Request) {
         } else if (buttonPayload === 'btn_suggest' || buttonPayload === '💡 Beri Cadangan') {
           await handleSuggestion(from, buttonPayload);
         } else if (buttonPayload === 'SEMAK_STOK') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2166,7 +2321,7 @@ export async function POST(request: Request) {
           );
           await handleCatalog(from);
         } else if (buttonPayload === 'TANYA_KIRA') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           const body =
             language === 'chinese'
               ? "🤖 KIRA 可以帮你：\n\n💰 查询产品价格\n📦 为店铺 / 餐厅找库存\n🍺 按预算推荐产品\n🎉 为活动推荐饮料\n\n你想做什么？"
@@ -2183,7 +2338,7 @@ export async function POST(request: Request) {
             ]
           );
         } else if (buttonPayload === 'AI_TANYA_HARGA') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2193,7 +2348,7 @@ export async function POST(request: Request) {
                 : "💰 Nak check harga produk apa bosku?\n\nContoh:\n• Beer paling murah\n• Harga Heineken\n• Whisky bawah RM200\n\nTaip nama produk atau bajet bos, KIRA carikan yang ngam 😊"
           );
         } else if (buttonPayload === 'AI_BORONG_KEDAI') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2203,14 +2358,14 @@ export async function POST(request: Request) {
                 : "📦 Bos cari stok untuk kedai, restoran atau event?\n\nBeritahu KIRA:\n• Jenis bisnes\n• Anggaran bajet\n• Produk yang biasa customer cari\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\""
           );
         } else if (buttonPayload === 'AI_CADANGAN') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAButtons(from, language === 'chinese' ? "🍺 KIRA 可以根据你的情况推荐产品。\n\n请选择：" : language === 'english' ? "🍺 KIRA can recommend products based on your situation.\n\nChoose one:" : "🍺 KIRA boleh cadangkan produk ikut situasi bosku.\n\nPilih satu:", [
             { id: 'AI_POPULAR', title: language === 'chinese' ? '🔥 热门产品' : language === 'english' ? '🔥 Popular' : '🔥 Produk Popular' },
             { id: 'AI_BUDGET', title: language === 'chinese' ? '💸 预算推荐' : language === 'english' ? '💸 Budget Picks' : '💸 Bajet Murah' },
             { id: 'AI_EVENT', title: language === 'chinese' ? '🎉 活动用途' : language === 'english' ? '🎉 For Event' : '🎉 Untuk Event' }
           ]);
         } else if (buttonPayload === 'AI_POPULAR') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
             .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
@@ -2234,7 +2389,7 @@ export async function POST(request: Request) {
                 : "Maaf bosku, belum ada produk in-stock untuk dicadangkan sekarang."
           );
         } else if (false && buttonPayload === 'AI_POPULAR') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await handleAIChat(
             from,
             language === 'chinese'
@@ -2244,7 +2399,7 @@ export async function POST(request: Request) {
                 : "Cadangkan produk popular untuk customer baru.\nJawab ringkas, friendly dan sales-focused."
           );
         } else if (buttonPayload === 'AI_BUDGET') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
             .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
@@ -2267,7 +2422,7 @@ export async function POST(request: Request) {
                 : "Maaf bosku, belum ada produk bajet yang in-stock sekarang."
           );
         } else if (false && buttonPayload === 'AI_BUDGET') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await handleAIChat(
             from,
             language === 'chinese'
@@ -2277,7 +2432,7 @@ export async function POST(request: Request) {
                 : "Cadangkan produk paling berbaloi atau bajet murah.\nTanya bajet customer jika belum diketahui."
           );
         } else if (buttonPayload === 'AI_EVENT') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           const { data: products } = await supabase
             .from('products')
             .select('id, name, price, category, stock_quantity, stock_status, is_featured, image_url')
@@ -2301,7 +2456,7 @@ export async function POST(request: Request) {
                 : "Maaf bosku, belum ada produk event yang in-stock sekarang."
           );
         } else if (false && buttonPayload === 'AI_EVENT') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await handleAIChat(
             from,
             language === 'chinese'
@@ -2311,7 +2466,7 @@ export async function POST(request: Request) {
                 : "Bantu customer pilih minuman untuk event.\nTanya jumlah orang, bajet dan jenis event jika maklumat belum cukup."
           );
         } else if (buttonPayload === 'QUALIFY_RETAIL') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2321,7 +2476,7 @@ export async function POST(request: Request) {
                 : "🏪 Untuk kedai, KIRA boleh bantu cadangkan stok yang senang jalan.\n\nBoleh bagitahu:\n• Bajet anggaran\n• Beer / wine / whisky / campuran\n• Customer biasa cari apa\n\nContoh:\n\"Saya mau stok beer untuk kedai, bajet RM1000\""
           );
         } else if (buttonPayload === 'QUALIFY_RESTAURANT') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2331,7 +2486,7 @@ export async function POST(request: Request) {
                 : "🍽️ Untuk restoran / bar, KIRA boleh cadangkan minuman ikut menu dan customer style.\n\nBoleh bagitahu:\n• Jenis restoran / bar\n• Bajet anggaran\n• Mau beer, wine, whisky atau campuran\n\nContoh:\n\"Saya mau wine dan beer untuk restoran, bajet RM2000\""
           );
         } else if (buttonPayload === 'QUALIFY_EVENT') {
-          const language = getUserLanguage(from);
+          const language = await getUserLanguage(from);
           await sendWAText(
             from,
             language === 'chinese'
@@ -2388,8 +2543,7 @@ export async function POST(request: Request) {
             
             const systemNote = `[SYSTEM PROMPT FOR KIRA: Customer nak edit repeat order. Previous order ID: ${oldOrderId}. Items: ${JSON.stringify(oldOrder.items)}. Tugas kau: 1. Tanya customer nak tukar apa. 2. Update cart accordingly. 3. Bila customer confirm, generate invoice baru. 4. Send payment link. Jangan tanya soalan lain. Focus on editing order je.]`;
             
-            if (!chatHistory.has(from)) chatHistory.set(from, []);
-            chatHistory.get(from)!.push({ role: 'system', content: systemNote });
+            await supabase.from('wa_messages').insert({ phone: from, role: 'system', content: systemNote });
             
             await sendWAText(from, msg);
           }
@@ -2699,6 +2853,123 @@ export async function POST(request: Request) {
         
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
+      // Handle Image Messages (Vision AI)
+      if (message && message.type === 'image') {
+        const from = message.from;
+        const imageId = message.image?.id;
+
+        console.log(`\n📸 IMAGE WA: [${from}] media=${imageId || 'missing'}`);
+
+        if (!imageId) {
+          await sendWAText(from, 'Maaf bosku, gambar tu tak jelas. Cuba hantar sekali lagi ya.');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const media = await downloadWAMedia(imageId);
+        if (!media) {
+          await sendWAText(from, 'Aduh, saya tak dapat buka gambar ni bos. Boleh hantar balik?');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const base64Image = media.buffer.toString('base64');
+        const mimeType = media.mimeType || 'image/jpeg';
+        
+        await sendWAText(from, 'KIRA tengah teliti gambar ni kejap ya bosku... 🔍👀');
+
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) {
+          await sendWAText(from, 'Maaf bos, mata AI KIRA belum pasang (API Key tiada).');
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        const visionPrompt = `You are analyzing a supplier invoice or purchase receipt for a liquor/beverage wholesale business.
+Extract the following information as JSON:
+{
+  "supplier": "supplier company name (string or null)",
+  "invoiceDate": "date in YYYY-MM-DD format (string or null)",  
+  "items": [
+    {
+      "name": "product name",
+      "quantity": number,
+      "unitPrice": number (in RM),
+      "total": number
+    }
+  ],
+  "invoiceTotal": number (total amount in RM)
+}
+
+Rules:
+- Extract ALL line items visible in the invoice
+- If a price is in another currency, convert to RM
+- Return ONLY valid JSON, no explanation text
+- If this is clearly NOT an invoice/receipt, return: {"error": "not_invoice"}`;
+
+        try {
+          const visionRes = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              model: "gpt-4o",
+              messages: [
+                {
+                  role: "user",
+                  content: [
+                    { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}`, detail: "high" } },
+                    { type: "text", text: visionPrompt },
+                  ],
+                },
+              ],
+            }),
+          });
+
+          const visionData = await visionRes.json();
+          const rawContent = visionData.choices?.[0]?.message?.content || "";
+          
+          let extractedInvoice: any;
+          try {
+            const cleaned = rawContent.replace(/```json\n?/gi, "").replace(/```\n?/g, "").trim();
+            extractedInvoice = JSON.parse(cleaned);
+          } catch (e) {
+            await sendWAText(from, 'Hmm... gambar ni macam kurang jelas atau KIRA tak dapat baca tulisan dia. Boleh ambil gambar yang lebih terang sikit bos? 🧐');
+            return new NextResponse('EVENT_RECEIVED', { status: 200 });
+          }
+
+          if (extractedInvoice.error === "not_invoice") {
+            await sendWAText(from, 'Cantik gambar bosku! KIRA ingat gambar resit tadi. Boleh KIRA bantu order apa-apa hari ni? 🍻');
+            return new NextResponse('EVENT_RECEIVED', { status: 200 });
+          }
+
+          const items: InvoiceItem[] = (extractedInvoice.items || []).map((item: any) => ({
+            name: item.name || "Unknown Product",
+            quantity: Number(item.quantity) || 1,
+            unitPrice: Number(item.unitPrice) || 0,
+            total: Number(item.total) || 0,
+            supplier: extractedInvoice.supplier,
+          }));
+
+          const catalogMatch = await matchInvoiceToCatalog(items);
+          
+          if (catalogMatch.matches.length === 0) {
+            await sendWAText(from, 'KIRA dah scan resit ni, tapi nampaknya produk ni KIRA belum ada stok lagi bosku. Ada cari barang lain?');
+          } else {
+            const savings = catalogMatch.totalSavings;
+            if (savings > 0) {
+              const reply = `Wah bosku! Kalau ambil barang-barang ni dari Golden Isle, bos boleh **jimat RM${savings.toFixed(2)}** tau! 💸🔥\n\nHarga resit bos: RM${catalogMatch.totalInvoiceSpend.toFixed(2)}\nHarga Golden Isle: RM${catalogMatch.totalGoldenIsleSpend.toFixed(2)}\n\nNak KIRA masukkan dalam troli terus tak barang-barang ni?`;
+              await sendWAText(from, reply);
+            } else {
+              const reply = `KIRA dah scan resit ni bosku. Harga lebih kurang sama je dengan harga borong KIRA. Boleh lah kalau bos nak tambah sikit stok dari Golden Isle! 🛒`;
+              await sendWAText(from, reply);
+            }
+          }
+        } catch (err) {
+          console.error("Vision API error:", err);
+          await sendWAText(from, "Aduh, sistem mata KIRA tengah pening sikit. Cuba lagi nanti ya bosku.");
+        }
+        return new NextResponse('EVENT_RECEIVED', { status: 200 });
+      }
 
       // Handle audio / voice messages through KIRA, then reply with voice when possible.
       if (message && message.type === 'audio') {
@@ -2733,7 +3004,7 @@ export async function POST(request: Request) {
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        const language = rememberUserLanguage(from, transcript);
+        const language = await rememberUserLanguage(from, transcript);
         console.log(`VOICE NOTE TRANSCRIPT WA: [${from}] "${transcript}"`);
 
         if (isCheckoutIntent(transcript)) {
@@ -2800,29 +3071,79 @@ export async function POST(request: Request) {
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
 
-      // Handle text messages
+      // Handle text messages — SIMPLIFIED ROUTER (Enterprise v2)
+      // Principle: ONE BRAIN (KIRA AI), not two competing routers.
+      // Only 4 safety-critical checks before AI. Everything else → KIRA decides.
 
       if (message && message.type === 'text') {
         const from = message.from;
         const msgText = message.text?.body?.trim() || '';
+
+        // ── Safety Check 1: Language Switch (must be before AI) ──
         const requestedLanguage = detectRequestedLanguage(msgText);
         if (requestedLanguage) {
           await handleLanguageSwitch(from, requestedLanguage);
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        rememberUserLanguage(from, msgText);
-
+        await rememberUserLanguage(from, msgText);
         console.log(`\n📩 MESEJ WA: [${from}] "${msgText}"`);
 
-        const wantsCheckout = isCheckoutIntent(msgText);
-        const wantsReceiptStatus = isReceiptStatusIntent(msgText);
-        const wantsHumanHandoff = isHumanHandoffIntent(msgText);
-        const wantsLocation = isLocationIntent(msgText);
-        const wantsAppointment = isAppointmentIntent(msgText);
+        // ── Safety Check 2: Human Handoff (must always work, even if AI is down) ──
+        if (isHumanHandoffIntent(msgText)) {
+          // Stop payment chasers when customer asks for human
+          try {
+            await supabase.from('orders')
+              .update({ chaser_opted_out: true })
+              .eq('customer_phone', from)
+              .in('payment_status', ['pending_payment', 'unpaid', 'pending'])
+              .eq('chaser_opted_out', false);
+          } catch (err) {
+            console.error('Error auto-stopping chaser:', err);
+          }
+          await handleHumanHandoff(from, `Customer text: ${msgText.slice(0, 160)}`);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
 
-        // Only stop payment chasers when the customer clearly opts out or asks for human takeover.
-        if (isChaserOptOutIntent(msgText) || wantsHumanHandoff) {
+        // ── Safety Check 3: Suggestion Mode Intercept (stateful, must intercept) ──
+        const { data: customerData } = await supabase.from('customers').select('is_awaiting_suggestion').eq('phone', from).single();
+        if (customerData?.is_awaiting_suggestion) {
+          await handleSuggestion(from, msgText);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        // ── Safety Check 4: Short Greeting (< 4 words — no AI needed) ──
+        const intent = detectIntent(msgText);
+        if (intent === 'greet') {
+          // Session tracking for repeat greeting
+          let isNewSession = false;
+          try {
+            const { data: customer } = await supabase.from('customers').select('last_session_at').eq('phone', from).single();
+            const now = Date.now();
+            if (customer && customer.last_session_at) {
+              const lastTime = new Date(customer.last_session_at).getTime();
+              if (now - lastTime > 8 * 60 * 60 * 1000) isNewSession = true;
+            } else {
+              isNewSession = true;
+            }
+            await supabase.from('customers').upsert({
+              phone: from,
+              last_session_at: new Date().toISOString()
+            }, { onConflict: 'phone' });
+          } catch (err) {
+            console.error('Error tracking session:', err);
+          }
+
+          if (isNewSession) {
+            const handled = await handleRepeatGreeting(from);
+            if (handled) return new NextResponse('EVENT_RECEIVED', { status: 200 });
+          }
+          await handleGreeting(from);
+          return new NextResponse('EVENT_RECEIVED', { status: 200 });
+        }
+
+        // ── Chaser opt-out (background action, doesn't block AI) ──
+        if (isChaserOptOutIntent(msgText)) {
           try {
             await supabase.from('orders')
               .update({ chaser_opted_out: true })
@@ -2834,17 +3155,8 @@ export async function POST(request: Request) {
           }
         }
 
-        // 1. Session tracking in DB
-        let isNewSession = false;
+        // ── Session tracking for non-greet messages ──
         try {
-          const { data: customer } = await supabase.from('customers').select('last_session_at').eq('phone', from).single();
-          const now = Date.now();
-          if (customer && customer.last_session_at) {
-            const lastTime = new Date(customer.last_session_at).getTime();
-            if (now - lastTime > 8 * 60 * 60 * 1000) isNewSession = true;
-          } else {
-            isNewSession = true;
-          }
           await supabase.from('customers').upsert({
             phone: from,
             last_session_at: new Date().toISOString()
@@ -2853,78 +3165,11 @@ export async function POST(request: Request) {
           console.error('Error tracking session:', err);
         }
 
-        // 2. If new session, check repeat order
-        if (isNewSession && !wantsCheckout && !wantsReceiptStatus && !wantsHumanHandoff && !wantsLocation && !wantsAppointment) {
-           const handled = await handleRepeatGreeting(from);
-           if (handled) return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        // Cek dulu kalau user sedang dalam mod suggestion
-        if (awaitingSuggestion.has(from)) {
-          await handleSuggestion(from, msgText);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (wantsCheckout) {
-          await handleOrder(from);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (wantsReceiptStatus) {
-          await handleReceipt(from);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (wantsHumanHandoff) {
-          await handleHumanHandoff(from, `Customer text: ${msgText.slice(0, 160)}`);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (wantsLocation) {
-          await handleStoreLocation(from);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (wantsAppointment) {
-          await handleAppointmentSuggestion(from);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (isProductAvailabilityIntent(msgText)) {
-          await handleProductAvailability(from, msgText);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        if (isProspectQualificationIntent(msgText)) {
-          await sendQualificationMenu(from);
-          return new NextResponse('EVENT_RECEIVED', { status: 200 });
-        }
-
-        // Detect intent & route
-        const intent = detectIntent(msgText);
-        console.log(`🧠 Intent detected: ${intent}`);
-
-        switch (intent) {
-          case 'greet':
-            await handleGreeting(from);
-            break;
-          case 'order':
-            await handleOrder(from);
-            break;
-          case 'catalog':
-            await handleCatalog(from);
-            break;
-          case 'receipt':
-            await handleReceipt(from);
-            break;
-          case 'suggest':
-            await handleSuggestion(from, msgText);
-            break;
-          case 'ai':
-          default:
-            await handleAIChat(from, msgText);
-            break;
-        }
+        // ── EVERYTHING ELSE → KIRA AI (Single Brain) ──
+        // KIRA will decide: recommend products, show catalog, check receipt,
+        // send location, book appointment, or just chat.
+        console.log(`🧠 Routed to KIRA AI (bypassed keyword router)`);
+        await handleAIChat(from, msgText);
       }
 
       return new NextResponse('EVENT_RECEIVED', { status: 200 });
