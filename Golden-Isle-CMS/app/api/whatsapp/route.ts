@@ -150,8 +150,8 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) throw new Error("ElevenLabs API Key not configured.");
 
-    // Use Mike - The Sales King if ELEVENLABS_VOICE_ID set, else fallback to Adam
-    const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
+    // Use Bella as the new playful KIRA!
+    const voiceId = process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
 
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=opus_48000_128`, {
       method: 'POST',
@@ -163,9 +163,9 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
         text: text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.35,
+          stability: 0.2, // Rendahkan sikit bagi manja/playful
+          similarity_boost: 0.9,
+          style: 0.7, // Naikkan style emosi
           use_speaker_boost: true,
         }
       })
