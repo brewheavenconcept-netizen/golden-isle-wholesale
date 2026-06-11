@@ -202,7 +202,7 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
     const audioBuffer = await generateVoiceNoteBuffer(voiceText);
     if (!audioBuffer) return false;
 
-    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/ogg', 'voice-note.ogg');
+    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/ogg; codecs=opus', 'voice-note.ogg');
     if (!audioMediaId) {
       console.error('[VOICE] WhatsApp media upload failed - audioMediaId is null');
       return false;
