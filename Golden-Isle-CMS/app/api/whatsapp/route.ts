@@ -147,21 +147,31 @@ type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_i
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
   try {
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    if (!apiKey) throw new Error("ElevenLabs API Key not configured.");
+    
+    // Fallback to Adam if not set
+    const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
+
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=opus_48000_128`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'xi-api-key': apiKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini-tts',
-        voice: 'onyx',
-        input: text,
-        instructions: 'Speak like a calm, confident male Sabah/Malaysia senior sales consultant. Natural Malay, English, or Chinese depending on the text. Warm, concise, not corporate, not robotic, not over-excited.',
-        response_format: 'opus'
+        text: text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.8,
+          similarity_boost: 0.8,
+          style: 0.0,
+          use_speaker_boost: true,
+        }
       })
     });
-    if (!res.ok) throw new Error(`TTS API Error: ${res.status} ${await res.text()}`);
+    
+    if (!res.ok) throw new Error(`ElevenLabs TTS API Error: ${res.status} ${await res.text()}`);
     const arrayBuffer = await res.arrayBuffer();
     return Buffer.from(arrayBuffer);
   } catch (err) {
@@ -2036,7 +2046,7 @@ Business Rules (CRITICAL — you are the SOLE decision-maker):
         }
 
         const success = await sendWAProductList(from, formattedSections, text);
-        if (!success) {
+        if (!success && shouldSendText) {
           await sendWAText(from, text);
         }
 
@@ -2056,14 +2066,14 @@ Business Rules (CRITICAL — you are the SOLE decision-maker):
         const { theme_prompt, caption } = args;
         console.log(`🤖 AI generating promo image for: ${theme_prompt}`);
         
-        await sendWAText(from, "Sekejap bosku, KIRA tengah sediakan gambar yang paling ngam untuk bosku... 📸✨");
+        if (shouldSendText) await sendWAText(from, "Sekejap bosku, KIRA tengah sediakan gambar yang paling ngam untuk bosku... 📸✨");
         
         const imageUrl = await generatePromoImage(theme_prompt);
         if (imageUrl) {
           await sendWAImage(from, imageUrl, caption);
           history.push({ role: 'assistant', content: `[System Note: Successfully sent generated promotional image with caption: ${caption}]` });
         } else {
-          await sendWAText(from, caption);
+          if (shouldSendText) await sendWAText(from, caption);
           history.push({ role: 'assistant', content: `[System Note: Sent text caption because image generation failed: ${caption}]` });
         }
         return caption || null;
@@ -2074,7 +2084,7 @@ Business Rules (CRITICAL — you are the SOLE decision-maker):
         const thumbnailId = products && products.length > 0 ? String(products[0].id) : undefined;
         console.log(`🤖 AI showing full catalog via tool`);
         const success = await sendWACatalogMessage(from, text, thumbnailId);
-        if (!success) {
+        if (!success && shouldSendText) {
           await sendWAText(from, text);
         }
         await sendCatalogFollowUp(from);
@@ -2151,7 +2161,7 @@ Business Rules (CRITICAL — you are the SOLE decision-maker):
       if (functionName === 'check_order_status') {
         const { text } = args;
         console.log(`🤖 AI checking order status`);
-        if (text) await sendWAText(from, text);
+        if (text && shouldSendText) await sendWAText(from, text);
         await handleReceipt(from);
         history.push({ role: 'assistant', content: `[System Note: Showed order status/receipt to user.]` });
         return text || null;
@@ -2177,7 +2187,7 @@ Business Rules (CRITICAL — you are the SOLE decision-maker):
       if (functionName === 'start_order') {
         const { text } = args;
         console.log(`🤖 AI starting order flow`);
-        if (text) await sendWAText(from, text);
+        if (text && shouldSendText) await sendWAText(from, text);
         await handleCatalog(from);
         history.push({ role: 'assistant', content: `[System Note: Opened catalog/order flow for user.]` });
         return text || null;
