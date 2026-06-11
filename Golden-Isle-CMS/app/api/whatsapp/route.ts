@@ -163,9 +163,9 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
         text: text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.2, // Rendahkan sikit bagi manja/playful
-          similarity_boost: 0.9,
-          style: 0.7, // Naikkan style emosi
+          stability: 0.45, // Naikkan sikit (0.45) supaya dia tak glitch/sangkut bila sebut bahasa Melayu
+          similarity_boost: 0.8,
+          style: 0.5, // Kurangkan sikit style supaya dia lebih natural
           use_speaker_boost: true,
         }
       })
