@@ -3122,8 +3122,10 @@ Rules:
           return new NextResponse('EVENT_RECEIVED', { status: 200 });
         }
 
-        const fallbackVoiceReply = buildVoiceInputSummary(transcript, aiReply, language);
-        await sendHighImpactVoiceReply(from, aiReply || fallbackVoiceReply, 'voice_input_summary');
+        // Reply with voice always for voice note input - use AI reply directly
+        const voiceReplyText = aiReply.length > 10 ? aiReply : buildVoiceInputSummary(transcript, aiReply, language);
+        const voiceSent = await sendAIVoiceReply(from, voiceReplyText);
+        console.log(`[VOICE REPLY] sent=${voiceSent} text="${voiceReplyText.slice(0, 80)}..."`);
 
         return new NextResponse('EVENT_RECEIVED', { status: 200 });
       }
