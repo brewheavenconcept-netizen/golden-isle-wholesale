@@ -153,7 +153,7 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
     // Use Mike - The Sales King if ELEVENLABS_VOICE_ID set, else fallback to Adam
     const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
 
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=opus_48000_128`, {
       method: 'POST',
       headers: {
         'xi-api-key': apiKey,
@@ -202,7 +202,7 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
     const audioBuffer = await generateVoiceNoteBuffer(voiceText);
     if (!audioBuffer) return false;
 
-    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/mpeg', 'voice-note.mp3');
+    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/ogg', 'voice-note.ogg');
     if (!audioMediaId) {
       console.error('[VOICE] WhatsApp media upload failed - audioMediaId is null');
       return false;
