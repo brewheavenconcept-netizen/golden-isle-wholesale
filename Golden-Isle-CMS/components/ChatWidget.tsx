@@ -39,6 +39,8 @@ import {
   MessageCircle,
   Mic,
   Orbit,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { WhatsAppBusinessIcon } from "@/components/landing/HeroSection";
@@ -1900,6 +1902,9 @@ export default function ChatWidget() {
 
   // ── Customer Context — tracks everything we learn, injected into LLM
   const [customerContext, setCustomerContext] = useState<CustomerContext>(createEmptyContext());
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const [loadingTtsIndex, setLoadingTtsIndex] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1921,6 +1926,19 @@ export default function ChatWidget() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [isOpen, isMobile]);
+
+  // Stop playing audio when ChatWidget is closed or component unmounts
+  useEffect(() => {
+    if (!isOpen && audioRef.current) {
+      audioRef.current.pause();
+      setPlayingIndex(null);
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [isOpen]);
 
   // Load from localStorage
   useEffect(() => {
@@ -2350,6 +2368,57 @@ export default function ChatWidget() {
   const handleSuggestionClick = (query: string) => {
     setMessage(query);
     setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const handlePlayVoice = async (text: string, index: number) => {
+    if (playingIndex === index) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      setPlayingIndex(null);
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setPlayingIndex(null);
+    setLoadingTtsIndex(index);
+
+    try {
+      const response = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate voice");
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setPlayingIndex(null);
+      };
+
+      audio.onerror = () => {
+        setPlayingIndex(null);
+        toast.error("Ralat memainkan audio.");
+      };
+
+      setLoadingTtsIndex(null);
+      setPlayingIndex(index);
+      await audio.play();
+    } catch (err) {
+      console.error("Failed playing TTS:", err);
+      setLoadingTtsIndex(null);
+      toast.error(lang === "zh" ? "语音生成失败" : lang === "en" ? "Failed to play voice." : "Gagal memainkan suara.");
+    }
   };
 
   // ── handleSuggestionClickAndSubmit — Hybrid LLM routing ──────────────────────
@@ -3178,6 +3247,28 @@ export default function ChatWidget() {
                                         </ReactMarkdown>
                                       )}
                                     </div>
+                                    {msg.role === "model" && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handlePlayVoice(msg.text, index)}
+                                        className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-[#d4af37] transition-all px-2.5 py-1 rounded-lg hover:bg-slate-200/50 cursor-pointer active:scale-95"
+                                      >
+                                        {loadingTtsIndex === index ? (
+                                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        ) : playingIndex === index ? (
+                                          <VolumeX className="w-3.5 h-3.5 text-[#d4af37] animate-pulse" />
+                                        ) : (
+                                          <Volume2 className="w-3.5 h-3.5" />
+                                        )}
+                                        <span>
+                                          {loadingTtsIndex === index
+                                            ? (lang === "zh" ? "语音生成中..." : lang === "en" ? "Generating..." : "Menjana suara...")
+                                            : playingIndex === index
+                                              ? (lang === "zh" ? "静音" : lang === "en" ? "Mute" : "Senyap")
+                                              : (lang === "zh" ? "播放语音" : lang === "en" ? "Listen" : "Dengar")}
+                                        </span>
+                                      </button>
+                                    )}
                                     {msg.role === "model" && msg.text.includes("SHOW_SUGGESTIONS:") && (
                                       <SuggestionChips text={msg.text} onSelect={handleSuggestionClickAndSubmit} lang={lang} />
                                     )}

@@ -136,6 +136,83 @@ const productsToUpsert = [
     stock_quantity: 0,
     image_url: '/products/brewdog_punk_ipa.png',
     description: 'A natural beer with a subtle bitterness, a refined flavor, and a distinctive hop character. Brewed with premium barley, Styrian Goldings and Saaz hops. Delivers a robust and high-carbonation finish.'
+  },
+  {
+    id: '33333333-3333-3333-3333-333333333333',
+    store_id: storeId,
+    name: 'Heineken Lager Beer Carton (24x320ml)',
+    category: 'Beer',
+    price: 155.00,
+    stock_status: 'in_stock',
+    stock_quantity: 100,
+    image_url: '/products/brewdog_punk_ipa.png',
+    description: 'The classic premium lager. A perfectly carbonated alcoholic beverage with a refreshing bitterness and subtle fruity notes.'
+  },
+  {
+    id: '44444444-4444-4444-4444-444444444444',
+    store_id: storeId,
+    name: 'Chivas Regal 12 Year Old',
+    category: 'Whisky',
+    price: 280.00,
+    stock_status: 'in_stock',
+    stock_quantity: 40,
+    image_url: '/products/jw_blue.png',
+    description: 'A rich and generous blended Scotch whisky. Radiant, warm amber color with an aromatic infusion of wild herbs, heather, honey, and orchard fruits.'
+  },
+  {
+    id: '55555555-5555-5555-5555-555555555555',
+    store_id: storeId,
+    name: 'Jack Daniel\\'s Old No. 7 Tennessee Whiskey',
+    category: 'Whisky',
+    price: 250.00,
+    stock_status: 'in_stock',
+    stock_quantity: 50,
+    image_url: '/products/jw_blue.png',
+    description: 'Mellowed drop by drop through 10-feet of sugar maple charcoal, then matured in handcrafted barrels of our own making. Smooth with notes of vanilla, toasted oak, and caramel.'
+  },
+  {
+    id: '66666666-6666-6666-6666-666666666666',
+    store_id: storeId,
+    name: 'Moët & Chandon Impérial Brut',
+    category: 'Champagne',
+    price: 320.00,
+    stock_status: 'in_stock',
+    stock_quantity: 20,
+    image_url: '/products/penfolds_bin_389.png',
+    description: 'The iconic Champagne of the House. Created in 1869, it embodies Moët & Chandon’s unique style, a style distinguished by its bright fruitiness, its seductive palate, and its elegant maturity.'
+  },
+  {
+    id: '77777777-7777-7777-7777-777777777777',
+    store_id: storeId,
+    name: 'Hennessy V.S.O.P Privilège Cognac',
+    category: 'Cognac',
+    price: 450.00,
+    stock_status: 'in_stock',
+    stock_quantity: 15,
+    image_url: '/products/jw_blue.png',
+    description: 'A balanced and harmonious cognac expressing 200 years of Hennessy\'s know-how. Aromas of fresh fruit and vanilla, with a smooth, perfectly balanced palate.'
+  },
+  {
+    id: '88888888-8888-8888-8888-888888888888',
+    store_id: storeId,
+    name: 'Grey Goose Vodka',
+    category: 'Vodka',
+    price: 210.00,
+    stock_status: 'in_stock',
+    stock_quantity: 30,
+    image_url: '/products/jw_blue.png',
+    description: 'Crafted using the finest French winter wheat and spring water from the Cognac region. Exceptionally smooth, crisp, and clean.'
+  },
+  {
+    id: '99999999-9999-9999-9999-999999999999',
+    store_id: storeId,
+    name: 'Suntory Roku Gin',
+    category: 'Gin',
+    price: 180.00,
+    stock_status: 'in_stock',
+    stock_quantity: 25,
+    image_url: '/products/jw_blue.png',
+    description: 'A perfectly balanced, exceptional gin crafted by Japanese artisans. Contains 6 uniquely Japanese botanicals including Sakura flower, Sakura leaf, Yuzu peel, Sencha tea, Gyokuro tea, and Sansho pepper.'
   }
 ];
 
