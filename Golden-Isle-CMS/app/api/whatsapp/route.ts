@@ -287,6 +287,37 @@ async function sendWAText(to: string, text: string) {
   });
 }
 
+// Hantar status "typing..." ke WA
+async function sendWATypingIndicator(to: string, messageId?: string) {
+  const waToken = process.env.WHATSAPP_TOKEN;
+  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!waToken || !waPhoneId) return;
+
+  try {
+    // There are 2 common ways for WA Cloud API, we'll try the sender_action approach or the typing_indicator approach.
+    // The official v20+ docs usually recommend this for typing indicator:
+    await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${waToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messageId ? {
+        messaging_product: 'whatsapp',
+        status: 'read',
+        message_id: messageId,
+        typing_indicator: { type: 'text' }
+      } : {
+        messaging_product: 'whatsapp',
+        to,
+        action: 'typing_on' // fallback format some aggregators use
+      }),
+    });
+  } catch (err) {
+    console.error('Error sending typing indicator:', err);
+  }
+}
+
 // Hantar mesej CTA URL interaktif ke WA
 async function sendWACtaUrl(to: string, bodyText: string, paymentLink: string): Promise<boolean> {
   const waToken = process.env.WHATSAPP_TOKEN;
@@ -3000,6 +3031,10 @@ Rules:
 
         console.log(`\nVOICE NOTE WA: [${from}] media=${audioId || 'missing'}`);
 
+        if (messageId) {
+          await sendWATypingIndicator(from, messageId);
+        }
+
         if (!audioId) {
           console.error('WA audio message missing media id:', JSON.stringify(message.audio || {}));
           await sendWAText(from, 'Maaf bosku, voice note tu belum dapat saya baca. Cuba hantar sekali lagi ya.');
@@ -3191,6 +3226,11 @@ Rules:
         // KIRA will decide: recommend products, show catalog, check receipt,
         // send location, book appointment, or just chat.
         console.log(`🧠 Routed to KIRA AI (bypassed keyword router)`);
+        
+        if (messageId) {
+          await sendWATypingIndicator(from, messageId);
+        }
+        
         await handleAIChat(from, msgText);
       }
 
