@@ -147,38 +147,40 @@ type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_i
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
   try {
-    const apiKey = process.env.ELEVENLABS_API_KEY;
-    if (!apiKey) throw new Error("ElevenLabs API Key not configured.");
-    
-    // Fallback to Adam if not set
-    const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
+    // 🧪 EXPERIMENT: Using OpenAI TTS to test if audio pipeline works
+    // If voice comes out → ElevenLabs API key is the problem
+    // If no voice → problem is in WhatsApp media upload
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OpenAI API Key not configured.");
 
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: {
-        'xi-api-key': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        text: text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.35,
-          use_speaker_boost: true,
-        }
+        model: 'tts-1',
+        input: text,
+        voice: 'onyx',   // Deep, natural male voice
+        response_format: 'mp3',
       })
     });
-    
-    if (!res.ok) throw new Error(`ElevenLabs TTS API Error: ${res.status} ${await res.text()}`);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`OpenAI TTS Error: ${res.status} ${errText}`);
+    }
+    console.log('[VOICE] OpenAI TTS generated OK, size check incoming...');
     const arrayBuffer = await res.arrayBuffer();
+    console.log(`[VOICE] Audio buffer size: ${arrayBuffer.byteLength} bytes`);
     return Buffer.from(arrayBuffer);
   } catch (err) {
     console.error('Error generating voice note:', err);
     return null;
   }
 }
+
 
 function trimForVoiceReply(text: string): string {
   return text
