@@ -153,7 +153,7 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
     // Fallback to Adam if not set
     const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
 
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=opus_48000_128`, {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
       method: 'POST',
       headers: {
         'xi-api-key': apiKey,
@@ -163,9 +163,9 @@ async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
         text: text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.8,
-          similarity_boost: 0.8,
-          style: 0.0,
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.35,
           use_speaker_boost: true,
         }
       })
@@ -196,8 +196,11 @@ async function sendAIVoiceReply(to: string, replyText: string): Promise<boolean>
     const audioBuffer = await generateVoiceNoteBuffer(voiceText);
     if (!audioBuffer) return false;
 
-    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/ogg; codecs=opus', 'voice-note.ogg');
-    if (!audioMediaId) return false;
+    const audioMediaId = await uploadWAMedia(audioBuffer, 'audio/mpeg', 'voice-note.mp3');
+    if (!audioMediaId) {
+      console.error('[VOICE] WhatsApp media upload failed - audioMediaId is null');
+      return false;
+    }
 
     await sendWAMediaById(to, audioMediaId, 'audio');
     return true;
