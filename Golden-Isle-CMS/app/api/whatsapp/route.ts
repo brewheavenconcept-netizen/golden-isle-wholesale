@@ -147,31 +147,35 @@ type VoiceMoment = 'greeting' | 'checkout_confirmation' | 'thank_you' | 'voice_i
 
 async function generateVoiceNoteBuffer(text: string): Promise<Buffer | null> {
   try {
-    // 🧪 EXPERIMENT: Using OpenAI TTS to test if audio pipeline works
-    // If voice comes out → ElevenLabs API key is the problem
-    // If no voice → problem is in WhatsApp media upload
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error("OpenAI API Key not configured.");
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    if (!apiKey) throw new Error("ElevenLabs API Key not configured.");
 
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+    // Use Mike - The Sales King if ELEVENLABS_VOICE_ID set, else fallback to Adam
+    const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
+
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'xi-api-key': apiKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'tts-1',
-        input: text,
-        voice: 'onyx',   // Deep, natural male voice
-        response_format: 'mp3',
+        text: text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.35,
+          use_speaker_boost: true,
+        }
       })
     });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(`OpenAI TTS Error: ${res.status} ${errText}`);
+      throw new Error(`ElevenLabs TTS Error: ${res.status} ${errText}`);
     }
-    console.log('[VOICE] OpenAI TTS generated OK, size check incoming...');
+    console.log('[VOICE] ElevenLabs TTS generated OK');
     const arrayBuffer = await res.arrayBuffer();
     console.log(`[VOICE] Audio buffer size: ${arrayBuffer.byteLength} bytes`);
     return Buffer.from(arrayBuffer);
